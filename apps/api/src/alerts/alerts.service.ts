@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { prisma, AlertSeverity } from '@signalcraft/database';
+import { prisma, AlertSeverity, Prisma } from '@signalcraft/database';
 import { NormalizedAlert } from '@signalcraft/shared';
 
 @Injectable()
@@ -28,11 +28,11 @@ export class AlertsService {
         environment: alert.environment,
         severity: this.mapSeverity(alert.severity),
         fingerprint: alert.fingerprint,
-        tagsJson: alert.tags,
+        tagsJson: alert.tags as Prisma.InputJsonValue,
         title: alert.title,
         message: alert.description,
         occurredAt: alert.occurredAt,
-        payloadJson: payload,
+        payloadJson: payload as Prisma.InputJsonValue,
       },
     });
   }
@@ -55,7 +55,7 @@ export class AlertsService {
 
   async listEvents(workspaceId: string, groupId: string) {
     return prisma.alertEvent.findMany({
-      where: { workspaceId, alertGroupId: groupId },
+      where: { workspaceId, alertGroupId: groupId } as Prisma.AlertEventWhereInput,
       orderBy: { occurredAt: 'desc' },
     });
   }

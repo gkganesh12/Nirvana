@@ -51,7 +51,7 @@ export class WebhooksController {
 
     const result = await this.alertProcessor.processSentryEvent({
       workspaceId,
-      payload,
+      payload: payload as Record<string, any>,
     });
 
     return { status: 'ok', ...result };

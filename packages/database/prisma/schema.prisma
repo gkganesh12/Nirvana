@@ -138,6 +138,7 @@ model AlertGroup {
   workspace Workspace @relation(fields: [workspaceId], references: [id])
   assignee  User?     @relation("AlertGroupAssignee", fields: [assigneeUserId], references: [id])
   notifications NotificationLog[]
+  alertEvents   AlertEvent[]
 
   @@index([groupKey])
   @@index([workspaceId])
