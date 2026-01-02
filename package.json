@@ -1,0 +1,31 @@
+{
+  "name": "signalcraft",
+  "private": true,
+  "packageManager": "npm@10.2.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:api": "turbo run dev --filter=@signalcraft/api",
+    "dev:web": "turbo run dev --filter=@signalcraft/web",
+    "dev:db": "docker compose up -d postgres redis",
+    "build": "turbo run build",
+    "build:api": "turbo run build --filter=@signalcraft/api",
+    "build:web": "turbo run build --filter=@signalcraft/web",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:migrate": "turbo run db:migrate --filter=@signalcraft/database",
+    "db:seed": "turbo run db:seed --filter=@signalcraft/database",
+    "db:reset": "turbo run db:reset --filter=@signalcraft/database"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.0",
+    "turbo": "^1.12.0",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,222 @@
+2026-01-02T06:17:54.541343Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/.turbo-cookie"), AnchoredSystemPathBuf(".turbo/cookies/1.cookie")}
+2026-01-02T06:17:54.541354Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:17:54.642302Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/config/.turbo"), AnchoredSystemPathBuf(".turbo/cookies/4.cookie"), AnchoredSystemPathBuf(".turbo/cookies/2.cookie"), AnchoredSystemPathBuf(".turbo/cookies/3.cookie"), AnchoredSystemPathBuf(".turbo/cookies/5.cookie"), AnchoredSystemPathBuf("apps/web/.turbo"), AnchoredSystemPathBuf("packages/database/.turbo"), AnchoredSystemPathBuf("packages/shared/.turbo")}
+2026-01-02T06:17:54.642315Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/config"), path: AnchoredSystemPathBuf("packages/config") }, WorkspacePackage { name: Other("@signalcraft/shared"), path: AnchoredSystemPathBuf("packages/shared") }, WorkspacePackage { name: Other("@signalcraft/database"), path: AnchoredSystemPathBuf("packages/database") }, WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:17:56.041721Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/shared/dist"), AnchoredSystemPathBuf("packages/database/dist"), AnchoredSystemPathBuf("packages/config/dist"), AnchoredSystemPathBuf(".turbo/cookies/6.cookie"), AnchoredSystemPathBuf("apps/web/.next")}
+2026-01-02T06:17:56.041735Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }, WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }, WorkspacePackage { name: Other("@signalcraft/config"), path: AnchoredSystemPathBuf("packages/config") }, WorkspacePackage { name: Other("@signalcraft/database"), path: AnchoredSystemPathBuf("packages/database") }, WorkspacePackage { name: Other("@signalcraft/shared"), path: AnchoredSystemPathBuf("packages/shared") }}))
+2026-01-02T06:17:56.041757Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:17:56.044617Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:17:56.114793Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:17:56.142231Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/7.cookie"), AnchoredSystemPathBuf("packages/database/prisma/seed.js"), AnchoredSystemPathBuf("packages/database/prisma/seed.d.ts")}
+2026-01-02T06:17:56.142239Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }, WorkspacePackage { name: Other("@signalcraft/database"), path: AnchoredSystemPathBuf("packages/database") }}))
+2026-01-02T06:17:56.142251Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:18:26.240626Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/database/tsconfig.json")}
+2026-01-02T06:18:26.240647Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/database"), path: AnchoredSystemPathBuf("packages/database") }}))
+2026-01-02T06:18:36.739405Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/10.cookie"), AnchoredSystemPathBuf(".turbo/cookies/12.cookie"), AnchoredSystemPathBuf(".turbo/cookies/13.cookie"), AnchoredSystemPathBuf(".turbo/cookies/14.cookie"), AnchoredSystemPathBuf(".turbo/cookies/9.cookie"), AnchoredSystemPathBuf("packages/config/dist"), AnchoredSystemPathBuf("packages/shared/.turbo"), AnchoredSystemPathBuf(".turbo/cookies/8.cookie"), AnchoredSystemPathBuf("packages/config/.turbo"), AnchoredSystemPathBuf("packages/shared/dist"), AnchoredSystemPathBuf(".turbo/cookies/11.cookie")}
+2026-01-02T06:18:36.739419Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/config"), path: AnchoredSystemPathBuf("packages/config") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }, WorkspacePackage { name: Other("@signalcraft/shared"), path: AnchoredSystemPathBuf("packages/shared") }}))
+2026-01-02T06:18:36.750783Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:18:36.750797Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:18:37.439633Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/15.cookie"), AnchoredSystemPathBuf(".turbo/cookies/16.cookie"), AnchoredSystemPathBuf("apps/api/.turbo")}
+2026-01-02T06:18:37.439647Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }, WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:18:39.440039Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:18:39.440049Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:18:39.540728Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:19:32.436813Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/database/package.json")}
+2026-01-02T06:19:32.436904Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/database"), path: AnchoredSystemPathBuf("packages/database") }}))
+2026-01-02T06:19:37.036617Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/auth/auth.service.ts")}
+2026-01-02T06:19:37.036626Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:19:37.036654Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:19:42.235422Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/auth/clerk-auth.guard.ts")}
+2026-01-02T06:19:42.235432Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:19:45.735283Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/config/validate-env.ts")}
+2026-01-02T06:19:45.735297Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:19:50.435038Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".env.example")}
+2026-01-02T06:19:50.435047Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:19:55.034787Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/tsconfig.json")}
+2026-01-02T06:19:55.034796Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:21:49.627866Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/17.cookie")}
+2026-01-02T06:21:49.627889Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:21:49.727950Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/20.cookie"), AnchoredSystemPathBuf(".turbo/cookies/21.cookie"), AnchoredSystemPathBuf(".turbo/cookies/19.cookie"), AnchoredSystemPathBuf(".turbo/cookies/18.cookie")}
+2026-01-02T06:21:49.727961Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:21:52.028427Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/22.cookie"), AnchoredSystemPathBuf(".turbo/cookies/23.cookie")}
+2026-01-02T06:21:52.028445Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:21:52.627882Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:21:52.627893Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:21:52.627913Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:21:53.928364Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:21:53.928380Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:21:53.968650Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:21:54.727321Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/24.cookie")}
+2026-01-02T06:21:54.727333Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:21:59.626851Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/tsconfig.json")}
+2026-01-02T06:21:59.626861Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-01-02T06:22:26.225826Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/.eslintrc.cjs")}
+2026-01-02T06:22:26.225843Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-01-02T06:22:36.825159Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/28.cookie"), AnchoredSystemPathBuf(".turbo/cookies/30.cookie"), AnchoredSystemPathBuf(".turbo/cookies/26.cookie"), AnchoredSystemPathBuf("packages/database/dist"), AnchoredSystemPathBuf(".turbo/cookies/27.cookie"), AnchoredSystemPathBuf("packages/database/.turbo"), AnchoredSystemPathBuf(".turbo/cookies/31.cookie"), AnchoredSystemPathBuf(".turbo/cookies/29.cookie"), AnchoredSystemPathBuf(".turbo/cookies/25.cookie")}
+2026-01-02T06:22:36.825173Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/database"), path: AnchoredSystemPathBuf("packages/database") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:22:36.833654Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:22:36.925550Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/.turbo"), AnchoredSystemPathBuf("apps/api/dist"), AnchoredSystemPathBuf(".turbo/cookies/32.cookie")}
+2026-01-02T06:22:36.925558Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:22:36.925578Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:22:58.724105Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/components/ui/table.tsx")}
+2026-01-02T06:22:58.724129Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-01-02T06:23:15.523305Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/tsconfig.json")}
+2026-01-02T06:23:15.523315Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-01-02T06:24:27.157438Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/36.cookie"), AnchoredSystemPathBuf(".turbo/cookies/37.cookie"), AnchoredSystemPathBuf(".turbo/cookies/33.cookie"), AnchoredSystemPathBuf(".turbo/cookies/34.cookie"), AnchoredSystemPathBuf(".turbo/cookies/35.cookie")}
+2026-01-02T06:24:27.157460Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:24:27.256736Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/38.cookie")}
+2026-01-02T06:24:27.256744Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:24:35.957389Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/39.cookie")}
+2026-01-02T06:24:35.957407Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:25:53.158939Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/40.cookie")}
+2026-01-02T06:25:53.159128Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:27:43.058194Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/41.cookie")}
+2026-01-02T06:27:43.058461Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:28:44.157592Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/42.cookie")}
+2026-01-02T06:28:44.157777Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:31:32.157891Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/43.cookie")}
+2026-01-02T06:31:32.158171Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:35:27.259772Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/44.cookie")}
+2026-01-02T06:35:27.260040Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:36:40.657354Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/45.cookie")}
+2026-01-02T06:36:40.657572Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:36:53.156206Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/51.cookie"), AnchoredSystemPathBuf("apps/web/.next"), AnchoredSystemPathBuf(".turbo/cookies/46.cookie"), AnchoredSystemPathBuf(".turbo/cookies/48.cookie"), AnchoredSystemPathBuf(".turbo/cookies/49.cookie"), AnchoredSystemPathBuf(".turbo/cookies/50.cookie"), AnchoredSystemPathBuf(".turbo/cookies/47.cookie")}
+2026-01-02T06:36:53.156225Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:36:53.198636Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:36:54.157613Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/.turbo"), AnchoredSystemPathBuf("apps/web/.next"), AnchoredSystemPathBuf(".turbo/cookies/52.cookie")}
+2026-01-02T06:36:54.157624Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:36:54.177733Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:37:03.657532Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/53.cookie")}
+2026-01-02T06:37:03.657554Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:37:04.373042Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:37:04.373090Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:37:04.453455Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:37:06.356505Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:37:06.356520Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:37:06.356536Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:38:42.362622Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/tsconfig.build.json")}
+2026-01-02T06:38:42.363150Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:38:47.156396Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/nest-cli.json")}
+2026-01-02T06:38:47.156407Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:39:20.756813Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/54.cookie")}
+2026-01-02T06:39:20.757071Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:39:21.356830Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:39:21.356838Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:39:21.356854Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:39:22.556736Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:39:22.556750Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:39:22.556769Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:39:37.658766Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/tsconfig.build.json")}
+2026-01-02T06:39:37.658786Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:39:46.760505Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/55.cookie")}
+2026-01-02T06:39:46.760517Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:39:47.260729Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:39:47.260737Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:39:47.271462Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:42:20.280154Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/tsconfig.json")}
+2026-01-02T06:42:20.281088Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:42:20.861276Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:42:20.861286Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:42:20.863555Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:42:41.661635Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/56.cookie")}
+2026-01-02T06:42:41.661834Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:42:42.261638Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:42:42.261647Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:42:42.261666Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:42:43.662394Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T06:42:43.662404Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:42:43.776076Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T06:44:59.472234Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/package.json")}
+2026-01-02T06:44:59.473004Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:45:05.762961Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/main.ts")}
+2026-01-02T06:45:05.762971Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:45:10.763066Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/config/validate-env.ts")}
+2026-01-02T06:45:10.763091Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:45:15.662915Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".env.example")}
+2026-01-02T06:45:15.662939Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T06:45:20.562213Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/auth/auth.module.ts")}
+2026-01-02T06:45:20.562222Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:45:30.862607Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/auth/webhooks.controller.ts")}
+2026-01-02T06:45:30.862626Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T06:45:41.662663Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/auth/auth.service.ts")}
+2026-01-02T06:45:41.662681Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:05:07.245466Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/config/validate-env.ts")}
+2026-01-02T07:05:07.246125Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:05:13.637485Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/auth/clerk-auth.guard.ts")}
+2026-01-02T07:05:13.637495Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:05:17.538540Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".env.example")}
+2026-01-02T07:05:17.538562Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:05:37.538042Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/57.cookie")}
+2026-01-02T07:05:37.538058Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:05:38.137767Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:05:38.137777Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:05:38.162594Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:05:39.536932Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:05:39.536941Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:05:39.674522Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:06:07.738197Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("package-lock.json")}
+2026-01-02T07:06:07.738234Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:06:13.737695Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/58.cookie")}
+2026-01-02T07:06:13.737704Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:06:14.638268Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:06:14.638278Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:06:14.638304Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:06:15.937541Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:06:15.937556Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:06:16.002043Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:07:09.751422Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts")}
+2026-01-02T07:07:09.752110Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:07:26.337603Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/59.cookie")}
+2026-01-02T07:07:26.337620Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:07:26.837109Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:07:26.837118Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:07:26.854779Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:07:28.236668Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:07:28.236678Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:07:28.290445Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:07:45.837618Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/queues/queue.service.ts")}
+2026-01-02T07:07:45.837635Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:07:49.936994Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/health/health.service.ts")}
+2026-01-02T07:07:49.937004Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:08:15.336563Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/60.cookie")}
+2026-01-02T07:08:15.336576Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:08:15.937053Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:08:15.937064Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:08:15.937082Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:08:17.236858Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:08:17.236867Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:08:17.306995Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:10:09.437212Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/61.cookie")}
+2026-01-02T07:10:09.437452Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:10:10.136398Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:10:10.136409Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:10:10.136435Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:10:11.936221Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:10:11.936268Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:10:12.079272Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:13:46.499240Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/62.cookie")}
+2026-01-02T07:13:46.499253Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:13:47.099321Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:13:47.099330Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:13:47.099351Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:13:48.499294Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:13:48.499303Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:13:48.595665Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:15:21.098049Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/63.cookie")}
+2026-01-02T07:15:21.098102Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:18:50.502893Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/app/page.tsx")}
+2026-01-02T07:18:50.503449Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-01-02T07:18:58.694342Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/components/user-summary.tsx")}
+2026-01-02T07:18:58.694380Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2026-01-02T07:19:13.494210Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/64.cookie")}
+2026-01-02T07:19:13.494223Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:19:14.094304Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:19:14.094313Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:19:14.094331Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:19:15.694082Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/dist")}
+2026-01-02T07:19:15.694094Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@signalcraft/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-02T07:19:15.736998Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-02T07:19:22.694062Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/65.cookie")}
+2026-01-02T07:19:22.694080Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-01-02T07:23:26.692895Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".gitignore")}
+2026-01-02T07:23:26.692926Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))

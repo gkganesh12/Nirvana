@@ -1,0 +1,42 @@
+name: Phase Completion Checklist
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  phase-checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^Phase\ [0-9]+ ]]; then
+            echo "⚠️ PR title should start with 'Phase X'"
+            exit 1
+          fi
+      
+      - name: Check PR Template
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.pull_request.body;
+            const requiredSections = [
+              '## Phase Information',
+              '## Summary',
+              '## Changes Made',
+              '## Testing',
+              '## Checklist'
+            ];
+            
+            for (const section of requiredSections) {
+              if (!body || !body.includes(section)) {
+                core.setFailed(`PR template missing: ${section}`);
+                return;
+              }
+            }
+            
+            console.log('✅ PR template sections present');
+

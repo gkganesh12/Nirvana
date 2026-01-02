@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum IntegrationType {
+  SENTRY
+  SLACK
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  DISABLED
+  ERROR
+}
+
+enum AlertSeverity {
+  INFO
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACK
+  SNOOZED
+  RESOLVED
+}
+
+enum NotificationTarget {
+  SLACK
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users          User[]
+  integrations   Integration[]
+  alertEvents    AlertEvent[]
+  alertGroups    AlertGroup[]
+  routingRules   RoutingRule[]
+  notifications  NotificationLog[]
+}
+
+model User {
+  id          String        @id @default(cuid())
+  workspaceId String
+  clerkId     String        @unique
+  email       String        @unique
+  displayName String?
+  role        WorkspaceRole @default(MEMBER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  assignedAlertGroups AlertGroup[] @relation("AlertGroupAssignee")
+
+  @@index([workspaceId])
+}
+
+model Integration {
+  id          String            @id @default(cuid())
+  workspaceId String
+  type        IntegrationType
+  status      IntegrationStatus @default(ACTIVE)
+  configJson  Json
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+}
+
+model AlertEvent {
+  id            String        @id @default(cuid())
+  workspaceId   String
+  source        String
+  sourceEventId String
+  project       String
+  environment   String
+  severity      AlertSeverity
+  fingerprint   String
+  tagsJson      Json
+  title         String
+  message       String
+  occurredAt    DateTime
+  receivedAt    DateTime      @default(now())
+  payloadJson   Json
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, sourceEventId])
+  @@index([workspaceId])
+}
+
+model AlertGroup {
+  id            String      @id @default(cuid())
+  workspaceId   String
+  groupKey      String
+  title         String
+  severity      AlertSeverity
+  environment   String
+  status        AlertStatus @default(OPEN)
+  assigneeUserId String?
+  firstSeenAt   DateTime
+  lastSeenAt    DateTime
+  count         Int         @default(1)
+  runbookUrl    String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  assignee  User?     @relation("AlertGroupAssignee", fields: [assigneeUserId], references: [id])
+  notifications NotificationLog[]
+
+  @@index([groupKey])
+  @@index([workspaceId])
+  @@index([status])
+}
+
+model RoutingRule {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  conditionsJson Json
+  actionsJson   Json
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+}
+
+model NotificationLog {
+  id           String             @id @default(cuid())
+  workspaceId  String
+  target       NotificationTarget
+  targetRef    String
+  alertGroupId String
+  status       NotificationStatus
+  errorMessage String?
+  sentAt       DateTime           @default(now())
+
+  workspace  Workspace   @relation(fields: [workspaceId], references: [id])
+  alertGroup AlertGroup  @relation(fields: [alertGroupId], references: [id])
+
+  @@index([workspaceId])
+  @@index([alertGroupId])
+}
