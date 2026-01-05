@@ -14,6 +14,8 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { RoutingModule } from './routing/routing.module';
+import { EscalationsModule } from './escalations/escalations.module';
 
 @Module({
   imports: [
@@ -32,9 +34,9 @@ import { NotificationsModule } from './notifications/notifications.module';
           process.env.NODE_ENV === 'production'
             ? undefined
             : {
-                target: 'pino-pretty',
-                options: { colorize: true, singleLine: true },
-              },
+              target: 'pino-pretty',
+              options: { colorize: true, singleLine: true },
+            },
       },
     }),
     ThrottlerModule.forRoot([
@@ -52,6 +54,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     AlertsModule,
     IntegrationsModule,
     NotificationsModule,
+    RoutingModule,
+    EscalationsModule,
   ],
   providers: [
     {
@@ -60,4 +64,5 @@ import { NotificationsModule } from './notifications/notifications.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
+

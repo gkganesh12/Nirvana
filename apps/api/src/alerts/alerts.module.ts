@@ -1,15 +1,30 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AlertsController } from './alerts.controller';
 import { AlertsService } from './alerts.service';
 import { NormalizationService } from './normalization.service';
 import { GroupingService } from './grouping.service';
 import { AlertProcessorService } from './alert-processor.service';
 import { QueueModule } from '../queues/queue.module';
+import { HygieneService } from './hygiene/hygiene.service';
+import { HygieneController } from './hygiene/hygiene.controller';
+import { EscalationsModule } from '../escalations/escalations.module';
+import { RoutingModule } from '../routing/routing.module';
 
 @Module({
-  imports: [QueueModule],
-  controllers: [AlertsController],
-  providers: [AlertsService, NormalizationService, GroupingService, AlertProcessorService],
-  exports: [AlertProcessorService, AlertsService],
+  imports: [
+    QueueModule,
+    forwardRef(() => EscalationsModule),
+    forwardRef(() => RoutingModule),
+  ],
+  controllers: [AlertsController, HygieneController],
+  providers: [
+    AlertsService,
+    NormalizationService,
+    GroupingService,
+    AlertProcessorService,
+    HygieneService,
+  ],
+  exports: [AlertProcessorService, AlertsService, HygieneService],
 })
-export class AlertsModule {}
+export class AlertsModule { }
+

@@ -26,3 +26,6 @@ export interface NormalizedAlert {
   occurredAt: Date;
   link: string | null;
 }
+
+// Export routing types
+export * from './routing.types';
