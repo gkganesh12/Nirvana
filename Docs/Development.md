@@ -48,6 +48,14 @@
 WORKSPACE_ID=your_workspace_id scripts/send-sentry-webhook.sh
 ```
 
+## Verify workspace linkage
+
+```bash
+DATABASE_URL=postgres://signalcraft@localhost:5432/signalcraft \\
+CLERK_ID=your_clerk_id \\
+scripts/verify-workspace.sh
+```
+
 ## Slack integration setup
 
 1. Create a Slack app and set redirect URL:
