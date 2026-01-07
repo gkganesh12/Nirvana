@@ -79,4 +79,47 @@ export class AuthService {
       },
     });
   }
+
+  /**
+   * Link an authenticated Clerk user to the demo workspace (first workspace found)
+   * This is useful for testing with seeded data
+   */
+  async linkToDemoWorkspace(clerkId: string, email: string, displayName?: string) {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { clerkId } });
+    if (existingUser) {
+      return {
+        message: 'User already linked to a workspace',
+        user: existingUser,
+        isNew: false,
+      };
+    }
+
+    // Find the first workspace (demo workspace from seed)
+    const demoWorkspace = await prisma.workspace.findFirst({
+      orderBy: { createdAt: 'asc' },
+    });
+
+    if (!demoWorkspace) {
+      throw new Error('No workspace found. Please run the seed script first.');
+    }
+
+    // Create user linked to the demo workspace
+    const user = await prisma.user.create({
+      data: {
+        workspaceId: demoWorkspace.id,
+        clerkId,
+        email,
+        displayName: displayName || null,
+        role: WorkspaceRole.OWNER,
+      },
+    });
+
+    return {
+      message: 'Successfully linked to demo workspace',
+      user,
+      workspace: demoWorkspace,
+      isNew: true,
+    };
+  }
 }

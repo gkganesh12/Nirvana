@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import crypto from 'crypto';
 import { prisma, AlertStatus, AlertSeverity } from '@signalcraft/database';
 import { NormalizedAlert, AlertSeverity as NormalizedSeverity } from '@signalcraft/shared';
+import { AnomalyDetectionService } from './anomaly-detection.service';
 
 const severityRank: Record<NormalizedSeverity, number> = {
   info: 1,
@@ -30,6 +31,10 @@ const normalizeSeverity = (severity: NormalizedSeverity): AlertSeverity => {
 @Injectable()
 export class GroupingService {
   private readonly windowMinutes = Number(process.env.GROUPING_WINDOW_MINUTES ?? 60);
+
+  constructor(
+    private readonly anomalyDetectionService: AnomalyDetectionService,
+  ) { }
 
   generateGroupKey(alert: NormalizedAlert): string {
     const rawKey = [alert.source, alert.project, alert.environment, alert.fingerprint]
@@ -61,11 +66,14 @@ export class GroupingService {
             title: alert.title,
             severity: normalizeSeverity(alert.severity),
             environment: alert.environment,
-            project: alert.project, // Phase 5: Store project for filtering
+            project: alert.project,
             status: AlertStatus.OPEN,
             firstSeenAt: alert.occurredAt,
             lastSeenAt: alert.occurredAt,
             count: 1,
+            // Impact Estimation
+            userCount: alert.userCount,
+            velocityPerHour: null, // Will be calculated on updates
           },
         });
       }
@@ -73,15 +81,44 @@ export class GroupingService {
       const existingSeverity = this.mapSeverityRank(existing.severity);
       const incomingSeverity = severityRank[alert.severity];
 
+      // Calculate velocity: occurrences per hour since first seen
+      const hoursSinceFirstSeen = Math.max(
+        (alert.occurredAt.getTime() - existing.firstSeenAt.getTime()) / (1000 * 60 * 60),
+        0.1 // Minimum 6 minutes to avoid division issues
+      );
+      const newVelocity = (existing.count + 1) / hoursSinceFirstSeen;
+
+      // Check for Anomaly (Velocity Spike)
+      const isAnomalous = await this.anomalyDetectionService.checkVelocityAnomaly(
+        workspaceId,
+        existing.id,
+        newVelocity
+      );
+
+      // Upgrade severity if anomalous
+      let finalSeverity = existing.severity;
+      if (incomingSeverity > existingSeverity) {
+        finalSeverity = normalizeSeverity(alert.severity);
+      }
+      if (isAnomalous && this.mapSeverityRank(finalSeverity) < severityRank.high) {
+        finalSeverity = AlertSeverity.HIGH; // Auto-escalate to at least HIGH
+      }
+
+      // Aggregate user count (take max)
+      const updatedUserCount = Math.max(
+        existing.userCount ?? 0,
+        alert.userCount ?? 0
+      ) || null;
+
       return tx.alertGroup.update({
         where: { id: existing.id },
         data: {
           lastSeenAt: alert.occurredAt,
           count: { increment: 1 },
-          severity:
-            incomingSeverity > existingSeverity
-              ? normalizeSeverity(alert.severity)
-              : existing.severity,
+          severity: finalSeverity,
+          // Impact Estimation
+          userCount: updatedUserCount,
+          velocityPerHour: newVelocity,
         },
       });
     });

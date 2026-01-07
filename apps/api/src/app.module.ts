@@ -18,9 +18,16 @@ import { RoutingModule } from './routing/routing.module';
 import { EscalationsModule } from './escalations/escalations.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { SettingsModule } from './settings/settings.module';
+import { JobsModule } from './jobs/jobs.module';
+import { ReleasesModule } from './releases/releases.module';
+import { UptimeModule } from './uptime/uptime.module';
+import { SessionReplayModule } from './session-replay/session-replay.module';
+
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
@@ -65,6 +72,10 @@ import { SettingsModule } from './settings/settings.module';
     EscalationsModule,
     DashboardModule,
     SettingsModule,
+    JobsModule,
+    ReleasesModule,
+    UptimeModule,
+    SessionReplayModule,
   ],
   providers: [
     {

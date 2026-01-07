@@ -8,7 +8,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   async register(@Body() payload: RegisterDto) {
@@ -27,5 +27,14 @@ export class AuthController {
   @Get('workspace')
   async workspace(@CurrentUser() user: { clerkId: string }) {
     return this.authService.getWorkspaceForUser(user.clerkId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(ClerkAuthGuard)
+  @Post('link-to-demo')
+  async linkToDemo(@CurrentUser() user: { clerkId: string; claims?: any }) {
+    const email = user.claims?.email || `${user.clerkId}@signalcraft.local`;
+    const displayName = user.claims?.name || user.claims?.first_name || undefined;
+    return this.authService.linkToDemoWorkspace(user.clerkId, email, displayName);
   }
 }

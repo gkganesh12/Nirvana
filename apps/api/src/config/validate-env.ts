@@ -18,6 +18,8 @@ const envSchema = z.object({
   ENCRYPTION_KEY: z.string().optional(),
   CORS_ORIGINS: z.string().optional(),
   REDIS_URL: z.string().optional(),
+  OPENROUTER_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
 });
 
 export type EnvVars = z.infer<typeof envSchema>;

@@ -5,7 +5,7 @@ import { SlackOAuthService } from './oauth.service';
 
 @Injectable()
 export class SlackService {
-  constructor(private readonly slackOAuth: SlackOAuthService) {}
+  constructor(private readonly slackOAuth: SlackOAuthService) { }
 
   async listChannels(workspaceId: string) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
@@ -50,5 +50,21 @@ export class SlackService {
         },
       },
     });
+  }
+
+  async sendTestMessage(workspaceId: string) {
+    const token = await this.slackOAuth.getDecryptedToken(workspaceId);
+    if (!token) throw new Error('Slack not connected');
+
+    const channel = await this.getDefaultChannel(workspaceId);
+    if (!channel) throw new Error('Default channel not configured');
+
+    const client = new WebClient(token);
+    await client.chat.postMessage({
+      channel,
+      text: '🔔 *SignalCraft Test Alert*\nThis is a test notification to verify your Slack integration.',
+    });
+
+    return true;
   }
 }

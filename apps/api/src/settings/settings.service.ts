@@ -29,14 +29,31 @@ export class SettingsService {
                 id: true,
                 name: true,
                 createdAt: true,
+                // Impact Threshold Configuration
+                highImpactUserThreshold: true,
+                mediumImpactUserThreshold: true,
+                highVelocityThreshold: true,
             },
         });
     }
 
-    async updateWorkspaceSettings(workspaceId: string, data: { name: string }) {
+    async updateWorkspaceSettings(
+        workspaceId: string,
+        data: {
+            name?: string;
+            highImpactUserThreshold?: number;
+            mediumImpactUserThreshold?: number;
+            highVelocityThreshold?: number;
+        }
+    ) {
         return prisma.workspace.update({
             where: { id: workspaceId },
-            data: { name: data.name },
+            data: {
+                ...(data.name !== undefined && { name: data.name }),
+                ...(data.highImpactUserThreshold !== undefined && { highImpactUserThreshold: data.highImpactUserThreshold }),
+                ...(data.mediumImpactUserThreshold !== undefined && { mediumImpactUserThreshold: data.mediumImpactUserThreshold }),
+                ...(data.highVelocityThreshold !== undefined && { highVelocityThreshold: data.highVelocityThreshold }),
+            },
         });
     }
 

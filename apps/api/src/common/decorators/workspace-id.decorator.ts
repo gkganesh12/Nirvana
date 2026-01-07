@@ -14,13 +14,16 @@ export const WorkspaceId = createParamDecorator(
         const request = ctx.switchToHttp().getRequest();
         const user = request.user;
 
-        if (!user?.clerkUserId) {
+        if (!user?.clerkUserId && !user?.clerkId) {
+            console.error('WorkspaceId Decorator: User not authenticated in request', user);
             throw new UnauthorizedException('User not authenticated');
         }
 
+        const clerkId = user.clerkUserId || user.clerkId;
+
         // Get user from database with workspace using clerkId
         const dbUser = await prisma.user.findUnique({
-            where: { clerkId: user.clerkUserId },
+            where: { clerkId },
             include: { workspace: true },
         });
 

@@ -14,7 +14,7 @@ export class IntegrationsController {
   constructor(
     private readonly slackOAuth: SlackOAuthService,
     private readonly slackService: SlackService,
-  ) {}
+  ) { }
 
   @Get('slack/status')
   async slackStatus(@CurrentUser() user: { clerkId: string }) {
@@ -68,7 +68,20 @@ export class IntegrationsController {
       throw new BadRequestException('Missing channelId');
     }
     await this.slackService.updateDefaultChannel(workspaceId, payload.channelId);
+    await this.slackService.updateDefaultChannel(workspaceId, payload.channelId);
     return { status: 'ok' };
+  }
+
+  @Post('slack/test')
+  async slackTest(@CurrentUser() user: { clerkId: string }) {
+    const workspaceId = await this.getWorkspaceId(user.clerkId);
+    try {
+      await this.slackService.sendTestMessage(workspaceId);
+      return { status: 'ok', message: 'Test message sent' };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      throw new BadRequestException(`Test failed: ${msg}`);
+    }
   }
 
   private async getWorkspaceId(clerkId: string) {
