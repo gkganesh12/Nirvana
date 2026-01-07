@@ -25,6 +25,8 @@ export interface NormalizedAlert {
   tags: Record<string, string>;
   occurredAt: Date;
   link: string | null;
+  // Impact Estimation
+  userCount: number | null;
 }
 
 // Export routing types

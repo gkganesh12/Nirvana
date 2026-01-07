@@ -48,10 +48,10 @@ export function SlackIntegration() {
 
   if (!status) {
     return (
-      <Card className="bg-white/80">
+      <Card className="bg-zinc-950 border-red-900/10">
         <CardHeader>
-          <CardTitle>Slack</CardTitle>
-          <CardDescription>Loading integration status...</CardDescription>
+          <CardTitle className="text-white">Slack</CardTitle>
+          <CardDescription className="text-zinc-500">Loading integration status...</CardDescription>
         </CardHeader>
         <CardContent>
           <Spinner />
@@ -61,10 +61,10 @@ export function SlackIntegration() {
   }
 
   return (
-    <Card className="bg-white/80">
+    <Card className="bg-zinc-950 border-red-900/10">
       <CardHeader>
-        <CardTitle>Slack</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-white">Slack</CardTitle>
+        <CardDescription className="text-zinc-500">
           {status.connected
             ? `Connected to ${status.teamName ?? 'workspace'}`
             : 'Connect Slack to deliver alert notifications.'}
@@ -74,14 +74,37 @@ export function SlackIntegration() {
         {status.connected ? (
           <>
             <div className="flex flex-wrap gap-3">
-              <Button asChild>
+              <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
                 <a href="/api/integrations/slack/connect">Reconnect</a>
               </Button>
-              <Button variant="outline" onClick={disconnect} disabled={loading}>
+              <Button variant="outline" onClick={disconnect} disabled={loading} className="border-red-900/20 text-red-400 hover:bg-red-950/20 hover:text-red-300">
                 {loading ? 'Disconnecting...' : 'Disconnect'}
               </Button>
-              <Button variant="secondary" onClick={loadChannels}>
+              <Button variant="secondary" onClick={loadChannels} className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700">
                 Load channels
+              </Button>
+              <Button 
+                variant="default" 
+                className="bg-red-600 hover:bg-red-700 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const res = await fetch('/api/integrations/slack/test', { method: 'POST' });
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert('Success: ' + data.message);
+                    } else {
+                      alert('Error: ' + data.message);
+                    }
+                  } catch (err) {
+                    alert('Failed to send test alert');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                disabled={loading}
+              >
+                Send Test Alert
               </Button>
             </div>
             {channels.length > 0 && (
@@ -90,10 +113,10 @@ export function SlackIntegration() {
                   <button
                     key={channel.id}
                     onClick={() => setDefaultChannel(channel.id)}
-                    className={`rounded-md border px-3 py-2 text-left text-sm ${
+                    className={`rounded-md border px-3 py-2 text-left text-sm transition-colors ${
                       status.defaultChannel === channel.id
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border bg-white'
+                        ? 'border-red-600 bg-red-950/30 text-white shadow-[0_0_10px_rgba(220,38,38,0.2)]'
+                        : 'border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:bg-zinc-800'
                     }`}
                   >
                     #{channel.name}
@@ -103,7 +126,7 @@ export function SlackIntegration() {
             )}
           </>
         ) : (
-          <Button asChild>
+          <Button asChild className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all hover:scale-105">
             <a href="/api/integrations/slack/connect">Connect Slack</a>
           </Button>
         )}
