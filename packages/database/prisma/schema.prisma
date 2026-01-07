@@ -54,12 +54,56 @@ model Workspace {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Impact Threshold Configuration (user configurable)
+  highImpactUserThreshold   Int @default(50)  // Users affected for "High Impact"
+  mediumImpactUserThreshold Int @default(10)  // Users affected for "Medium Impact"
+  highVelocityThreshold     Float @default(10) // Events/hour for "High Velocity"
+
   users          User[]
   integrations   Integration[]
   alertEvents    AlertEvent[]
   alertGroups    AlertGroup[]
   routingRules   RoutingRule[]
   notifications  NotificationLog[]
+  correlationRules CorrelationRule[]
+  releases       Release[]
+  uptimeChecks   UptimeCheck[]
+}
+
+// Phase 4: Uptime Monitoring
+model UptimeCheck {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  url         String
+  method      String   @default("GET")
+  interval    Int      @default(60)  // seconds between checks
+  timeout     Int      @default(30)  // request timeout in seconds
+  enabled     Boolean  @default(true)
+  headers     Json?    // Optional custom headers
+  expectedStatus Int?  // Expected HTTP status code (default: 2xx)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  results     UptimeResult[]
+  
+  @@index([workspaceId])
+  @@index([workspaceId, enabled])
+}
+
+model UptimeResult {
+  id            String   @id @default(cuid())
+  uptimeCheckId String
+  status        String   // "up", "down", "degraded"
+  responseTime  Int?     // Response time in ms
+  statusCode    Int?     // HTTP status code
+  errorMessage  String?  // Error message if failed
+  checkedAt     DateTime @default(now())
+  
+  uptimeCheck   UptimeCheck @relation(fields: [uptimeCheckId], references: [id], onDelete: Cascade)
+  
+  @@index([uptimeCheckId, checkedAt])
 }
 
 model User {
@@ -114,11 +158,45 @@ model AlertEvent {
 
   workspace Workspace @relation(fields: [workspaceId], references: [id])
   alertGroup AlertGroup? @relation(fields: [alertGroupId], references: [id])
+  breadcrumbs Breadcrumb[]
+  sessionReplay SessionReplay?
 
   @@unique([workspaceId, sourceEventId])
   @@index([workspaceId])
   @@index([alertGroupId])
   @@index([alertGroupId, occurredAt]) // Phase 6: Timeline optimization
+}
+
+// Phase 5: Session Replay - records of user sessions leading to errors
+model SessionReplay {
+  id            String   @id @default(cuid())
+  alertEventId  String   @unique
+  sessionId     String   // Client-side session ID
+  duration      Int?     // Duration in milliseconds
+  events        Json     // rrweb events (stored as JSON for now, move to object storage for production)
+  storageUrl    String?  // URL if stored in external storage (R2/S3)
+  compressedSize Int?    // Size in bytes
+  createdAt     DateTime @default(now())
+  
+  alertEvent    AlertEvent @relation(fields: [alertEventId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+}
+
+// Phase 2: Breadcrumbs - events leading up to an error
+model Breadcrumb {
+  id           String   @id @default(cuid())
+  alertEventId String
+  type         String   // "http", "console", "navigation", "click", "user", "debug", "default"
+  category     String?  // "xhr", "fetch", "ui", "info", "query"
+  message      String
+  level        String   @default("info") // "debug", "info", "warning", "error"
+  data         Json?    // Additional context: { url, method, statusCode, duration }
+  timestamp    DateTime
+  
+  alertEvent   AlertEvent @relation(fields: [alertEventId], references: [id], onDelete: Cascade)
+  
+  @@index([alertEventId, timestamp])
 }
 
 model AlertGroup {
@@ -137,11 +215,25 @@ model AlertGroup {
   runbookUrl     String?
   snoozeUntil    DateTime?   // Phase 4: Alert hygiene - snooze expiry
   resolvedAt     DateTime?   // Phase 4: Track when alert was resolved
+  
+  // Differentiation: Resolution Memory
+  resolutionNotes     String?    // What fixed this alert
+  lastResolvedBy      String?    // User who resolved (clerkId or Slack userId)
+  avgResolutionMins   Int?       // Rolling average time to resolve (minutes)
+  
+  // Differentiation: Impact Estimation
+  userCount           Int?       // Affected users (from source like Sentry)
+  velocityPerHour     Float?     // Occurrences per hour (calculated)
+  
+  // Release Tracking
+  releaseId      String?
+  
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
   workspace     Workspace @relation(fields: [workspaceId], references: [id])
   assignee      User?     @relation("AlertGroupAssignee", fields: [assigneeUserId], references: [id])
+  release       Release?  @relation(fields: [releaseId], references: [id])
   notifications NotificationLog[]
   alertEvents   AlertEvent[]
 
@@ -152,6 +244,24 @@ model AlertGroup {
   @@index([workspaceId, status, lastSeenAt]) // Phase 6: Inbox optimization
   @@index([workspaceId, environment])        // Phase 6: Filter optimization
   @@index([workspaceId, project])            // Phase 6: Filter optimization
+  @@index([releaseId])                       // Release tracking
+}
+
+model Release {
+  id          String   @id @default(cuid())
+  workspaceId String
+  version     String   // e.g., "v2.3.1", "1.0.0-beta"
+  environment String   // production, staging, development
+  commitSha   String?  // Git commit SHA
+  deployedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  alertGroups AlertGroup[]
+  
+  @@unique([workspaceId, version, environment])
+  @@index([workspaceId])
+  @@index([workspaceId, deployedAt])
 }
 
 model RoutingRule {
@@ -183,8 +293,23 @@ model NotificationLog {
   sentAt       DateTime           @default(now())
 
   workspace  Workspace   @relation(fields: [workspaceId], references: [id])
-  alertGroup AlertGroup  @relation(fields: [alertGroupId], references: [id])
+  alertGroup AlertGroup @relation(fields: [alertGroupId], references: [id])
 
   @@index([workspaceId])
   @@index([alertGroupId])
+  @@index([sentAt])
+}
+
+model CorrelationRule {
+  id                String   @id @default(cuid())
+  workspaceId       String
+  sourceGroupKey    String   // The "cause" or first alert
+  targetGroupKey    String   // The "effect" or subsequent alert
+  confidence        Float    // 0.0 to 1.0
+  lastUpdatedAt     DateTime @default(now())
+  
+  workspace         Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, sourceGroupKey, targetGroupKey])
+  @@index([workspaceId, sourceGroupKey])
 }
