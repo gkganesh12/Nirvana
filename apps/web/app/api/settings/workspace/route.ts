@@ -9,7 +9,7 @@ export async function GET(_req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5050';
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:5050';
 
     try {
         const res = await fetch(`${apiUrl}/api/settings/workspace`, {
@@ -22,8 +22,13 @@ export async function GET(_req: NextRequest) {
         if (!res.ok) {
             // Return 404 as null or empty object if not found
             if (res.status === 404) return NextResponse.json({});
-            const error = await res.json().catch(() => ({}));
-            return NextResponse.json(error, { status: res.status });
+            const errorText = await res.text();
+            console.error('Backend Workspace Settings Error:', res.status, errorText);
+            try {
+                return NextResponse.json(JSON.parse(errorText), { status: res.status });
+            } catch {
+                return NextResponse.json({ error: errorText || res.statusText }, { status: res.status });
+            }
         }
 
         const data = await res.json();
@@ -42,7 +47,7 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5050';
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:5050';
     const body = await req.json();
 
     try {
@@ -56,8 +61,13 @@ export async function PUT(req: NextRequest) {
         });
 
         if (!res.ok) {
-            const error = await res.json().catch(() => ({}));
-            return NextResponse.json(error, { status: res.status });
+            const errorText = await res.text();
+            console.error('Backend Update Workspace Settings Error:', res.status, errorText);
+            try {
+                return NextResponse.json(JSON.parse(errorText), { status: res.status });
+            } catch {
+                return NextResponse.json({ error: errorText || res.statusText }, { status: res.status });
+            }
         }
 
         const data = await res.json();
