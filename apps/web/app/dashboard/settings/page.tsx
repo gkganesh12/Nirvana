@@ -33,6 +33,12 @@ const settingsSections = [
     href: '/dashboard/settings/notifications',
     icon: Bell,
   },
+  {
+    title: 'API Keys',
+    description: 'Manage programmatic access to your workspace',
+    href: '/dashboard/settings/api-keys',
+    icon: Key,
+  },
 ];
 
 export default function SettingsPage() {

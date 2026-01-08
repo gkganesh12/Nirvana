@@ -22,6 +22,7 @@ import { JobsModule } from './jobs/jobs.module';
 import { ReleasesModule } from './releases/releases.module';
 import { UptimeModule } from './uptime/uptime.module';
 import { SessionReplayModule } from './session-replay/session-replay.module';
+import { ApiKeysModule } from './api-keys/api-keys.module';
 
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -76,6 +77,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ReleasesModule,
     UptimeModule,
     SessionReplayModule,
+    ApiKeysModule,
   ],
   providers: [
     {
