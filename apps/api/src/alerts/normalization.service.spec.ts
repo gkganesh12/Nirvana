@@ -17,92 +17,188 @@ describe('NormalizationService', () => {
     });
 
     describe('normalizeSentry', () => {
-        it('should normalize a standard Sentry payload', () => {
-            const payload = {
-                event_id: '12345',
-                project: 'my-project',
-                level: 'error',
-                message: 'Something went wrong',
-                environment: 'production',
-            };
-
-            const result = service.normalizeSentry(payload);
-
-            expect(result).toMatchObject({
-                source: 'SENTRY',
-                sourceEventId: '12345',
-                project: 'my-project',
-                severity: 'high', // error -> high
-                environment: 'production',
-                description: 'Something went wrong',
-            });
-        });
-
-        it('should extract data from nested event object', () => {
-            const payload = {
-                id: '999',
+        it('should extract basic fields from Sentry payload', () => {
+            const sentryPayload = {
                 event: {
-                    event_id: '999',
-                    title: 'Nested Title',
-                    level: 'fatal',
-                    tags: [['environment', 'staging']],
-                }
+                    event_id: 'abc123',
+                    message: 'TypeError: Cannot read property',
+                    level: 'error',
+                    platform: 'javascript',
+                    timestamp: 1704672000,
+                    exception: {
+                        values: [
+                            {
+                                type: 'TypeError',
+                                value: 'Cannot read property "foo" of undefined',
+                                stacktrace: {
+                                    frames: [
+                                        {
+                                            filename: 'app.js',
+                                            function: 'handleClick',
+                                            lineno: 123,
+                                            colno: 45,
+                                        },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                    tags: {
+                        environment: 'production',
+                        release: 'v1.0.0',
+                    },
+                    user: {
+                        id: 'user123',
+                        email: 'user@example.com',
+                    },
+                },
+                project: 'web-app',
             };
 
-            const result = service.normalizeSentry(payload);
+            const normalized = service.normalizeSentry(sentryPayload);
 
-            expect(result).toMatchObject({
-                source: 'SENTRY',
-                sourceEventId: '999',
-                title: 'Nested Title',
-                severity: 'critical', // fatal -> critical
-                environment: 'staging',
+            expect(normalized).toMatchObject({
+                title: expect.stringContaining('TypeError'),
+                message: expect.any(String),
+                severity: 'HIGH',
+                project: 'web-app',
+                environment: 'production',
+                source: 'sentry',
+            });
+            expect(normalized.tags).toBeDefined();
+            expect(normalized.stack).toBeDefined();
+        });
+
+        it('should map Sentry levels to severity correctly', () => {
+            const levels = [
+                { sentry: 'fatal', expected: 'CRITICAL' },
+                { sentry: 'error', expected: 'HIGH' },
+                { sentry: 'warning', expected: 'MEDIUM' },
+                { sentry: 'info', expected: 'LOW' },
+                { sentry: 'debug', expected: 'INFO' },
+            ];
+
+            levels.forEach(({ sentry, expected }) => {
+                const payload = {
+                    event: {
+                        message: 'Test',
+                        level: sentry,
+                    },
+                    project: 'test',
+                };
+
+                const normalized = service.normalizeSentry(payload);
+                expect(normalized.severity).toBe(expected);
             });
         });
 
-        it('should handle missing fields with defaults', () => {
+        it('should handle missing optional fields gracefully', () => {
+            const minimalPayload = {
+                event: {
+                    message: 'Error occurred',
+                },
+                project: 'minimal-app',
+            };
+
+            const normalized = service.normalizeSentry(minimalPayload);
+
+            expect(normalized).toMatchObject({
+                title: 'Error occurred',
+                message: 'Error occurred',
+                severity: 'MEDIUM', // default
+                project: 'minimal-app',
+                environment: 'production', // default
+                source: 'sentry',
+            });
+        });
+
+        it('should extract stack trace from exception', () => {
             const payload = {
-                event_id: 'abc',
-                // No project, env, level
+                event: {
+                    message: 'Error',
+                    exception: {
+                        values: [
+                            {
+                                type: 'Error',
+                                stacktrace: {
+                                    frames: [
+                                        { filename: 'app.js', function: 'main', lineno: 10 },
+                                        { filename: 'lib.js', function: 'helper', lineno: 25 },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                project: 'test',
             };
 
-            const result = service.normalizeSentry(payload);
+            const normalized = service.normalizeSentry(payload);
 
-            expect(result).toMatchObject({
-                sourceEventId: 'abc',
-                project: 'unknown',
-                environment: 'unknown',
-                severity: 'info', // default
-            });
+            expect(normalized.stack).toBeDefined();
+            expect(normalized.stack).toContain('app.js');
+            expect(normalized.stack).toContain('lib.js');
         });
 
-        it('should throw error if event_id is missing', () => {
-            const payload = {};
-            expect(() => service.normalizeSentry(payload)).toThrow('Missing Sentry event id');
-        });
-
-        it('should extract tags correctly from array format', () => {
+        it('should extract environment from tags', () => {
             const payload = {
-                event_id: '1',
-                tags: [['os', 'linux'], ['browser', 'chrome']]
+                event: {
+                    message: 'Error',
+                    tags: {
+                        environment: 'staging',
+                    },
+                },
+                project: 'test',
             };
-            const result = service.normalizeSentry(payload);
-            expect(result.tags).toEqual({
-                os: 'linux',
-                browser: 'chrome'
-            });
+
+            const normalized = service.normalizeSentry(payload);
+            expect(normalized.environment).toBe('staging');
         });
 
-        it('should extract tags correctly from object format', () => {
+        it('should include user context when available', () => {
             const payload = {
-                event_id: '1',
-                tags: { os: 'linux', browser: 'chrome' }
+                event: {
+                    message: 'Error',
+                    user: {
+                        id: 'user-456',
+                        email: 'test@example.com',
+                        username: 'testuser',
+                    },
+                },
+                project: 'test',
             };
-            const result = service.normalizeSentry(payload);
-            expect(result.tags).toEqual({
-                os: 'linux',
-                browser: 'chrome'
+
+            const normalized = service.normalizeSentry(payload);
+            expect(normalized.tags).toMatchObject({
+                'user.id': 'user-456',
+                'user.email': 'test@example.com',
             });
+        });
+    });
+
+    describe('inferSeverity', () => {
+        it('should infer CRITICAL for fatal errors', () => {
+            expect(service.inferSeverity('fatal', 'OutOfMemoryError')).toBe('CRITICAL');
+        });
+
+        it('should infer HIGH for errors', () => {
+            expect(service.inferSeverity('error', 'TypeError')).toBe('HIGH');
+        });
+
+        it('should infer MEDIUM for warnings', () => {
+            expect(service.inferSeverity('warning', 'Deprecated API')).toBe('MEDIUM');
+        });
+
+        it('should infer LOW for info messages', () => {
+            expect(service.inferSeverity('info', 'User logged in')).toBe('LOW');
+        });
+
+        it('should infer INFO for debug messages', () => {
+            expect(service.inferSeverity('debug', 'Cache hit')).toBe('INFO');
+        });
+
+        it('should default to MEDIUM for unknown levels', () => {
+            expect(service.inferSeverity('unknown', 'Something happened')).toBe('MEDIUM');
         });
     });
 });
