@@ -8,7 +8,7 @@ class IngestReplayDto {
     alertEventId!: string;
     sessionId!: string;
     duration?: number;
-    events!: unknown[];
+    storageUrl?: string;
 }
 
 @ApiTags('session-replay')
@@ -18,12 +18,15 @@ class IngestReplayDto {
 export class SessionReplayController {
     constructor(private readonly sessionReplayService: SessionReplayService) { }
 
+    @Get('upload-url/:sessionId')
+    @ApiOperation({ summary: 'Generate presigned URL for uploading session replay' })
+    async getUploadUrl(@Param('sessionId') sessionId: string) {
+        return this.sessionReplayService.generateUploadUrl(sessionId);
+    }
+
     @Post('ingest')
-    @ApiOperation({ summary: 'Ingest a session replay' })
-    async ingestReplay(
-        @WorkspaceId() workspaceId: string,
-        @Body() dto: IngestReplayDto,
-    ) {
+    @ApiOperation({ summary: 'Save session replay metadata after upload' })
+    async ingestReplay(@WorkspaceId() workspaceId: string, @Body() dto: IngestReplayDto) {
         return this.sessionReplayService.ingestReplay(workspaceId, dto);
     }
 
