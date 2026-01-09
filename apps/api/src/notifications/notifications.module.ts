@@ -7,6 +7,7 @@ import { NotificationsController } from './notifications.controller';
 import { AiModule } from '../ai/ai.module';
 import { AlertsModule } from '../alerts/alerts.module';
 import { forwardRef } from '@nestjs/common';
+import { EmailNotificationService } from './email-notification.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { forwardRef } from '@nestjs/common';
     forwardRef(() => AlertsModule),
   ],
   controllers: [NotificationsController],
-  providers: [NotificationLogService, SlackNotificationService, NotificationProcessor],
-  exports: [SlackNotificationService, NotificationLogService],
+  providers: [NotificationLogService, SlackNotificationService, NotificationProcessor, EmailNotificationService],
+  exports: [SlackNotificationService, NotificationLogService, EmailNotificationService],
 })
 export class NotificationsModule { }

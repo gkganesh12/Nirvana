@@ -69,6 +69,7 @@ model Workspace {
   releases         Release[]
   uptimeChecks     UptimeCheck[]
   apiKeys          ApiKey[]
+  emailIntegration EmailIntegration?
 }
 
 model ApiKey {
@@ -89,6 +90,21 @@ model ApiKey {
   @@index([workspaceId])
   @@index([keyHash])
   @@index([workspaceId, createdAt])
+}
+
+model EmailIntegration {
+  id          String   @id @default(cuid())
+  workspaceId String   @unique
+  apiKey      String // Encrypted SendGrid API key
+  fromEmail   String
+  fromName    String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
 }
 
 // Phase 4: Uptime Monitoring
