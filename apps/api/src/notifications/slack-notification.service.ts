@@ -11,7 +11,7 @@ export class SlackNotificationService {
   constructor(
     private readonly slackOAuth: SlackOAuthService,
     private readonly slackService: SlackService,
-  ) {}
+  ) { }
 
   async sendAlert(workspaceId: string, alertGroupId: string) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
@@ -110,6 +110,153 @@ export class SlackNotificationService {
             action_id: 'resolve',
             value: group.id,
             ...(disableActions ? { disabled: true } : {}),
+          },
+        ],
+      },
+    ];
+  }
+
+  /**
+   * Send alert to a specific channel (from routing rules)
+   */
+  async sendToChannel(
+    workspaceId: string,
+    alertGroupId: string,
+    channelId: string,
+    options: { mentionHere?: boolean; mentionChannel?: boolean } = {},
+  ) {
+    const token = await this.slackOAuth.getDecryptedToken(workspaceId);
+    if (!token) {
+      throw new Error('Slack not connected');
+    }
+
+    const group = await prisma.alertGroup.findFirst({
+      where: { id: alertGroupId, workspaceId },
+    });
+    if (!group) {
+      throw new Error('Alert group not found');
+    }
+
+    const client = new WebClient(token);
+    const blocks = this.buildBlocks(group);
+
+    // Build text with optional mentions
+    let text = group.title;
+    if (options.mentionChannel) {
+      text = `<!channel> ${text}`;
+    } else if (options.mentionHere) {
+      text = `<!here> ${text}`;
+    }
+
+    const response = await client.chat.postMessage({
+      channel: channelId,
+      text,
+      blocks,
+    });
+
+    this.logger.log(`Alert sent to channel`, {
+      alertGroupId,
+      channelId,
+      ts: response.ts,
+    });
+
+    return { channelId, ts: response.ts };
+  }
+
+  /**
+   * Send escalation notification
+   */
+  async sendEscalation(
+    workspaceId: string,
+    alertGroupId: string,
+    channelId: string,
+    escalationLevel: number,
+    mentionHere: boolean,
+  ) {
+    const token = await this.slackOAuth.getDecryptedToken(workspaceId);
+    if (!token) {
+      throw new Error('Slack not connected');
+    }
+
+    const group = await prisma.alertGroup.findFirst({
+      where: { id: alertGroupId, workspaceId },
+    });
+    if (!group) {
+      throw new Error('Alert group not found');
+    }
+
+    const client = new WebClient(token);
+    const blocks = this.buildEscalationBlocks(group, escalationLevel);
+
+    // Always mention for escalations
+    const mention = mentionHere ? '<!here>' : '';
+    const text = `${mention} 🚨 *ESCALATION (Level ${escalationLevel})* - ${group.title}`;
+
+    const response = await client.chat.postMessage({
+      channel: channelId,
+      text,
+      blocks,
+    });
+
+    this.logger.log(`Escalation notification sent`, {
+      alertGroupId,
+      channelId,
+      level: escalationLevel,
+      ts: response.ts,
+    });
+
+    return { channelId, ts: response.ts };
+  }
+
+  private buildEscalationBlocks(
+    group: { id: string; title: string; severity: string; environment: string; count: number; status: AlertStatus },
+    escalationLevel: number,
+  ) {
+    const severityEmoji = this.mapSeverity(group.severity);
+    const statusLabel = group.status.toLowerCase();
+
+    return [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `🚨 *ESCALATION (Level ${escalationLevel})* 🚨\n${severityEmoji} *${group.title}*`,
+        },
+      },
+      {
+        type: 'section',
+        fields: [
+          { type: 'mrkdwn', text: `*Env:* ${group.environment}` },
+          { type: 'mrkdwn', text: `*Count:* ${group.count}` },
+          { type: 'mrkdwn', text: `*Status:* ${statusLabel}` },
+          { type: 'mrkdwn', text: `*Escalation Level:* ${escalationLevel}` },
+        ],
+      },
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: '⚠️ This alert has not been acknowledged. Please take action immediately.',
+          },
+        ],
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Acknowledge' },
+            style: 'primary',
+            action_id: 'ack',
+            value: group.id,
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Resolve' },
+            style: 'danger',
+            action_id: 'resolve',
+            value: group.id,
           },
         ],
       },

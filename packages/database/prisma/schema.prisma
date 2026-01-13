@@ -121,43 +121,50 @@ model AlertEvent {
 }
 
 model AlertGroup {
-  id            String      @id @default(cuid())
-  workspaceId   String
-  groupKey      String
-  title         String
-  severity      AlertSeverity
-  environment   String
-  status        AlertStatus @default(OPEN)
+  id             String      @id @default(cuid())
+  workspaceId    String
+  groupKey       String
+  title          String
+  severity       AlertSeverity
+  environment    String
+  status         AlertStatus @default(OPEN)
   assigneeUserId String?
-  firstSeenAt   DateTime
-  lastSeenAt    DateTime
-  count         Int         @default(1)
-  runbookUrl    String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  firstSeenAt    DateTime
+  lastSeenAt     DateTime
+  count          Int         @default(1)
+  runbookUrl     String?
+  snoozeUntil    DateTime?   // Phase 4: Alert hygiene - snooze expiry
+  resolvedAt     DateTime?   // Phase 4: Track when alert was resolved
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-  assignee  User?     @relation("AlertGroupAssignee", fields: [assigneeUserId], references: [id])
+  workspace     Workspace @relation(fields: [workspaceId], references: [id])
+  assignee      User?     @relation("AlertGroupAssignee", fields: [assigneeUserId], references: [id])
   notifications NotificationLog[]
   alertEvents   AlertEvent[]
 
   @@index([groupKey])
   @@index([workspaceId])
   @@index([status])
+  @@index([lastSeenAt])  // Phase 4: For auto-close queries
 }
 
 model RoutingRule {
-  id            String   @id @default(cuid())
-  workspaceId   String
+  id             String   @id @default(cuid())
+  workspaceId    String
+  name           String   // Phase 4: Human-readable rule name
+  description    String?  // Phase 4: Rule description
   conditionsJson Json
-  actionsJson   Json
-  enabled       Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  actionsJson    Json
+  priority       Int      @default(0)  // Phase 4: Lower = higher priority
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id])
 
   @@index([workspaceId])
+  @@index([workspaceId, enabled, priority])  // Phase 4: Optimized rule query
 }
 
 model NotificationLog {
