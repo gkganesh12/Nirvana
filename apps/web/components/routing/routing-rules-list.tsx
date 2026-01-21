@@ -100,10 +100,10 @@ export function RoutingRulesList() {
 
   if (loading) {
     return (
-      <Card className="bg-white/80">
+      <Card className="bg-zinc-950 border-red-900/10">
         <CardHeader>
-          <CardTitle>Routing Rules</CardTitle>
-          <CardDescription>Loading rules...</CardDescription>
+          <CardTitle className="text-white">Routing Rules</CardTitle>
+          <CardDescription className="text-zinc-500">Loading rules...</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center py-8">
           <Spinner />
@@ -114,13 +114,13 @@ export function RoutingRulesList() {
 
   if (error) {
     return (
-      <Card className="bg-white/80">
+      <Card className="bg-zinc-950 border-red-900/10">
         <CardHeader>
-          <CardTitle>Routing Rules</CardTitle>
+          <CardTitle className="text-white">Routing Rules</CardTitle>
           <CardDescription className="text-red-500">{error}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={fetchRules}>Retry</Button>
+          <Button onClick={fetchRules} className="bg-red-600 hover:bg-red-700 text-white">Retry</Button>
         </CardContent>
       </Card>
     );
@@ -128,57 +128,57 @@ export function RoutingRulesList() {
 
   return (
     <>
-      <Card className="bg-white/80">
+      <Card className="bg-zinc-950 border-red-900/10">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Routing Rules</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Routing Rules</CardTitle>
+            <CardDescription className="text-zinc-500">
               Define conditions to route alerts to specific Slack channels with escalation settings.
             </CardDescription>
           </div>
-          <Button onClick={() => setCreateDialogOpen(true)}>
+          <Button onClick={() => setCreateDialogOpen(true)} className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]">
             + New Rule
           </Button>
         </CardHeader>
         <CardContent>
           {rules.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-zinc-500">
               <p className="mb-4">No routing rules configured yet.</p>
-              <Button onClick={() => setCreateDialogOpen(true)}>Create your first rule</Button>
+              <Button onClick={() => setCreateDialogOpen(true)} variant="outline" className="border-red-900/20 text-red-400 hover:bg-red-950/20">Create your first rule</Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">Priority</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Conditions</TableHead>
-                  <TableHead>Actions</TableHead>
-                  <TableHead className="w-24">Status</TableHead>
-                  <TableHead className="w-32">Actions</TableHead>
+                <TableRow className="border-zinc-800 hover:bg-transparent">
+                  <TableHead className="w-12 text-zinc-500">Priority</TableHead>
+                  <TableHead className="text-zinc-500">Name</TableHead>
+                  <TableHead className="text-zinc-500">Conditions</TableHead>
+                  <TableHead className="text-zinc-500">Actions</TableHead>
+                  <TableHead className="w-24 text-zinc-500">Status</TableHead>
+                  <TableHead className="w-32 text-zinc-500">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rules.map((rule) => (
-                  <TableRow key={rule.id} className={!rule.enabled ? 'opacity-50' : ''}>
-                    <TableCell className="font-mono text-sm">{rule.priority}</TableCell>
+                  <TableRow key={rule.id} className={`${!rule.enabled ? 'opacity-50' : ''} border-zinc-800 hover:bg-red-900/10 transition-colors`}>
+                    <TableCell className="font-mono text-sm text-zinc-400">{rule.priority}</TableCell>
                     <TableCell>
-                      <div className="font-medium">{rule.name}</div>
+                      <div className="font-medium text-white">{rule.name}</div>
                       {rule.description && (
-                        <div className="text-sm text-muted-foreground truncate max-w-xs">
+                        <div className="text-sm text-zinc-500 truncate max-w-xs">
                           {rule.description}
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm">{formatConditions(rule.conditions)}</TableCell>
-                    <TableCell className="text-sm">{formatActions(rule.actions)}</TableCell>
+                    <TableCell className="text-sm text-zinc-400">{formatConditions(rule.conditions)}</TableCell>
+                    <TableCell className="text-sm text-zinc-400">{formatActions(rule.actions)}</TableCell>
                     <TableCell>
                       <button
                         onClick={() => handleToggleEnabled(rule)}
-                        className={`px-2 py-1 rounded text-xs font-medium ${
+                        className={`px-2 py-1 rounded text-xs font-medium border ${
                           rule.enabled
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : 'bg-zinc-800 text-zinc-400 border-zinc-700'
                         }`}
                       >
                         {rule.enabled ? 'Active' : 'Disabled'}
@@ -190,6 +190,7 @@ export function RoutingRulesList() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingRule(rule)}
+                          className="text-zinc-400 hover:text-white hover:bg-zinc-800"
                         >
                           Edit
                         </Button>
@@ -197,7 +198,7 @@ export function RoutingRulesList() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setDeletingRule(rule)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-500 hover:text-red-400 hover:bg-red-950/20"
                         >
                           Delete
                         </Button>

@@ -9,7 +9,7 @@ export async function GET(_req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5050';
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:5050';
 
     try {
         const res = await fetch(`${apiUrl}/api/settings/notifications`, {
@@ -40,7 +40,7 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5050';
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:5050';
     const body = await req.json();
 
     try {

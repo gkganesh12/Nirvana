@@ -9,6 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import crypto from 'crypto';
 import { AlertProcessorService } from '../alerts/alert-processor.service';
 
@@ -17,9 +18,10 @@ import { AlertProcessorService } from '../alerts/alert-processor.service';
 export class WebhooksController {
   private readonly logger = new Logger(WebhooksController.name);
 
-  constructor(private readonly alertProcessor: AlertProcessorService) {}
+  constructor(private readonly alertProcessor: AlertProcessorService) { }
 
   @Post('sentry')
+  @Throttle({ default: { ttl: 60000, limit: 100 } }) // 100 requests per minute
   async handleSentryWebhook(
     @Req() req: { body: Buffer },
     @Body() parsedBody: unknown,

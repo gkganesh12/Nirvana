@@ -9,12 +9,15 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-sans'
 export const metadata = {
   title: 'SignalCraft',
   description: 'SignalCraft alerting platform',
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
-      <body className="font-sans">
+    <html lang="en" className={`${spaceGrotesk.variable} bg-black`}>
+      <body className="font-sans bg-black">
         <ClerkProvider>
           <Providers>{children}</Providers>
         </ClerkProvider>

@@ -47,6 +47,9 @@ export class NormalizationService {
     );
     const link = this.getString(payloadRecord.url) ?? null;
 
+    // Impact Estimation: Extract user count from Sentry payload
+    const userCount = this.extractUserCount(payloadRecord, event);
+
     return {
       source: 'SENTRY',
       sourceEventId: String(sourceEventId),
@@ -59,6 +62,7 @@ export class NormalizationService {
       tags,
       occurredAt,
       link,
+      userCount,
     };
   }
 
@@ -146,5 +150,46 @@ export class NormalizationService {
 
   private getString(value: unknown): string | undefined {
     return typeof value === 'string' ? value : undefined;
+  }
+
+  /**
+   * Extract user count from Sentry payload for impact estimation
+   * Sentry may include user counts in different locations
+   */
+  private extractUserCount(
+    payload: Record<string, unknown>,
+    event: Record<string, unknown>,
+  ): number | null {
+    // Check for user_count in various locations
+    const userCount =
+      this.getNumber(payload.user_count) ??
+      this.getNumber(event.user_count) ??
+      this.getNumber(payload.userCount) ??
+      this.getNumber(event.userCount);
+
+    if (userCount !== null) {
+      return userCount;
+    }
+
+    // Check for users array length
+    const users = payload.users ?? event.users;
+    if (Array.isArray(users)) {
+      return users.length;
+    }
+
+    return null;
+  }
+
+  private getNumber(value: unknown): number | null {
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const parsed = parseInt(value, 10);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+    return null;
   }
 }

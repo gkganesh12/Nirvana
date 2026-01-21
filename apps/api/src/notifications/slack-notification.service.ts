@@ -1,8 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { WebClient } from '@slack/web-api';
 import { prisma, AlertStatus } from '@signalcraft/database';
 import { SlackOAuthService } from '../integrations/slack/oauth.service';
 import { SlackService } from '../integrations/slack/slack.service';
+import { AiService } from '../ai/ai.service';
+import { AlertsService } from '../alerts/alerts.service';
 
 @Injectable()
 export class SlackNotificationService {
@@ -11,6 +13,8 @@ export class SlackNotificationService {
   constructor(
     private readonly slackOAuth: SlackOAuthService,
     private readonly slackService: SlackService,
+    private readonly aiService: AiService,
+    @Inject(forwardRef(() => AlertsService)) private readonly alertsService: AlertsService,
   ) { }
 
   async sendAlert(workspaceId: string, alertGroupId: string) {
@@ -31,8 +35,33 @@ export class SlackNotificationService {
       throw new Error('Alert group not found');
     }
 
+    // AI Resolution Suggestion
+    let aiSuggestion = null;
+    if (this.aiService.isEnabled()) {
+      try {
+        const pastResolutions = await this.alertsService.findSimilarResolvedAlerts({
+          title: group.title,
+          project: group.project,
+        });
+
+        if (pastResolutions.length > 0) {
+          aiSuggestion = await this.aiService.generateResolutionSuggestion(
+            {
+              title: group.title,
+              description: `Severity: ${group.severity}, Environment: ${group.environment}`,
+              environment: group.environment,
+              project: group.project,
+            },
+            pastResolutions
+          );
+        }
+      } catch (error) {
+        this.logger.error('Failed to get AI suggestion', error);
+      }
+    }
+
     const client = new WebClient(token);
-    const blocks = this.buildBlocks(group);
+    const blocks = this.buildBlocks(group, false, aiSuggestion);
     const response = await client.chat.postMessage({
       channel: channelId,
       text: group.title,
@@ -60,7 +89,7 @@ export class SlackNotificationService {
     }
 
     const client = new WebClient(token);
-    const blocks = this.buildBlocks(group, true);
+    const blocks = this.buildBlocks(group, true, null);
     await client.chat.update({
       channel: channelId,
       ts,
@@ -69,51 +98,147 @@ export class SlackNotificationService {
     });
   }
 
-  private buildBlocks(group: { id: string; title: string; severity: string; environment: string; count: number; status: AlertStatus }, disableActions = false) {
+  /**
+   * Extended group interface for enriched Slack messages
+   */
+  private buildBlocks(
+    group: {
+      id: string;
+      title: string;
+      severity: string;
+      environment: string;
+      count: number;
+      status: AlertStatus;
+      runbookUrl?: string | null;
+      resolutionNotes?: string | null;
+      lastResolvedBy?: string | null;
+      avgResolutionMins?: number | null;
+      userCount?: number | null;
+      velocityPerHour?: number | null;
+    },
+    disableActions = false,
+    aiSuggestion?: { suggestion: string; confidence: string } | null,
+  ) {
     const severityEmoji = this.mapSeverity(group.severity);
     const statusLabel = group.status.toLowerCase();
-    return [
-      {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const blocks: any[] = [];
+
+    // Main alert section
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `${severityEmoji} *${group.title}*`,
+      },
+      fields: [
+        { type: 'mrkdwn', text: `*Env:* ${group.environment}` },
+        { type: 'mrkdwn', text: `*Count:* ${group.count}` },
+        { type: 'mrkdwn', text: `*Status:* ${statusLabel}` },
+      ],
+    });
+
+    // AI Suggestion (Differentiation Feature)
+    if (aiSuggestion) {
+      const confidenceEmoji = aiSuggestion.confidence === 'high' ? '🟢' : aiSuggestion.confidence === 'medium' ? '🟡' : '⚪';
+      blocks.push({
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${severityEmoji} *${group.title}*`,
+          text: `💡 *AI Suggestion* (${confidenceEmoji} Confidence)\n${aiSuggestion.suggestion}`,
         },
-        fields: [
-          { type: 'mrkdwn', text: `*Env:* ${group.environment}` },
-          { type: 'mrkdwn', text: `*Count:* ${group.count}` },
-          { type: 'mrkdwn', text: `*Status:* ${statusLabel}` },
-        ],
-      },
-      {
-        type: 'actions',
-        elements: [
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Acknowledge' },
-            style: 'primary',
-            action_id: 'ack',
-            value: group.id,
-            ...(disableActions ? { disabled: true } : {}),
-          },
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Snooze 1h' },
-            action_id: 'snooze',
-            value: group.id,
-            ...(disableActions ? { disabled: true } : {}),
-          },
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Resolve' },
-            style: 'danger',
-            action_id: 'resolve',
-            value: group.id,
-            ...(disableActions ? { disabled: true } : {}),
-          },
-        ],
-      },
-    ];
+      });
+    }
+
+    // Impact Badge (Differentiation Feature)
+    const impactBadge = this.getImpactBadge(group);
+    if (impactBadge) {
+      blocks.push({
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: impactBadge }],
+      });
+    }
+
+    // Resolution Memory (Differentiation Feature)
+    if (group.count > 1 && group.resolutionNotes) {
+      const resolverInfo = group.lastResolvedBy ? ` by ${group.lastResolvedBy}` : '';
+      const timeInfo = group.avgResolutionMins ? ` (avg ${group.avgResolutionMins} min)` : '';
+      blocks.push({
+        type: 'context',
+        elements: [{
+          type: 'mrkdwn',
+          text: `🔄 *Previous fix${resolverInfo}${timeInfo}:* "${group.resolutionNotes}"`,
+        }],
+      });
+    }
+
+    // Runbook Section (Differentiation Feature)
+    if (group.runbookUrl) {
+      blocks.push({
+        type: 'section',
+        text: { type: 'mrkdwn', text: `📖 *Runbook:* <${group.runbookUrl}|View Runbook>` },
+      });
+    } else {
+      blocks.push({
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: '⚠️ No runbook for this alert type. Consider adding one!' }],
+      });
+    }
+
+    // Action buttons
+    blocks.push({
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Acknowledge' },
+          style: 'primary',
+          action_id: 'ack',
+          value: group.id,
+          ...(disableActions ? { disabled: true } : {}),
+        },
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Snooze 1h' },
+          action_id: 'snooze',
+          value: group.id,
+          ...(disableActions ? { disabled: true } : {}),
+        },
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Resolve' },
+          style: 'danger',
+          action_id: 'resolve',
+          value: group.id,
+          ...(disableActions ? { disabled: true } : {}),
+        },
+      ],
+    });
+
+    return blocks;
+  }
+
+  /**
+   * Generate impact badge based on user count or velocity
+   */
+  private getImpactBadge(group: {
+    userCount?: number | null;
+    velocityPerHour?: number | null;
+    count: number;
+  }): string | null {
+    if (group.userCount && group.userCount >= 50) {
+      return `🔴 *High Impact:* ${group.userCount} users affected`;
+    }
+    if (group.userCount && group.userCount >= 10) {
+      return `🟠 *Medium Impact:* ${group.userCount} users affected`;
+    }
+    if (group.velocityPerHour && group.velocityPerHour >= 10) {
+      return `⚡ *High Velocity:* ${group.velocityPerHour.toFixed(1)} occurrences/hour`;
+    }
+    if (group.count > 10) {
+      return `🟡 ${group.count} total occurrences`;
+    }
+    return null;
   }
 
   /**

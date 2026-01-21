@@ -3,26 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --background: 33 47% 96%;
-  --foreground: 24 21% 20%;
-  --card: 36 43% 97%;
-  --card-foreground: 24 21% 18%;
-  --popover: 36 43% 97%;
-  --popover-foreground: 24 21% 18%;
-  --primary: 20 68% 45%;
-  --primary-foreground: 36 43% 97%;
-  --secondary: 206 45% 84%;
-  --secondary-foreground: 210 24% 24%;
-  --muted: 30 24% 90%;
-  --muted-foreground: 24 10% 40%;
-  --accent: 156 32% 78%;
-  --accent-foreground: 170 30% 20%;
-  --destructive: 0 72% 52%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 28 26% 85%;
-  --input: 28 26% 85%;
-  --ring: 20 68% 45%;
-  --radius: 12px;
+  /* DARK THEME BASE - RED & BLACK */
+  --background: 0 0% 0%;
+  /* #0a0a0a (Almost Black) */
+  --foreground: 0 0% 95%;
+  /* #f2f2f2 (Off White) */
+
+  --card: 0 0% 7%;
+  /* #121212 (Dark Gray) */
+  --card-foreground: 0 0% 95%;
+
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 95%;
+
+  --primary: 0 72% 51%;
+  /* #dc2626 (Red-600) */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 12%;
+  /* #1f1f1f */
+  --secondary-foreground: 0 0% 95%;
+
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 60%;
+
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 95%;
+
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 95%;
+
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 0 72% 51%;
+  /* Red Ring */
+
+  --radius: 0.5rem;
 }
 
 * {
@@ -31,12 +47,49 @@
 
 body {
   @apply bg-background text-foreground antialiased;
-  background-image: radial-gradient(circle at top, rgba(255, 229, 186, 0.6), transparent 45%),
-    radial-gradient(circle at 20% 20%, rgba(191, 227, 255, 0.35), transparent 50%),
-    linear-gradient(180deg, rgba(255, 247, 233, 0.9), rgba(255, 255, 255, 0.9));
+  /* Subtle red glow in the background */
+  background-image:
+    radial-gradient(circle at top center, rgba(220, 38, 38, 0.15), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(220, 38, 38, 0.05), transparent 40%);
   min-height: 100vh;
 }
 
 main {
   position: relative;
+}
+
+@layer utilities {
+  .animate-gradient {
+    /* Updated for Red/Black Theme */
+    background-size: 200% auto;
+    animation: gradient 4s linear infinite;
+  }
+
+  .animate-scan {
+    animation: scan 3s linear infinite;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
