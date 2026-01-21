@@ -1,284 +1,108 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { 
-  GitMerge, 
-  Trash2, 
-  RefreshCw,
-  ArrowRight,
-  Sparkles,
-  AlertTriangle,
-  TrendingUp
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { correlationClient } from '@/lib/services/correlation-client';
+import { CorrelationGroup } from '@/types/correlation';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Layers, AlertTriangle, CheckCircle } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
-interface CorrelationRule {
-  id: string;
-  sourceGroupKey: string;
-  targetGroupKey: string;
-  confidence: number;
-  lastUpdatedAt: string;
-  sourceAlert: {
-    id: string;
-    title: string;
-    project: string;
-    severity: string;
-  } | null;
-  targetAlert: {
-    id: string;
-    title: string;
-    project: string;
-    severity: string;
-  } | null;
-}
-
-const severityColors: Record<string, string> = {
-  CRITICAL: 'bg-red-500',
-  HIGH: 'bg-orange-500',
-  MEDIUM: 'bg-yellow-500',
-  LOW: 'bg-blue-500',
-  INFO: 'bg-zinc-500',
-};
-
-export default function CorrelationRulesPage() {
-  const [rules, setRules] = useState<CorrelationRule[]>([]);
+export default function CorrelationGroupsPage() {
+  const [groups, setGroups] = useState<CorrelationGroup[]>([]);
   const [loading, setLoading] = useState(true);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [minConfidence, setMinConfidence] = useState(0.5);
 
-  async function fetchRules() {
+  useEffect(() => {
+    loadGroups();
+  }, []);
+
+  async function loadGroups() {
     try {
-      const res = await fetch(`/api/correlation-rules?minConfidence=${minConfidence}`);
-      if (res.ok) {
-        const data = await res.json();
-        setRules(data);
-      }
+      const workspaceId = 'default-workspace';
+      const data = await correlationClient.listGroups(workspaceId);
+      setGroups(data);
     } catch (error) {
-      console.error('Failed to fetch rules:', error);
+      console.error('Failed to load correlation groups:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    fetchRules();
-  }, [minConfidence]);
-
-  const handleAnalyze = async () => {
-    setAnalyzing(true);
-    try {
-      await fetch('/api/correlation-rules', { method: 'POST' });
-      // Wait a bit for analysis to complete
-      setTimeout(() => {
-        fetchRules();
-        setAnalyzing(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Analysis failed:', error);
-      setAnalyzing(false);
-    }
-  };
-
-  const handleDelete = async (ruleId: string) => {
-    try {
-      await fetch('/api/correlation-rules', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ruleId }),
-      });
-      setRules(rules.filter(r => r.id !== ruleId));
-    } catch (error) {
-      console.error('Delete failed:', error);
-    }
-  };
-
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return 'text-green-400';
-    if (confidence >= 0.6) return 'text-yellow-400';
-    return 'text-orange-400';
-  };
-
-  const getConfidenceBg = (confidence: number) => {
-    if (confidence >= 0.8) return 'bg-green-900/20';
-    if (confidence >= 0.6) return 'bg-yellow-900/20';
-    return 'bg-orange-900/20';
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Correlation Rules</h1>
-          <p className="text-zinc-400 mt-1">AI-detected patterns between alerts</p>
-        </div>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-zinc-900/50 rounded-xl animate-pulse"></div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="p-12 text-center text-gray-500">Loading correlations...</div>;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Correlation Rules</h1>
-          <p className="text-zinc-400 mt-1">AI-detected patterns between alerts</p>
-        </div>
-        <button
-          onClick={handleAnalyze}
-          disabled={analyzing}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-        >
-          {analyzing ? (
-            <RefreshCw className="w-4 h-4 animate-spin" />
-          ) : (
-            <Sparkles className="w-4 h-4" />
-          )}
-          {analyzing ? 'Analyzing...' : 'Run Analysis'}
-        </button>
-      </div>
-
-      {/* Confidence Filter */}
-      <div className="flex items-center gap-4 bg-zinc-900/50 border border-white/5 rounded-xl p-4">
-        <span className="text-sm text-zinc-400">Min Confidence:</span>
-        <div className="flex gap-2">
-          {[0.5, 0.6, 0.7, 0.8].map((conf) => (
-            <button
-              key={conf}
-              onClick={() => setMinConfidence(conf)}
-              className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                minConfidence === conf
-                  ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-              }`}
-            >
-              {Math.round(conf * 100)}%
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Rules List */}
-      {rules.length === 0 ? (
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-12 text-center">
-          <GitMerge className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No correlation rules found</h3>
-          <p className="text-zinc-500 mb-4">
-            Run analysis to detect patterns between your alerts
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Correlation Groups</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+             Intelligent grouping of related alerts to reduce noise.
           </p>
-          <button
-            onClick={handleAnalyze}
-            disabled={analyzing}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <Sparkles className="w-4 h-4" />
-            Run Analysis
-          </button>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {rules.map((rule) => (
-            <div
-              key={rule.id}
-              className="bg-zinc-900/50 border border-white/5 rounded-xl p-6 hover:border-red-900/30 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6 flex-1">
-                  {/* Source Alert */}
-                  <div className="flex-1">
-                    {rule.sourceAlert ? (
-                      <a
-                        href={`/dashboard/alerts/${rule.sourceAlert.id}`}
-                        className="block group"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-2 h-2 rounded-full ${severityColors[rule.sourceAlert.severity] || 'bg-zinc-500'}`}></div>
-                          <span className="text-xs text-zinc-500">{rule.sourceAlert.project}</span>
-                        </div>
-                        <p className="text-white group-hover:text-red-400 transition-colors line-clamp-1">
-                          {rule.sourceAlert.title}
-                        </p>
-                      </a>
-                    ) : (
-                      <div>
-                        <p className="text-zinc-500 text-sm">Unknown Alert</p>
-                        <p className="text-zinc-600 text-xs font-mono">{rule.sourceGroupKey.slice(0, 20)}...</p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {groups.map((group) => (
+          <div key={group.id} className="relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+             <div className="flex flex-1 flex-col p-6">
+                <div className="flex items-start justify-between">
+                   <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
+                         <Layers className="h-4 w-4" />
                       </div>
-                    )}
-                  </div>
-
-                  {/* Arrow */}
-                  <div className="flex flex-col items-center gap-1">
-                    <ArrowRight className="w-5 h-5 text-red-500" />
-                    <span className={`text-xs font-medium ${getConfidenceColor(rule.confidence)}`}>
-                      {Math.round(rule.confidence * 100)}%
-                    </span>
-                  </div>
-
-                  {/* Target Alert */}
-                  <div className="flex-1">
-                    {rule.targetAlert ? (
-                      <a
-                        href={`/dashboard/alerts/${rule.targetAlert.id}`}
-                        className="block group"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-2 h-2 rounded-full ${severityColors[rule.targetAlert.severity] || 'bg-zinc-500'}`}></div>
-                          <span className="text-xs text-zinc-500">{rule.targetAlert.project}</span>
-                        </div>
-                        <p className="text-white group-hover:text-red-400 transition-colors line-clamp-1">
-                          {rule.targetAlert.title}
-                        </p>
-                      </a>
-                    ) : (
                       <div>
-                        <p className="text-zinc-500 text-sm">Unknown Alert</p>
-                        <p className="text-zinc-600 text-xs font-mono">{rule.targetGroupKey.slice(0, 20)}...</p>
+                         <h3 className="font-medium text-gray-900 dark:text-gray-100">Group #{group.id.slice(0, 6)}</h3>
+                         <p className="text-xs text-gray-500">
+                           {formatDistanceToNow(new Date(group.createdAt), { addSuffix: true })}
+                         </p>
                       </div>
-                    )}
-                  </div>
+                   </div>
+                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${group.status === 'resolved' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+                      {group.status}
+                   </span>
                 </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-4 ml-6">
-                  <div className={`px-3 py-1 rounded-full ${getConfidenceBg(rule.confidence)}`}>
-                    <span className={`text-sm font-medium ${getConfidenceColor(rule.confidence)}`}>
-                      {rule.confidence >= 0.8 ? 'High' : rule.confidence >= 0.6 ? 'Medium' : 'Low'} Confidence
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(rule.id)}
-                    className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
-                    title="Delete rule"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                
+                <div className="mt-4 space-y-3">
+                   <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Primary Alert</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-200 truncate max-w-[150px]">
+                        {group.primaryAlertId}
+                      </span>
+                   </div>
+                   <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Related Alerts</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-200">
+                        {group.relatedAlertIds.length}
+                      </span>
+                   </div>
+                   <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Confidence</span>
+                      <span className="font-medium text-green-600 dark:text-green-400">
+                        {(group.confidenceScore * 100).toFixed(0)}%
+                      </span>
+                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                
+                {group.rootCauseAnalysis && (
+                   <div className="mt-4 rounded-md bg-gray-50 p-3 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                      <strong>AI Analysis:</strong> {group.rootCauseAnalysis}
+                   </div>
+                )}
+             </div>
+             
+             <div className="bg-gray-50 px-6 py-4 dark:bg-gray-800/50">
+                <Link href={`/dashboard/alerts/${group.primaryAlertId}`} className="flex items-center justify-end text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+                   View Incident <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+             </div>
+          </div>
+        ))}
 
-      {/* Info Box */}
-      <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-2 bg-blue-900/20 rounded-lg">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
-          </div>
-          <div>
-            <h3 className="font-medium text-white mb-1">How Correlation Works</h3>
-            <p className="text-sm text-zinc-500">
-              SignalCraft analyzes your alert history to find patterns. When Alert A frequently 
-              occurs within 5 minutes of Alert B, a correlation rule is created. Higher confidence 
-              means the pattern is more consistent. Use these rules to understand root causes and 
-              reduce alert fatigue.
-            </p>
-          </div>
-        </div>
+        {groups.length === 0 && (
+           <div className="col-span-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center text-gray-500 dark:border-gray-700">
+              No correlation groups active.
+           </div>
+        )}
       </div>
     </div>
   );
