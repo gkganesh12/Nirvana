@@ -9,7 +9,7 @@ interface CreateApiKeyDto {
     expiresAt?: Date;
 }
 
-interface ApiKeyResponse {
+export interface ApiKeyResponse {
     id: string;
     name: string;
     prefix: string;

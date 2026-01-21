@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { dashboardClient } from '@/lib/services/dashboard-client';
 import { CustomDashboard } from '@/types/dashboard';
 
 export default function DashboardListPage() {
   const [dashboards, setDashboards] = useState<CustomDashboard[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     loadDashboards();

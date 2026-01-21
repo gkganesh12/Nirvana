@@ -24,6 +24,15 @@ import { UptimeModule } from './uptime/uptime.module';
 import { SessionReplayModule } from './session-replay/session-replay.module';
 import { ApiKeysModule } from './api-keys/api-keys.module';
 import { AuditModule } from './audit/audit.module';
+import { EncryptionModule } from './common/encryption/encryption.module';
+import { SecretsModule } from './common/secrets/secrets.module';
+import { EventsModule } from './common/websocket/events.module';
+import { SamlModule } from './saml/saml.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { InvitationsModule } from './invitations/invitations.module';
+import { WorkflowModule } from './workflows/workflow.module';
+import { CorrelationModule } from './correlation/correlation.module';
+import { CustomDashboardModule } from './dashboards/dashboard.module';
 
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -80,6 +89,15 @@ import { ScheduleModule } from '@nestjs/schedule';
     SessionReplayModule,
     ApiKeysModule,
     AuditModule,
+    EncryptionModule,
+    SecretsModule,
+    EventsModule,
+    SamlModule,
+    PermissionsModule,
+    InvitationsModule,
+    WorkflowModule,
+    CorrelationModule,
+    CustomDashboardModule,
   ],
   providers: [
     {

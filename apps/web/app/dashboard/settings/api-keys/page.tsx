@@ -155,7 +155,7 @@ export default function ApiKeysPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-white mb-2">Save your API key now!</h3>
               <p className="text-sm text-zinc-300 mb-4">
-                For security reasons, this is the only time you'll be able to see this key.
+                For security reasons, this is the only time you&apos;ll be able to see this key.
                 Copy it now and store it securely.
               </p>
               <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export default function ApiKeysPage() {
               Include your API key in the Authorization header when making requests:
             </p>
             <code className="block bg-black/50 px-4 py-3 rounded-lg font-mono text-sm text-zinc-300">
-              curl -H "Authorization: Bearer sk_live_..." https://api.signalcraft.com/api/...
+              curl -H &quot;Authorization: Bearer sk_live_...&quot; https://api.signalcraft.com/api/...
             </code>
           </div>
         </div>

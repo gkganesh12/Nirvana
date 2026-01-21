@@ -1,17 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { 
   BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
   Clock, 
   AlertTriangle, 
   CheckCircle2, 
   XCircle,
   Activity,
   Users,
-  Zap
+  Zap,
+  LayoutDashboard
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -46,6 +47,48 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState('7d');
 
   useEffect(() => {
+    function generateSampleData(): AnalyticsData {
+      const days = timeRange === '24h' ? 24 : timeRange === '7d' ? 7 : 30;
+      const alertsOverTime = [];
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        alertsOverTime.push({
+          date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          count: Math.floor(Math.random() * 50) + 10,
+        });
+      }
+      
+      return {
+        alertsOverTime,
+        resolvedAverageTime: 47,
+        alertsBySeverity: [
+          { severity: 'CRITICAL', count: 12 },
+          { severity: 'HIGH', count: 34 },
+          { severity: 'MEDIUM', count: 67 },
+          { severity: 'LOW', count: 45 },
+          { severity: 'INFO', count: 23 },
+        ],
+        alertsByProject: [
+          { project: 'payments-api', count: 45 },
+          { project: 'user-service', count: 38 },
+          { project: 'web-frontend', count: 32 },
+          { project: 'auth-service', count: 28 },
+          { project: 'notifications', count: 18 },
+        ],
+        alertsByEnvironment: [
+          { environment: 'production', count: 89 },
+          { environment: 'staging', count: 42 },
+          { environment: 'development', count: 30 },
+        ],
+        totalAlerts: 181,
+        resolvedAlerts: 142,
+        openAlerts: 39,
+        mttr: 47,
+        resolutionRate: 78.5,
+      };
+    }
+
     async function fetchAnalytics() {
       try {
         const res = await fetch(`/api/dashboard/analytics?range=${timeRange}`);
@@ -64,48 +107,6 @@ export default function AnalyticsPage() {
     }
     fetchAnalytics();
   }, [timeRange]);
-
-  function generateSampleData(): AnalyticsData {
-    const days = timeRange === '24h' ? 24 : timeRange === '7d' ? 7 : 30;
-    const alertsOverTime = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      alertsOverTime.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        count: Math.floor(Math.random() * 50) + 10,
-      });
-    }
-    
-    return {
-      alertsOverTime,
-      resolvedAverageTime: 47,
-      alertsBySeverity: [
-        { severity: 'CRITICAL', count: 12 },
-        { severity: 'HIGH', count: 34 },
-        { severity: 'MEDIUM', count: 67 },
-        { severity: 'LOW', count: 45 },
-        { severity: 'INFO', count: 23 },
-      ],
-      alertsByProject: [
-        { project: 'payments-api', count: 45 },
-        { project: 'user-service', count: 38 },
-        { project: 'web-frontend', count: 32 },
-        { project: 'auth-service', count: 28 },
-        { project: 'notifications', count: 18 },
-      ],
-      alertsByEnvironment: [
-        { environment: 'production', count: 89 },
-        { environment: 'staging', count: 42 },
-        { environment: 'development', count: 30 },
-      ],
-      totalAlerts: 181,
-      resolvedAlerts: 142,
-      openAlerts: 39,
-      mttr: 47,
-      resolutionRate: 78.5,
-    };
-  }
 
   if (loading) {
     return (
@@ -139,6 +140,12 @@ export default function AnalyticsPage() {
           <p className="text-zinc-400 mt-1">Operational insights and metrics</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/dashboard/analytics/custom">
+            <Button variant="outline">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Custom Dashboards
+            </Button>
+          </Link>
           {['24h', '7d', '30d'].map((range) => (
             <button
               key={range}

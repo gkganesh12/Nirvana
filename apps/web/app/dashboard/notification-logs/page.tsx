@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { 
   Bell, 
   CheckCircle2, 
@@ -33,7 +33,7 @@ export default function NotificationLogsPage() {
   const [filter, setFilter] = useState<string>('');
   const [refreshing, setRefreshing] = useState(false);
 
-  async function fetchLogs() {
+  const fetchLogs = useCallback(async () => {
     try {
       const url = filter 
         ? `/api/notification-logs?status=${filter}` 
@@ -49,11 +49,11 @@ export default function NotificationLogsPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }
+  }, [filter]);
 
   useEffect(() => {
     fetchLogs();
-  }, [filter]);
+  }, [fetchLogs]);
 
   const handleRefresh = () => {
     setRefreshing(true);

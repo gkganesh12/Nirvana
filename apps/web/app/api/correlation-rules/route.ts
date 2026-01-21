@@ -79,7 +79,7 @@ export async function DELETE(request: NextRequest) {
     }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
     const { getToken } = await auth();
     const token = await getToken();
 

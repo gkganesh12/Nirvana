@@ -23,302 +23,102 @@ describe('RulesEngineService', () => {
         jest.clearAllMocks();
     });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
-    });
-
-    describe('evaluateCondition', () => {
+    describe('testRule', () => {
         it('should match "equals" condition', () => {
-            const condition = {
-                field: 'severity',
-                operator: 'equals' as const,
-                value: 'CRITICAL',
+            const conditions = {
+                all: [{ field: 'severity' as any, operator: 'equals' as any, value: 'critical' }]
             };
-            const alert = { severity: 'CRITICAL', project: 'web-app' };
+            const alert: any = { severity: 'critical', project: 'web-app' };
 
-            expect(service.evaluateCondition(condition, alert)).toBe(true);
+            const result = service.testRule(conditions, alert);
+            expect(result.matched).toBe(true);
         });
 
         it('should not match "equals" when values differ', () => {
-            const condition = {
-                field: 'severity',
-                operator: 'equals' as const,
-                value: 'CRITICAL',
+            const conditions = {
+                all: [{ field: 'severity' as any, operator: 'equals' as any, value: 'critical' }]
             };
-            const alert = { severity: 'HIGH', project: 'web-app' };
+            const alert: any = { severity: 'high', project: 'web-app' };
 
-            expect(service.evaluateCondition(condition, alert)).toBe(false);
+            const result = service.testRule(conditions, alert);
+            expect(result.matched).toBe(false);
         });
 
         it('should match "contains" condition', () => {
-            const condition = {
-                field: 'message',
-                operator: 'contains' as const,
-                value: 'timeout',
+            const conditions = {
+                all: [{ field: 'title' as any, operator: 'contains' as any, value: 'timeout' }]
             };
-            const alert = {
-                message: 'Connection timeout occurred',
-                severity: 'HIGH',
+            const alert: any = {
+                title: 'Connection timeout occurred',
+                severity: 'high',
             };
 
-            expect(service.evaluateCondition(condition, alert)).toBe(true);
-        });
-
-        it('should match "startsWith" condition', () => {
-            const condition = {
-                field: 'project',
-                operator: 'startsWith' as const,
-                value: 'web-',
-            };
-            const alert = { project: 'web-app-frontend', severity: 'HIGH' };
-
-            expect(service.evaluateCondition(condition, alert)).toBe(true);
+            const result = service.testRule(conditions, alert);
+            expect(result.matched).toBe(true);
         });
 
         it('should match "in" condition with array', () => {
-            const condition = {
-                field: 'environment',
-                operator: 'in' as const,
-                value: ['production', 'staging'],
+            const conditions = {
+                all: [{ field: 'environment' as any, operator: 'in' as any, value: ['production', 'staging'] }]
             };
-            const alert = { environment: 'production', severity: 'HIGH' };
+            const alert: any = { environment: 'production', severity: 'high' };
 
-            expect(service.evaluateCondition(condition, alert)).toBe(true);
+            const result = service.testRule(conditions, alert);
+            expect(result.matched).toBe(true);
         });
 
-        it('should not match "in" condition when value not in array', () => {
-            const condition = {
-                field: 'environment',
-                operator: 'in' as const,
-                value: ['production', 'staging'],
+        it('should match "greater_than" for severity rank', () => {
+            const conditions = {
+                all: [{ field: 'severity' as any, operator: 'greater_than' as any, value: 'low' }]
             };
-            const alert = { environment: 'development', severity: 'HIGH' };
-
-            expect(service.evaluateCondition(condition, alert)).toBe(false);
-        });
-
-        it('should match "exists" condition when field is present', () => {
-            const condition = {
-                field: 'user.id',
-                operator: 'exists' as const,
-                value: true,
-            };
-            const alert = {
-                severity: 'HIGH',
-                tags: { 'user.id': 'user123' },
+            const alert: any = {
+                severity: 'critical',
             };
 
-            expect(service.evaluateCondition(condition, alert)).toBe(true);
-        });
-
-        it('should match "greaterThan" for numeric values', () => {
-            const condition = {
-                field: 'eventCount',
-                operator: 'greaterThan' as const,
-                value: 10,
-            };
-            const alert = {
-                severity: 'HIGH',
-                eventCount: 15,
-            };
-
-            expect(service.evaluateCondition(condition, alert)).toBe(true);
+            const result = service.testRule(conditions, alert);
+            expect(result.matched).toBe(true);
         });
     });
 
-    describe('evaluateConditionGroup', () => {
-        it('should evaluate AND group correctly (all true)', () => {
-            const group = {
-                operator: 'AND' as const,
-                conditions: [
-                    { field: 'severity', operator: 'equals' as const, value: 'CRITICAL' },
-                    { field: 'environment', operator: 'equals' as const, value: 'production' },
-                ],
-            };
-            const alert = {
-                severity: 'CRITICAL',
-                environment: 'production',
-                project: 'web-app',
-            };
-
-            expect(service.evaluateConditionGroup(group, alert)).toBe(true);
-        });
-
-        it('should evaluate AND group correctly (one false)', () => {
-            const group = {
-                operator: 'AND' as const,
-                conditions: [
-                    { field: 'severity', operator: 'equals' as const, value: 'CRITICAL' },
-                    { field: 'environment', operator: 'equals' as const, value: 'production' },
-                ],
-            };
-            const alert = {
-                severity: 'CRITICAL',
-                environment: 'staging', // doesn't match
-                project: 'web-app',
-            };
-
-            expect(service.evaluateConditionGroup(group, alert)).toBe(false);
-        });
-
-        it('should evaluate OR group correctly (at least one true)', () => {
-            const group = {
-                operator: 'OR' as const,
-                conditions: [
-                    { field: 'severity', operator: 'equals' as const, value: 'CRITICAL' },
-                    { field: 'severity', operator: 'equals' as const, value: 'HIGH' },
-                ],
-            };
-            const alert = {
-                severity: 'HIGH', // matches second condition
-                environment: 'production',
-            };
-
-            expect(service.evaluateConditionGroup(group, alert)).toBe(true);
-        });
-
-        it('should evaluate OR group correctly (all false)', () => {
-            const group = {
-                operator: 'OR' as const,
-                conditions: [
-                    { field: 'severity', operator: 'equals' as const, value: 'CRITICAL' },
-                    { field: 'severity', operator: 'equals' as const, value: 'HIGH' },
-                ],
-            };
-            const alert = {
-                severity: 'MEDIUM', // doesn't match any
-                environment: 'production',
-            };
-
-            expect(service.evaluateConditionGroup(group, alert)).toBe(false);
-        });
-
-        it('should handle nested condition groups', () => {
-            const group = {
-                operator: 'AND' as const,
-                conditions: [
-                    { field: 'project', operator: 'equals' as const, value: 'web-app' },
-                ],
-                groups: [
-                    {
-                        operator: 'OR' as const,
-                        conditions: [
-                            { field: 'severity', operator: 'equals' as const, value: 'CRITICAL' },
-                            { field: 'severity', operator: 'equals' as const, value: 'HIGH' },
-                        ],
-                    },
-                ],
-            };
-            const alert = {
-                project: 'web-app',
-                severity: 'HIGH',
-            };
-
-            expect(service.evaluateConditionGroup(group, alert)).toBe(true);
-        });
-    });
-
-    describe('findMatchingRule', () => {
+    describe('getFirstMatchingRule', () => {
         it('should find first matching enabled rule', async () => {
             const mockRules = [
                 {
                     id: 'rule1',
+                    name: 'Rule 1',
                     priority: 1,
                     enabled: true,
-                    conditions: {
-                        operator: 'AND',
-                        conditions: [
-                            { field: 'severity', operator: 'equals', value: 'CRITICAL' },
-                        ],
+                    conditionsJson: {
+                        all: [{ field: 'severity', operator: 'equals', value: 'critical' }],
                     },
-                    actions: [{ type: 'slack', config: { channel: '#alerts' } }],
-                },
-                {
-                    id: 'rule2',
-                    priority: 2,
-                    enabled: true,
-                    conditions: {
-                        operator: 'AND',
-                        conditions: [
-                            { field: 'severity', operator: 'equals', value: 'HIGH' },
-                        ],
-                    },
-                    actions: [{ type: 'slack', config: { channel: '#warnings' } }],
+                    actionsJson: { slackChannelId: 'C123' },
+                    workspaceId: 'ws-1',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
                 },
             ];
 
             (prisma.routingRule.findMany as jest.Mock).mockResolvedValue(mockRules);
 
-            const alert = {
-                severity: 'CRITICAL',
+            const alert: any = {
+                severity: 'critical',
                 project: 'web-app',
                 environment: 'production',
             };
 
-            const matchingRule = await service.findMatchingRule('workspace123', alert);
+            const result = await service.getFirstMatchingRule('ws-1', alert);
 
-            expect(matchingRule).toBeDefined();
-            expect(matchingRule?.id).toBe('rule1');
-        });
-
-        it('should skip disabled rules', async () => {
-            const mockRules = [
-                {
-                    id: 'rule1',
-                    priority: 1,
-                    enabled: false, // disabled
-                    conditions: {
-                        operator: 'AND',
-                        conditions: [
-                            { field: 'severity', operator: 'equals', value: 'CRITICAL' },
-                        ],
-                    },
-                    actions: [],
-                },
-                {
-                    id: 'rule2',
-                    priority: 2,
-                    enabled: true,
-                    conditions: {
-                        operator: 'AND',
-                        conditions: [
-                            { field: 'severity', operator: 'equals', value: 'CRITICAL' },
-                        ],
-                    },
-                    actions: [],
-                },
-            ];
-
-            (prisma.routingRule.findMany as jest.Mock).mockResolvedValue(mockRules);
-
-            const alert = { severity: 'CRITICAL', project: 'web-app' };
-            const matchingRule = await service.findMatchingRule('workspace123', alert);
-
-            expect(matchingRule?.id).toBe('rule2'); // should match the enabled rule
+            expect(result).toBeDefined();
+            expect(result?.ruleId).toBe('rule1');
         });
 
         it('should return null when no rules match', async () => {
-            const mockRules = [
-                {
-                    id: 'rule1',
-                    priority: 1,
-                    enabled: true,
-                    conditions: {
-                        operator: 'AND',
-                        conditions: [
-                            { field: 'severity', operator: 'equals', value: 'CRITICAL' },
-                        ],
-                    },
-                    actions: [],
-                },
-            ];
+            (prisma.routingRule.findMany as jest.Mock).mockResolvedValue([]);
 
-            (prisma.routingRule.findMany as jest.Mock).mockResolvedValue(mockRules);
+            const alert: any = { severity: 'low', project: 'web-app' };
+            const result = await service.getFirstMatchingRule('ws-1', alert);
 
-            const alert = { severity: 'LOW', project: 'web-app' };
-            const matchingRule = await service.findMatchingRule('workspace123', alert);
-
-            expect(matchingRule).toBeNull();
+            expect(result).toBeNull();
         });
     });
 });

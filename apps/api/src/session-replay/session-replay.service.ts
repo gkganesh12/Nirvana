@@ -129,6 +129,7 @@ export class SessionReplayService {
                 sessionId: dto.sessionId,
                 duration: dto.duration,
                 storageUrl: dto.storageUrl,
+                events: [], // Required field - empty since events are stored in R2
             },
         });
 
@@ -193,5 +194,38 @@ export class SessionReplayService {
         });
 
         return !!latestEvent?.sessionReplay;
+    }
+
+    /**
+     * Get session replay for a specific alert event
+     */
+    async getReplayForEvent(eventId: string): Promise<SessionReplayResponse | null> {
+        const replay = await prisma.sessionReplay.findUnique({
+            where: { alertEventId: eventId },
+        });
+
+        if (!replay) {
+            return null;
+        }
+
+        // If using R2, generate download URL
+        if (replay.storageUrl && this.s3Client) {
+            const downloadUrl = await this.generateDownloadUrl(replay.sessionId);
+            return {
+                id: replay.id,
+                sessionId: replay.sessionId,
+                duration: replay.duration,
+                storageUrl: downloadUrl,
+                createdAt: replay.createdAt,
+            };
+        }
+
+        return {
+            id: replay.id,
+            sessionId: replay.sessionId,
+            duration: replay.duration,
+            storageUrl: replay.storageUrl,
+            createdAt: replay.createdAt,
+        };
     }
 }

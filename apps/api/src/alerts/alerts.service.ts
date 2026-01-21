@@ -3,6 +3,8 @@ import { prisma, AlertSeverity, Prisma, AlertStatus } from '@signalcraft/databas
 import { NormalizedAlert } from '@signalcraft/shared';
 import { AiService } from '../ai/ai.service';
 import { AnomalyDetectionService } from './anomaly-detection.service';
+import { EventsGateway } from '../common/websocket/events.gateway';
+import { AuditService } from '../audit/audit.service';
 
 export interface AlertGroupFilters {
   status?: AlertStatus[];
@@ -39,6 +41,8 @@ export class AlertsService {
   constructor(
     private readonly aiService: AiService,
     private readonly anomalyDetectionService: AnomalyDetectionService,
+    private readonly eventsGateway: EventsGateway,
+    private readonly auditService: AuditService,
   ) { }
 
 
@@ -134,6 +138,9 @@ export class AlertsService {
 
     // Extract and save breadcrumbs from Sentry payload
     await this.extractAndSaveBreadcrumbs(event.id, payload);
+
+    // Emit real-time event
+    this.eventsGateway.emitToWorkspace(workspaceId, 'alert.created', event);
 
     return event;
   }
@@ -375,13 +382,26 @@ export class AlertsService {
       return null;
     }
 
-    return prisma.alertGroup.update({
+    const updated = await prisma.alertGroup.update({
       where: { id: groupId },
       data: {
         status: AlertStatus.ACK,
         assigneeUserId: userId ?? alert.assigneeUserId,
       },
     });
+
+    if (userId) {
+      await this.auditService.log({
+        workspaceId,
+        userId,
+        action: 'ACKNOWLEDGE_ALERT',
+        resourceType: 'AlertGroup',
+        resourceId: groupId,
+        metadata: { title: alert.title },
+      });
+    }
+
+    return updated;
   }
 
   /**
@@ -413,7 +433,7 @@ export class AlertsService {
       ? Math.round((alert.avgResolutionMins + resolutionMinutes) / 2)
       : resolutionMinutes;
 
-    return prisma.alertGroup.update({
+    const updated = await prisma.alertGroup.update({
       where: { id: groupId },
       data: {
         status: AlertStatus.RESOLVED,
@@ -423,12 +443,27 @@ export class AlertsService {
         avgResolutionMins: newAvgResolution,
       },
     });
+
+    if (resolvedBy) {
+      // Find the DB user by resolvedBy email or ID?
+      // Alerts controller passes DB user ID as resolvedBy.
+      await this.auditService.log({
+        workspaceId,
+        userId: resolvedBy,
+        action: 'RESOLVE_ALERT',
+        resourceType: 'AlertGroup',
+        resourceId: groupId,
+        metadata: { title: alert.title, resolutionMinutes },
+      });
+    }
+
+    return updated;
   }
 
   /**
    * Snooze an alert group for a duration
    */
-  async snoozeAlert(workspaceId: string, groupId: string, durationMinutes = 60) {
+  async snoozeAlert(workspaceId: string, groupId: string, durationMinutes = 60, userId?: string) {
     const alert = await prisma.alertGroup.findFirst({
       where: { id: groupId, workspaceId },
     });
@@ -439,13 +474,27 @@ export class AlertsService {
 
     const snoozeUntil = new Date(Date.now() + durationMinutes * 60 * 1000);
 
-    return prisma.alertGroup.update({
+    const updated = await prisma.alertGroup.update({
       where: { id: groupId },
       data: {
         status: AlertStatus.SNOOZED,
         snoozeUntil,
       },
     });
+
+    if (userId) {
+      await this.auditService.log({
+        workspaceId,
+        userId,
+        action: 'SNOOZE_ALERT',
+        resourceType: 'AlertGroup',
+        resourceId: groupId,
+        metadata: { title: alert.title, durationMinutes },
+      });
+    }
+
+    this.eventsGateway.emitToWorkspace(workspaceId, 'alert.updated', updated);
+    return updated;
   }
 
   /**
@@ -460,13 +509,15 @@ export class AlertsService {
       return null;
     }
 
-    return prisma.alertGroup.update({
+    const updated = await prisma.alertGroup.update({
       where: { id: groupId },
       data: {
         ...(data.assigneeUserId !== undefined && { assigneeUserId: data.assigneeUserId }),
         ...(data.runbookUrl !== undefined && { runbookUrl: data.runbookUrl }),
       },
     });
+    this.eventsGateway.emitToWorkspace(workspaceId, 'alert.updated', updated);
+    return updated;
   }
 
   async getWorkspaceIdByClerkId(clerkId: string) {
@@ -476,15 +527,15 @@ export class AlertsService {
 
   private mapSeverity(severity: NormalizedAlert['severity']): AlertSeverity {
     switch (severity) {
-      case 'critical':
+      case AlertSeverity.CRITICAL:
         return AlertSeverity.CRITICAL;
-      case 'high':
+      case AlertSeverity.HIGH:
         return AlertSeverity.HIGH;
-      case 'med':
+      case AlertSeverity.MEDIUM:
         return AlertSeverity.MEDIUM;
-      case 'low':
+      case AlertSeverity.LOW:
         return AlertSeverity.LOW;
-      case 'info':
+      case AlertSeverity.INFO:
       default:
         return AlertSeverity.INFO;
     }

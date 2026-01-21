@@ -1,4 +1,4 @@
-export type WorkspaceRole = 'owner' | 'admin' | 'member';
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'MEMBER';
 
 export interface WorkspaceRef {
   id: string;
@@ -11,7 +11,7 @@ export interface UserRef {
   displayName: string | null;
 }
 
-export type AlertSeverity = 'info' | 'low' | 'med' | 'high' | 'critical';
+export type AlertSeverity = 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 export interface NormalizedAlert {
   source: string;

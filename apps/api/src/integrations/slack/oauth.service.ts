@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { prisma, IntegrationStatus, IntegrationType } from '@signalcraft/database';
-import { EncryptionService } from '../encryption.service';
+import { EncryptionService } from '../../common/encryption/encryption.service';
+import { SecretsService } from '../../common/secrets/secrets.service';
 
 interface SlackOAuthResponse {
   ok: boolean;
@@ -13,15 +14,34 @@ interface SlackOAuthResponse {
 
 @Injectable()
 export class SlackOAuthService {
-  constructor(private readonly encryption: EncryptionService) {}
+  private readonly logger = new Logger(SlackOAuthService.name);
+
+  constructor(
+    private readonly encryption: EncryptionService,
+    private readonly secretsService: SecretsService,
+  ) { }
 
   async exchangeCode(code: string) {
-    const clientId = process.env.SLACK_CLIENT_ID;
-    const clientSecret = process.env.SLACK_CLIENT_SECRET;
-    const redirectUri = process.env.SLACK_REDIRECT_URI;
+    let clientId: string | undefined;
+    let clientSecret: string | undefined;
+    let redirectUri: string | undefined;
+
+    try {
+      // ✅ SECURE: Get from Secrets Manager
+      clientId = await this.secretsService.getSecret('signalcraft/global/slack-client-id');
+      clientSecret = await this.secretsService.getSecret('signalcraft/global/slack-client-secret');
+      redirectUri = process.env.SLACK_REDIRECT_URI; // Keeping this in env as it's not a secret
+    } catch (error) {
+      // Fallback to Env
+      clientId = process.env.SLACK_CLIENT_ID;
+      clientSecret = process.env.SLACK_CLIENT_SECRET;
+      redirectUri = process.env.SLACK_REDIRECT_URI;
+
+      this.logger.warn('Slack OAuth secrets not found in Secrets Manager, using fallback');
+    }
 
     if (!clientId || !clientSecret || !redirectUri) {
-      throw new Error('Slack OAuth env vars missing');
+      throw new Error('Slack OAuth configuration missing');
     }
 
     const response = await fetch('https://slack.com/api/oauth.v2.access', {

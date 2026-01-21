@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as rrweb from 'rrweb';
-import type { eventWithTime } from 'rrweb/typings/types';
+// @ts-ignore - eventWithTime is not exported from rrweb directly in some versions
+import type { eventWithTime, listenerHandler } from '@rrweb/types';
 
 interface UseSessionRecordingOptions {
     enabled?: boolean;
@@ -22,7 +23,7 @@ export function useSessionRecording(options: UseSessionRecordingOptions = {}) {
     const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
     const [isRecording, setIsRecording] = useState(false);
     const eventsRef = useRef<eventWithTime[]>([]);
-    const stopFnRef = useRef<(() => void) | null>(null);
+    const stopFnRef = useRef<listenerHandler | undefined | null>(null);
     const startTimeRef = useRef<number>(0);
 
     useEffect(() => {
@@ -52,7 +53,9 @@ export function useSessionRecording(options: UseSessionRecordingOptions = {}) {
         stopFnRef.current = stopFn;
 
         return () => {
-            stopFn();
+            if (stopFn) {
+                stopFn();
+            }
             setIsRecording(false);
         };
     }, [enabled, sampleRate, maxDuration]);

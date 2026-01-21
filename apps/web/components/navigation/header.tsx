@@ -45,8 +45,17 @@ export function Header() {
   );
 }
 
+interface AlertGroup {
+  id: string;
+  title: string;
+  severity: string;
+  environment: string;
+  project: string;
+  lastSeenAt: string;
+}
+
 function NotificationsDropdown() {
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<AlertGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasNew, setHasNew] = useState(false);
 

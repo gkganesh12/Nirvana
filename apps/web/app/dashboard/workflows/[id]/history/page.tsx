@@ -6,7 +6,7 @@ import { workflowClient } from '@/lib/services/workflow-client';
 import { WorkflowExecution, Workflow } from '@/types/workflow';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle, XCircle, Clock, Terminal } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/utils';
 
 export default function WorkflowHistoryPage({ params }: { params: { id: string } }) {
   const [executions, setExecutions] = useState<WorkflowExecution[]>([]);
@@ -15,6 +15,7 @@ export default function WorkflowHistoryPage({ params }: { params: { id: string }
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   async function loadData() {
@@ -77,7 +78,7 @@ export default function WorkflowHistoryPage({ params }: { params: { id: string }
                           {exec.status}
                         </p>
                         <p className="text-xs text-gray-500">
-                          Started {formatDistanceToNow(new Date(exec.startedAt), { addSuffix: true })}
+                          Started {formatDistanceToNow(new Date(exec.startedAt))}
                         </p>
                       </div>
                     </div>

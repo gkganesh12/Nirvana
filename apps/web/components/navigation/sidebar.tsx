@@ -1,14 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Inbox, GitBranch, Webhook, BarChart3, Settings, AlertTriangle, Bell, GitMerge } from 'lucide-react';
+import { Inbox, GitBranch, Webhook, BarChart3, Settings, AlertTriangle, Bell, GitMerge, Activity, Calendar, Workflow } from 'lucide-react';
 
 const links = [
   { label: 'Overview', href: '/dashboard', icon: Inbox },
   { label: 'Alerts', href: '/dashboard/alerts', icon: AlertTriangle },
+  { label: 'Activity Feed', href: '/dashboard/activity', icon: Activity },
+  { label: 'On-call Schedule', href: '/dashboard/on-call', icon: Calendar },
   { label: 'Routing Rules', href: '/dashboard/rules', icon: GitBranch },
+  { label: 'Workflows', href: '/dashboard/workflows', icon: Workflow },
   { label: 'Correlations', href: '/dashboard/correlations', icon: GitMerge },
   { label: 'Integrations', href: '/dashboard/integrations', icon: Webhook },
   { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
@@ -24,7 +28,7 @@ export function Sidebar() {
          {/* Team Switcher Placeholder */}
          <div className="flex items-center gap-3 rounded-lg bg-red-950/10 px-3 py-2 border border-red-900/20 hover:bg-red-900/20 transition-colors cursor-pointer group">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black border border-red-900/30 group-hover:border-red-500/50 transition-colors">
-              <img src="/logo.png" alt="Team Logo" className="h-6 w-6 object-contain" />
+              <Image src="/logo.png" alt="Team Logo" width={24} height={24} className="object-contain" />
             </div>
             <div className="flex flex-col">
                <span className="text-sm font-medium text-white">SignalCraft</span>

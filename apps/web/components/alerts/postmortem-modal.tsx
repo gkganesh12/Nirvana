@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
-import { FileText, Download } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface PostmortemModalProps {
   alertGroupId: string;

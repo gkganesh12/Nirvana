@@ -1,18 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { WebClient } from '@slack/web-api';
+import { SecretsService } from '../../common/secrets/secrets.service';
 import { prisma } from '@signalcraft/database';
 import { SlackOAuthService } from './oauth.service';
 
+interface SlackConfig {
+  accessToken: string;
+  botToken: string;
+  signingSecret: string;
+  teamId?: string;
+}
+
 @Injectable()
 export class SlackService {
-  constructor(private readonly slackOAuth: SlackOAuthService) { }
+  private readonly logger = new Logger(SlackService.name);
+  private readonly clients = new Map<string, WebClient>();
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly secretsService: SecretsService,
+    private readonly slackOAuth: SlackOAuthService,
+  ) { }
+
+  /**
+   * Get or create Slack client for workspace
+   */
+  async getClient(workspaceId: string): Promise<WebClient> {
+    // Check cache
+    if (this.clients.has(workspaceId)) {
+      return this.clients.get(workspaceId)!;
+    }
+
+    // ✅ RETRIEVE SLACK CREDENTIALS FROM SECRETS MANAGER
+    const config = await this.getSlackConfig(workspaceId);
+
+    const client = new WebClient(config.botToken);
+    this.clients.set(workspaceId, client);
+
+    return client;
+  }
+
+  /**
+   * Get Slack configuration from AWS Secrets Manager
+   */
+  async getSlackConfig(workspaceId: string): Promise<SlackConfig> {
+    try {
+      // ✅ SECURE: Get from Secrets Manager instead of .env
+      const config = await this.secretsService.getSecretJson<SlackConfig>(
+        `signalcraft/${workspaceId}/slack`
+      );
+
+      this.logger.log(`Retrieved Slack config for workspace ${workspaceId}`);
+      return config;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to retrieve Slack config for workspace ${workspaceId}: ${message}`);
+      throw new NotFoundException(`Slack configuration not found for workspace ${workspaceId}`);
+    }
+  }
 
   async listChannels(workspaceId: string) {
-    const token = await this.slackOAuth.getDecryptedToken(workspaceId);
-    if (!token) {
-      return [];
-    }
-    const client = new WebClient(token);
+    const client = await this.getClient(workspaceId);
     const response = await client.conversations.list({
       types: 'public_channel,private_channel',
       limit: 200,

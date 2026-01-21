@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { FilterBar } from '@/components/alerts/filter-bar';
 import { AlertTable } from '@/components/alerts/alert-table';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 
 interface AlertGroup {
   id: string;

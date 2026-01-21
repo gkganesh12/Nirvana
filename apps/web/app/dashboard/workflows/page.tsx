@@ -9,7 +9,6 @@ import {
   Plus, 
   Play, 
   Pause, 
-  MoreHorizontal, 
   Trash2, 
   Edit,
   History

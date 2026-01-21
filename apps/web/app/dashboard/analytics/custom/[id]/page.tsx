@@ -9,16 +9,37 @@ import { AlertsBySeverityWidget } from '@/components/dashboard/widgets/alerts-by
 import { RecentAlertsWidget } from '@/components/dashboard/widgets/recent-alerts-widget';
 import { Button } from '@/components/ui/button';
 import { Pencil, ArrowLeft, RefreshCw } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/utils';
+
+// Widget data types
+interface SeverityData {
+  severity: string;
+  count: number;
+}
+
+interface Alert {
+  id: string;
+  title: string;
+  severity: string;
+  status: string;
+  lastSeenAt: string;
+}
+
+type WidgetData = 
+  | { count: number }
+  | SeverityData[]
+  | Alert[]
+  | null;
 
 export default function ViewDashboardPage({ params }: { params: { id: string } }) {
   const [dashboard, setDashboard] = useState<CustomDashboard | null>(null);
-  const [widgetData, setWidgetData] = useState<Record<string, any>>({});
+  const [widgetData, setWidgetData] = useState<Record<string, WidgetData>>({});
   const [loading, setLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   useEffect(() => {
     loadDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   async function loadDashboardData() {
@@ -30,7 +51,7 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
       setDashboard(response.dashboard);
       
       // Transform array to map for easier lookup
-      const dataMap: Record<string, any> = {};
+      const dataMap: Record<string, WidgetData> = {};
       response.widgetData.forEach(item => {
         dataMap[item.id] = item.data;
       });
@@ -50,11 +71,11 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
     
     switch (widget.type) {
       case 'alert_count':
-        return <AlertCountWidget title={widget.title} data={data} loading={false} />;
+        return <AlertCountWidget title={widget.title} data={data as { count: number } | null} loading={false} />;
       case 'alerts_by_severity':
-        return <AlertsBySeverityWidget title={widget.title} data={data} loading={false} />;
+        return <AlertsBySeverityWidget title={widget.title} data={data as SeverityData[] | null} loading={false} />;
       case 'recent_alerts':
-        return <RecentAlertsWidget title={widget.title} data={data} loading={false} />;
+        return <RecentAlertsWidget title={widget.title} data={data as Alert[] | null} loading={false} />;
       default:
         return (
           <div className="flex h-full items-center justify-center rounded-lg border bg-gray-50 p-4 text-gray-500">
@@ -106,7 +127,7 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
           <div className="flex items-center gap-3">
              {lastRefreshed && (
                <span className="text-xs text-gray-400">
-                 Updated {formatDistanceToNow(lastRefreshed, { addSuffix: true })}
+                 Updated {formatDistanceToNow(lastRefreshed)}
                </span>
              )}
              <Button variant="outline" size="sm" onClick={loadDashboardData} disabled={loading}>

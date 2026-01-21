@@ -14,7 +14,7 @@ import { UserId } from '../common/decorators/user-id.decorator';
 import { ApiKeyService } from './api-key.service';
 
 class CreateApiKeyDto {
-    name: string;
+    name!: string;
     expiresAt?: string; // ISO date string
 }
 

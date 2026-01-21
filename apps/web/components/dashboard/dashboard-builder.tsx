@@ -5,12 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { dashboardClient } from '@/lib/services/dashboard-client';
-import { CustomDashboard, CreateDashboardDto, Widget } from '@/types/dashboard';
+import { CreateDashboardDto, Widget } from '@/types/dashboard';
 import { AlertCountWidget } from './widgets/alert-count-widget';
 import { AlertsBySeverityWidget } from './widgets/alerts-by-severity-widget';
 import { RecentAlertsWidget } from './widgets/recent-alerts-widget';
 import { 
-  Plus, 
   Save, 
   BarChart3, 
   List, 
@@ -139,10 +138,13 @@ export function DashboardBuilder({ dashboardId }: DashboardBuilderProps) {
     
     switch (widget.type) {
       case 'alert_count':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return <AlertCountWidget title={widget.title} data={data as any} loading={false} />;
       case 'alerts_by_severity':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return <AlertsBySeverityWidget title={widget.title} data={data as any} loading={false} />;
       case 'recent_alerts':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return <RecentAlertsWidget title={widget.title} data={data as any} loading={false} />;
       default:
         return <div className="p-4 text-center text-gray-500">Unknown Widget Type</div>;

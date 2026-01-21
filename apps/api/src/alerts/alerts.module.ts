@@ -16,6 +16,7 @@ import { PostmortemService } from './postmortem.service';
 import { EscalationsModule } from '../escalations/escalations.module';
 import { RoutingModule } from '../routing/routing.module';
 import { AiModule } from '../ai/ai.module';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AiModule } from '../ai/ai.module';
     forwardRef(() => EscalationsModule),
     forwardRef(() => RoutingModule),
     AiModule,
+    AuditModule,
   ],
   controllers: [AlertsController, HygieneController, CorrelationRulesController],
   providers: [

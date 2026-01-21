@@ -1,7 +1,7 @@
 'use client';
 
 import { WorkflowStep } from '@/types/workflow';
-import { Zap, PlayCircle, GitBranch, CheckSquare, Settings } from 'lucide-react';
+import { Zap, PlayCircle, GitBranch, Settings } from 'lucide-react';
 
 interface WorkflowCanvasProps {
   steps: WorkflowStep[];
@@ -11,10 +11,7 @@ interface WorkflowCanvasProps {
 export function WorkflowCanvas({ steps, onStepClick }: WorkflowCanvasProps) {
   // Simple vertical layout with SVG connectors
   const nodeHeight = 80;
-  const nodeWidth = 280;
   const gap = 40;
-  
-  const totalHeight = (steps.length + 1) * (nodeHeight + gap); // +1 for trigger
 
   return (
     <div className="relative min-h-[600px] w-full overflow-auto rounded-xl bg-slate-50 p-8 dark:bg-slate-900/50">
@@ -58,7 +55,7 @@ export function WorkflowCanvas({ steps, onStepClick }: WorkflowCanvasProps) {
         </div>
 
         {/* Steps */}
-        {steps.map((step, index) => (
+        {steps.map((step, _index) => (
           <div 
             key={step.id} 
             onClick={() => onStepClick(step.id)}

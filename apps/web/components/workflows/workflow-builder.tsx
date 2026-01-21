@@ -4,20 +4,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { workflowClient } from '@/lib/services/workflow-client';
 import { 
-  Workflow, 
   CreateWorkflowDto, 
   WorkflowStep,
   WorkflowTrigger 
 } from '@/types/workflow';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { 
   Plus, 
   Save, 
-  ArrowRight,
   Zap,
-  CheckCircle,
   XCircle,
   Settings
 } from 'lucide-react';
@@ -172,7 +168,7 @@ export function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
                 <div className="flex-1">
                    <select 
                       value={step.type}
-                      onChange={(e) => updateStep(step.id, { type: e.target.value as any })}
+                      onChange={(e) => updateStep(step.id, { type: e.target.value as WorkflowStep['type'] })}
                       className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 sm:text-sm"
                    >
                      <option value="action">Action</option>

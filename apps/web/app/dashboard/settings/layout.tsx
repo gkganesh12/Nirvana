@@ -8,6 +8,8 @@ const navItems = [
   { href: '/dashboard/settings/workspace', label: 'Workspace', icon: '🏢' },
   { href: '/dashboard/settings/users', label: 'Users', icon: '👥' },
   { href: '/dashboard/settings/notifications', label: 'Notifications', icon: '🔔' },
+  { href: '/dashboard/settings/sso', label: 'SSO / SAML', icon: '🔐' },
+  { href: '/dashboard/settings/permissions', label: 'Permissions', icon: '🛡️' },
 ];
 
 export default function SettingsLayout({

@@ -51,7 +51,16 @@ describe('RoutingRulesService', () => {
                 actions: { slackChannelId: 'C123' },
             };
 
-            (prisma.routingRule.create as jest.Mock).mockResolvedValue({ id: 'rule-1', ...dto, priority: 1, enabled: true });
+            (prisma.routingRule.create as jest.Mock).mockResolvedValue({
+                id: 'rule-1',
+                ...dto,
+                conditionsJson: dto.conditions,
+                actionsJson: dto.actions,
+                priority: 1,
+                enabled: true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
 
             const result = await service.createRule('ws-1', dto);
 
@@ -63,7 +72,7 @@ describe('RoutingRulesService', () => {
         it('should throw BadRequest if conditions are missing', async () => {
             const dto: any = {
                 name: 'Bad Rule',
-                conditions: {},
+                conditions: null,
                 actions: { slackChannelId: 'C123' },
             };
             await expect(service.createRule('ws-1', dto)).rejects.toThrow(BadRequestException);

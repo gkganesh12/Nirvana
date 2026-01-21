@@ -1,17 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { 
   Users, 
   Bell, 
   Building2, 
   ChevronRight,
-  Shield,
   Key,
-  Globe,
-  Palette
 } from 'lucide-react';
 
 const settingsSections = [
@@ -48,7 +43,6 @@ const settingsSections = [
 ];
 
 export default function SettingsPage() {
-  const pathname = usePathname();
 
   return (
     <div className="space-y-6">

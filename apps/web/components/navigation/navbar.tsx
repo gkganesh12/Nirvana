@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@clerk/nextjs';
 import { Menu, X } from 'lucide-react';
@@ -17,7 +18,7 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <div className="relative">
              <div className="absolute inset-0 bg-red-600 blur opacity-20 hover:opacity-40 transition-opacity"></div>
-             <img src="/logo.png" alt="SignalCraft" className="relative h-10 w-10 object-contain" />
+             <Image src="/logo.png" alt="SignalCraft" width={40} height={40} className="relative object-contain" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">SignalCraft</span>
         </div>

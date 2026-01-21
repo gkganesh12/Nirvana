@@ -19,8 +19,9 @@ import { AlertsService } from './alerts.service';
 import { QueueService } from '../queues/queue.service';
 import { RulesEngineService } from '../routing/rules-engine.service';
 import { EscalationService } from '../escalations/escalation.service';
-import { AlertForEvaluation, RuleEvaluationResult } from '@signalcraft/shared';
-import { AlertStatus } from '@signalcraft/database';
+import { AlertForEvaluation, RuleEvaluationResult, NormalizedAlert } from '@signalcraft/shared';
+import { AlertGroup, AlertEvent } from '@signalcraft/database';
+import { InternalServerException } from '../common/exceptions/base.exception';
 
 interface ProcessingResult {
   duplicate: boolean;
@@ -46,6 +47,49 @@ export class AlertProcessorService {
     @Inject(forwardRef(() => EscalationService))
     private readonly escalationService: EscalationService,
   ) { }
+
+  /**
+   * Process an incoming Datadog alert event
+   */
+  async processDatadogEvent({
+    workspaceId,
+    payload,
+  }: {
+    workspaceId: string;
+    payload: Record<string, unknown>;
+  }): Promise<ProcessingResult> {
+    const startTime = Date.now();
+
+    // Step 1: Normalize
+    const normalized = this.normalizationService.normalizeDatadog(payload);
+
+    // Step 2: Check duplicates
+    const duplicate = await this.alertsService.isDuplicate(
+      workspaceId,
+      normalized.sourceEventId,
+    );
+    if (duplicate) {
+      this.logger.log(`Duplicate Datadog alert ignored`, {
+        workspaceId,
+        sourceEventId: normalized.sourceEventId,
+      });
+      return { duplicate: true };
+    }
+
+    // Step 3: Grouping
+    const group = await this.groupingService.upsertGroup(workspaceId, normalized) as AlertGroup;
+
+    // Step 4: Save event
+    const event = await this.alertsService.saveAlertEvent(
+      workspaceId,
+      normalized,
+      payload,
+      group.id,
+    ) as AlertEvent;
+
+    // Step 5: Evaluate routing (Shared logic)
+    return this.evaluateAndRoute(workspaceId, group, normalized, event, startTime);
+  }
 
   /**
    * Process an incoming Sentry alert event
@@ -76,7 +120,7 @@ export class AlertProcessorService {
     }
 
     // Step 3: Upsert alert group (deduplication)
-    const group = await this.groupingService.upsertGroup(workspaceId, normalized);
+    const group = await this.groupingService.upsertGroup(workspaceId, normalized) as AlertGroup;
 
     // Step 4: Save the alert event
     const event = await this.alertsService.saveAlertEvent(
@@ -84,9 +128,19 @@ export class AlertProcessorService {
       normalized,
       payload,
       group.id,
-    );
+    ) as AlertEvent;
 
-    // Step 5: Evaluate routing rules
+    // Step 5: Evaluate routing
+    return this.evaluateAndRoute(workspaceId, group, normalized, event, startTime);
+  }
+
+  private async evaluateAndRoute(
+    workspaceId: string,
+    group: AlertGroup,
+    normalized: NormalizedAlert,
+    event: AlertEvent,
+    startTime: number,
+  ): Promise<ProcessingResult> {
     const alertForEval: AlertForEvaluation = {
       id: group.id,
       workspaceId,
@@ -141,12 +195,16 @@ export class AlertProcessorService {
 
     // If no rules matched, use default routing (fallback)
     if (matchedRules.length === 0) {
-      await this.queueDefaultNotification(workspaceId, group.id);
-      notificationsQueued = 1;
+      try {
+        await this.queueDefaultNotification(workspaceId, group.id);
+        notificationsQueued = 1;
+      } catch (error) {
+        throw new InternalServerException('Failed to queue default notification', { error });
+      }
     }
 
     const processingTimeMs = Date.now() - startTime;
-    this.logger.log(`Alert processed`, {
+    this.logger.log(`Alert processed (${normalized.source})`, {
       workspaceId,
       groupId: group.id,
       eventId: event.id,
@@ -200,13 +258,9 @@ export class AlertProcessorService {
    * Queue default notification (fallback when no rules match)
    */
   private async queueDefaultNotification(workspaceId: string, alertGroupId: string) {
-    try {
-      await this.queueService.addJob('notifications', 'alert-created', {
-        workspaceId,
-        alertGroupId,
-      });
-    } catch (error) {
-      this.logger.warn('Notification queue unavailable', { error });
-    }
+    await this.queueService.addJob('notifications', 'alert-created', {
+      workspaceId,
+      alertGroupId,
+    });
   }
 }

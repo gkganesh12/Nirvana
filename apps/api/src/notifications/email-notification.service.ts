@@ -1,142 +1,267 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { prisma } from '@signalcraft/database';
 import * as sgMail from '@sendgrid/mail';
+import { EncryptionService } from '../common/encryption/encryption.service';
+import { SecretsService } from '../common/secrets/secrets.service';
 
 interface SendAlertEmailDto {
-    to: string;
-    alertTitle: string;
-    alertMessage: string;
-    severity: string;
-    project: string;
-    environment: string;
-    alertUrl: string;
+  to: string;
+  alertTitle: string;
+  alertMessage: string;
+  severity: string;
+  project: string;
+  environment: string;
+  alertUrl: string;
 }
 
 @Injectable()
 export class EmailNotificationService {
-    private readonly logger = new Logger(EmailNotificationService.name);
+  private readonly logger = new Logger(EmailNotificationService.name);
 
-    constructor() { }
+  constructor(
+    private readonly encryptionService: EncryptionService,
+    private readonly secretsService: SecretsService,
+  ) { }
 
-    /**
-     * Send an alert notification email
-     */
-    async sendAlertNotification(
-        workspaceId: string,
-        dto: SendAlertEmailDto,
-    ): Promise<boolean> {
+  /**
+   * Internal helper to set SendGrid API key securely
+   */
+  private async configureSendGrid(workspaceId: string, emailIntegrationKey?: string) {
+    try {
+      // 1. Try Workspace-Specific Secret in Secrets Manager first
+      const secretKey = `signalcraft/${workspaceId}/sendgrid-api-key`;
+      if (await this.secretsService.secretExists(secretKey)) {
+        const apiKey = await this.secretsService.getSecret(secretKey);
+        sgMail.setApiKey(apiKey);
+        return;
+      }
+
+      // 2. Fallback to Global Secret in Secrets Manager
+      const globalKey = `signalcraft/global/sendgrid-api-key`;
+      try {
+        const apiKey = await this.secretsService.getSecret(globalKey);
+        sgMail.setApiKey(apiKey);
+        return;
+      } catch (e) {
+        // Fallback to provided key from DB or env
+      }
+
+      // 3. Fallback to Database key (existing logic)
+      if (emailIntegrationKey) {
+        let apiKey = emailIntegrationKey;
         try {
-            // Get email integration for workspace
-            const emailIntegration = await prisma.emailIntegration.findUnique({
-                where: { workspaceId },
-            });
-
-            if (!emailIntegration || !emailIntegration.verified) {
-                this.logger.warn(`No verified email integration for workspace ${workspaceId}`);
-                return false;
-            }
-
-            // Use API key directly (TODO: add encryption)
-            sgMail.setApiKey(emailIntegration.apiKey);
-
-            // Determine color based on severity
-            const severityColor = this.getSeverityColor(dto.severity);
-
-            const msg = {
-                to: dto.to,
-                from: {
-                    email: emailIntegration.fromEmail,
-                    name: emailIntegration.fromName || 'SignalCraft Alerts',
-                },
-                subject: `[${dto.severity}] ${dto.alertTitle}`,
-                html: this.generateAlertEmailHtml(dto, severityColor),
-            };
-
-            await sgMail.send(msg);
-            this.logger.log(`Alert email sent to ${dto.to} for workspace ${workspaceId}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Failed to send alert email:`, error);
-            return false;
+          if (apiKey.includes(':')) {
+            apiKey = this.encryptionService.decrypt(apiKey);
+          }
+        } catch (e) {
+          // Legacy plaintext key
         }
+        sgMail.setApiKey(apiKey);
+        return;
+      }
+
+      // 4. Final fallback to environment variable
+      const envKey = process.env.SENDGRID_API_KEY;
+      if (envKey) {
+        sgMail.setApiKey(envKey);
+      } else {
+        throw new Error('No SendGrid API key found');
+      }
+    } catch (error) {
+      this.logger.error('Failed to configure SendGrid API key', error);
+      throw error;
     }
+  }
 
-    /**
-     * Send escalation notification email
-     */
-    async sendEscalationEmail(
-        workspaceId: string,
-        to: string,
-        alertTitle: string,
-        alertMessage: string,
-        severity: string,
-        escalationLevel: number,
-        alertUrl: string,
-    ): Promise<boolean> {
-        try {
-            const emailIntegration = await prisma.emailIntegration.findUnique({
-                where: { workspaceId },
-            });
+  /**
+   * Send an alert notification email
+   */
+  async sendAlertNotification(
+    workspaceId: string,
+    dto: SendAlertEmailDto,
+  ): Promise<boolean> {
+    try {
+      // Get email integration for workspace (still needed for fromEmail/fromName)
+      const emailIntegration = await prisma.emailIntegration.findUnique({
+        where: { workspaceId },
+      });
 
-            if (!emailIntegration || !emailIntegration.verified) {
-                return false;
-            }
+      // ✅ CONFIGURE SENDGRID SECURELY
+      await this.configureSendGrid(workspaceId, emailIntegration?.apiKey);
 
-            const apiKey = this.encryptionService.decrypt(emailIntegration.apiKey);
-            sgMail.setApiKey(apiKey);
+      if (!emailIntegration || !emailIntegration.verified) {
+        this.logger.warn(`No verified email integration for workspace ${workspaceId}`);
+        return false;
+      }
 
-            const msg = {
-                to,
-                from: {
-                    email: emailIntegration.fromEmail,
-                    name: emailIntegration.fromName || 'SignalCraft Alerts',
-                },
-                subject: `🚨 ESCALATION Level ${escalationLevel}: ${alertTitle}`,
-                html: this.generateEscalationEmailHtml({
-                    alertTitle,
-                    alertMessage,
-                    severity,
-                    escalationLevel,
-                    alertUrl,
-                }),
-            };
+      // Determine color based on severity
+      const severityColor = this.getSeverityColor(dto.severity);
 
-            await sgMail.send(msg);
-            this.logger.log(`Escalation email (L${escalationLevel}) sent to ${to}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Failed to send escalation email:`, error);
-            return false;
+      const msg = {
+        to: dto.to,
+        from: {
+          email: emailIntegration.fromEmail,
+          name: emailIntegration.fromName || 'SignalCraft Alerts',
+        },
+        subject: `[${dto.severity}] ${dto.alertTitle}`,
+        html: this.generateAlertEmailHtml(dto, severityColor),
+      };
+
+      await sgMail.send(msg);
+      this.logger.log(`Alert email sent to ${dto.to} for workspace ${workspaceId}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to send alert email:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Send escalation notification email
+   */
+  async sendEscalationEmail(
+    workspaceId: string,
+    to: string,
+    alertTitle: string,
+    alertMessage: string,
+    severity: string,
+    escalationLevel: number,
+    alertUrl: string,
+  ): Promise<boolean> {
+    try {
+      const emailIntegration = await prisma.emailIntegration.findUnique({
+        where: { workspaceId },
+      });
+
+      if (!emailIntegration || !emailIntegration.verified) {
+        return false;
+      }
+
+      // Decrypt API key or use as-is (backward compatibility)
+      let apiKey = emailIntegration.apiKey;
+      try {
+        if (apiKey.includes(':')) {
+          apiKey = this.encryptionService.decrypt(apiKey);
         }
+      } catch (e) {
+        // Legacy key
+      }
+      sgMail.setApiKey(apiKey);
+
+      const msg = {
+        to,
+        from: {
+          email: emailIntegration.fromEmail,
+          name: emailIntegration.fromName || 'SignalCraft Alerts',
+        },
+        subject: `🚨 ESCALATION Level ${escalationLevel}: ${alertTitle}`,
+        html: this.generateEscalationEmailHtml({
+          alertTitle,
+          alertMessage,
+          severity,
+          escalationLevel,
+          alertUrl,
+        }),
+      };
+
+      await sgMail.send(msg);
+      this.logger.log(`Escalation email (L${escalationLevel}) sent to ${to}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to send escalation email:`, error);
+      return false;
     }
+  }
 
-    /**
-     * Test email configuration
-     */
-    async sendTestEmail(
-        workspaceId: string,
-        to: string,
-    ): Promise<{ success: boolean; error?: string }> {
-        try {
-            const emailIntegration = await prisma.emailIntegration.findUnique({
-                where: { workspaceId },
-            });
+  /**
+   * Send a workspace invitation email
+   */
+  async sendWorkspaceInvitation(
+    workspaceId: string,
+    to: string,
+    workspaceName: string,
+    inviteUrl: string,
+  ): Promise<boolean> {
+    try {
+      const emailIntegration = await prisma.emailIntegration.findUnique({
+        where: { workspaceId },
+      });
 
-            if (!emailIntegration) {
-                return { success: false, error: 'No email integration configured' };
-            }
+      // Default integration if none exists for workspace
+      await this.configureSendGrid(workspaceId, emailIntegration?.apiKey);
 
-            const apiKey = this.encryptionService.decrypt(emailIntegration.apiKey);
-            sgMail.setApiKey(apiKey);
+      const msg = {
+        to,
+        from: {
+          email: emailIntegration?.fromEmail || process.env.DEFAULT_FROM_EMAIL || 'alerts@signalcraft.dev',
+          name: emailIntegration?.fromName || 'SignalCraft',
+        },
+        subject: `You've been invited to join ${workspaceName} on SignalCraft`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #09090b; color: #fafafa; border-radius: 12px; border: 1px solid #27272a;">
+            <h1 style="color: #fafafa; font-size: 24px; margin-bottom: 20px;">Join ${workspaceName}</h1>
+            <p style="color: #a1a1aa; line-height: 1.6;">
+              You've been invited to collaborate on SignalCraft. Click the button below to accept the invitation and join the team.
+            </p>
+            <div style="margin: 30px 0;">
+              <a href="${inviteUrl}" style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Accept Invitation
+              </a>
+            </div>
+            <p style="color: #71717a; font-size: 14px;">
+              If you didn't expect this invitation, you can safely ignore this email.
+            </p>
+            <hr style="border: none; border-top: 1px solid #27272a; margin: 30px 0;" />
+            <p style="color: #52525b; font-size: 12px; text-align: center;">
+              SignalCraft - Intelligent Signal Monitoring
+            </p>
+          </div>
+        `,
+      };
 
-            const msg = {
-                to,
-                from: {
-                    email: emailIntegration.fromEmail,
-                    name: emailIntegration.fromName || 'SignalCraft',
-                },
-                subject: 'SignalCraft Email Integration Test',
-                html: `
+      await sgMail.send(msg);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to send invitation email to ${to}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Test email configuration
+   */
+  async sendTestEmail(
+    workspaceId: string,
+    to: string,
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const emailIntegration = await prisma.emailIntegration.findUnique({
+        where: { workspaceId },
+      });
+
+      if (!emailIntegration) {
+        return { success: false, error: 'No email integration configured' };
+      }
+
+      // Decrypt API key or use as-is (backward compatibility)
+      let apiKey = emailIntegration.apiKey;
+      try {
+        if (apiKey.includes(':')) {
+          apiKey = this.encryptionService.decrypt(apiKey);
+        }
+      } catch (e) {
+        // Legacy key
+      }
+      sgMail.setApiKey(apiKey);
+
+      const msg = {
+        to,
+        from: {
+          email: emailIntegration.fromEmail,
+          name: emailIntegration.fromName || 'SignalCraft',
+        },
+        subject: 'SignalCraft Email Integration Test',
+        html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #dc2626;">✓ Email Integration Active</h2>
             <p style="color: #52525b;">
@@ -147,33 +272,33 @@ export class EmailNotificationService {
             </p>
           </div>
         `,
-            };
+      };
 
-            await sgMail.send(msg);
-            return { success: true };
-        } catch (error: any) {
-            this.logger.error(`Test email failed:`, error);
-            return { success: false, error: error.message };
-        }
+      await sgMail.send(msg);
+      return { success: true };
+    } catch (error: any) {
+      this.logger.error(`Test email failed:`, error);
+      return { success: false, error: error.message };
     }
+  }
 
-    private getSeverityColor(severity: string): string {
-        switch (severity.toUpperCase()) {
-            case 'CRITICAL':
-                return '#dc2626'; // Red
-            case 'HIGH':
-                return '#ea580c'; // Orange
-            case 'MEDIUM':
-                return '#f59e0b'; // Amber
-            case 'LOW':
-                return '#3b82f6'; // Blue
-            default:
-                return '#71717a'; // Gray
-        }
+  private getSeverityColor(severity: string): string {
+    switch (severity.toUpperCase()) {
+      case 'CRITICAL':
+        return '#dc2626'; // Red
+      case 'HIGH':
+        return '#ea580c'; // Orange
+      case 'MEDIUM':
+        return '#f59e0b'; // Amber
+      case 'LOW':
+        return '#3b82f6'; // Blue
+      default:
+        return '#71717a'; // Gray
     }
+  }
 
-    private generateAlertEmailHtml(dto: SendAlertEmailDto, color: string): string {
-        return `
+  private generateAlertEmailHtml(dto: SendAlertEmailDto, color: string): string {
+    return `
       <!DOCTYPE html>
       <html>
         <head>
@@ -249,16 +374,16 @@ export class EmailNotificationService {
         </body>
       </html>
     `;
-    }
+  }
 
-    private generateEscalationEmailHtml(params: {
-        alertTitle: string;
-        alertMessage: string;
-        severity: string;
-        escalationLevel: number;
-        alertUrl: string;
-    }): string {
-        return `
+  private generateEscalationEmailHtml(params: {
+    alertTitle: string;
+    alertMessage: string;
+    severity: string;
+    escalationLevel: number;
+    alertUrl: string;
+  }): string {
+    return `
       <!DOCTYPE html>
       <html>
         <body style="margin: 0; padding: 0; background-color: #09090b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -305,5 +430,5 @@ export class EmailNotificationService {
         </body>
       </html>
     `;
-    }
+  }
 }

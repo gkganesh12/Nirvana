@@ -46,7 +46,7 @@ const levelColors: Record<string, string> = {
     error: 'text-red-400 border-red-800/30',
 };
 
-const levelIcons: Record<string, React.ReactNode> = {
+const _levelIcons: Record<string, React.ReactNode> = {
     debug: <Bug className="w-3 h-3" />,
     info: <Info className="w-3 h-3" />,
     warning: <AlertTriangle className="w-3 h-3" />,

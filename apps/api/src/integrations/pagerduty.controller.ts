@@ -42,15 +42,14 @@ export class PagerDutyController {
     @ApiOperation({ summary: 'Configure PagerDuty integration' })
     async configure(@WorkspaceId() workspaceId: string, @Body() dto: ConfigurePagerDutyDto) {
         // Save configuration to Integration table
-        await this.integrationsService.upsertIntegration({
+        await this.integrationsService.upsertIntegration(
             workspaceId,
-            type: 'PAGERDUTY' as any, // Will need enum update
-            config: {
+            'PAGERDUTY' as any,
+            {
                 apiKey: dto.apiKey,
                 serviceId: dto.serviceId,
             },
-            status: 'ACTIVE' as any,
-        });
+        );
 
         return { success: true };
     }

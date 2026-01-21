@@ -1,7 +1,7 @@
 'use client';
 
 import { WidgetWrapper } from './widget-wrapper';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/utils';
 
 interface Alert {
   id: string;
@@ -37,7 +37,7 @@ export function RecentAlertsWidget({ title, data, loading, error }: RecentAlerts
                 {alert.title}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {formatDistanceToNow(new Date(alert.lastSeenAt), { addSuffix: true })}
+                {formatDistanceToNow(new Date(alert.lastSeenAt))}
               </p>
             </div>
             <div className={`ml-4 rounded-full border px-2 py-0.5 text-xs font-medium ${severityStyles[alert.severity] || severityStyles.INFO}`}>

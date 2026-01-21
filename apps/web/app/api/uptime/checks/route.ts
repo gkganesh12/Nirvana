@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:5050';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
     const { getToken } = await auth();
     const token = await getToken();
 

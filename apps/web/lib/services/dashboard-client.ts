@@ -3,8 +3,7 @@ import {
     CustomDashboard,
     CreateDashboardDto,
     UpdateDashboardDto,
-    DashboardTemplate,
-    Widget
+    DashboardTemplate
 } from '../../types/dashboard';
 
 class DashboardClient {
@@ -55,10 +54,12 @@ class DashboardClient {
 
     async getWidgetData(dashboardId: string, workspaceId: string): Promise<{
         dashboard: CustomDashboard;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         widgetData: { id: string; data: any }[];
     }> {
         return apiFetch<{
             dashboard: CustomDashboard;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             widgetData: { id: string; data: any }[];
         }>(`/api/dashboards/${dashboardId}/data`, {
             headers: this.getHeaders(workspaceId),

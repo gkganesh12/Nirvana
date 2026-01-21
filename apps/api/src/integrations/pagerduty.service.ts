@@ -37,11 +37,11 @@ export class PagerDutyService {
                 },
             });
 
-            if (!integration || !integration.config) {
+            if (!integration || !integration.configJson) {
                 return { success: false, error: 'PagerDuty not configured' };
             }
 
-            const config = integration.config as any;
+            const config = integration.configJson as any;
             const apiKey = config.apiKey;
             const serviceId = config.serviceId;
 

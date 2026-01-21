@@ -6,7 +6,7 @@ import { prisma } from '@signalcraft/database';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<WorkspaceRole[]>(ROLES_KEY, [
@@ -29,7 +29,10 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('User not found');
     }
 
-    if (!requiredRoles.includes(user.role.toLowerCase() as WorkspaceRole)) {
+    // Attach DB user to request for use in controllers
+    request.dbUser = user;
+
+    if (!requiredRoles.includes(user.role as WorkspaceRole)) {
       throw new ForbiddenException('Insufficient role');
     }
 

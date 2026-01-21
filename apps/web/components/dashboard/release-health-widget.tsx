@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowUpRight, ArrowDownRight, Package, TrendingUp, TrendingDown } from 'lucide-react';
+import { Package, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface ReleaseHealth {
     id: string;

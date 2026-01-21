@@ -16,11 +16,11 @@ import {
 import { StatusBadge } from '@/components/alerts/status-badge';
 import { SeverityBadge } from '@/components/alerts/severity-badge';
 import { AiSuggestionCard } from '@/components/alerts/ai-suggestion-card';
-import { CorrelatedAlertsCard } from '@/components/alerts/correlated-alerts-card';
+import { CorrelatedAlerts } from '@/components/alerts/correlated-alerts';
 import { PostmortemModal } from '@/components/alerts/postmortem-modal';
 import { BreadcrumbTimeline } from '@/components/alerts/breadcrumb-timeline';
 import { SessionReplayPlayer } from '@/components/alerts/session-replay-player';
-import { Pencil, Save, X, ArrowLeft } from 'lucide-react';
+import { Pencil, Save, X } from 'lucide-react';
 
 interface AlertDetail {
   id: string;
@@ -400,7 +400,7 @@ export default function AlertDetailPage() {
       <BreadcrumbTimeline alertGroupId={alert.id} />
 
       {/* Correlated Alerts */}
-      <CorrelatedAlertsCard alertId={alert.id} />
+      <CorrelatedAlerts alertId={alert.id} />
 
       {/* Resolution Memory & Impact Estimation */}
       <div className="grid gap-6 lg:grid-cols-2">

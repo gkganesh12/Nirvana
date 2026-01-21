@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { AlertsTrendChart } from '@/components/dashboard/alerts-trend-chart';
 import { TopSourcesTable } from '@/components/dashboard/top-sources-table';
@@ -87,7 +88,7 @@ export default function DashboardPage() {
         <div className="text-center">
           <div className="relative mx-auto h-16 w-16 mb-6">
             <div className="absolute inset-0 bg-red-600 rounded-full blur-xl opacity-20 animate-pulse"></div>
-            <img src="/logo.png" alt="Loading..." className="relative h-16 w-16 object-contain animate-bounce" />
+            <Image src="/logo.png" alt="Loading..." width={64} height={64} className="relative object-contain animate-bounce" />
           </div>
           <p className="text-zinc-500 animate-pulse">Loading dashboard...</p>
         </div>

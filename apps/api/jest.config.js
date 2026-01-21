@@ -8,12 +8,21 @@ module.exports = {
         }],
     },
     collectCoverageFrom: [
-        '**/*.ts', // collect coverage from all ts files
-        '!**/*.module.ts', // exclude modules
-        '!**/*.dto.ts', // exclude DTOs
-        '!**/index.ts', // exclude barrels
+        '**/*.ts',
+        '!**/*.module.ts',
+        '!**/*.dto.ts',
+        '!**/index.ts',
         '!main.ts',
     ],
+    coverageThreshold: {
+        global: {
+            branches: 70,
+            functions: 70,
+            lines: 80,
+            statements: 80,
+        },
+    },
+    setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
     coverageDirectory: '../coverage',
     testEnvironment: 'node',
 };

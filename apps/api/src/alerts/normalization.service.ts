@@ -1,54 +1,131 @@
 import { Injectable } from '@nestjs/common';
 import { NormalizedAlert, AlertSeverity } from '@signalcraft/shared';
+import { ValidationException } from '../common/exceptions/base.exception';
 
 @Injectable()
 export class NormalizationService {
+
+  normalizeDatadog(payload: Record<string, unknown>): NormalizedAlert {
+    // Datadog ID usually passes as $ID
+    const sourceEventId = String(payload.id || payload.event_id || Date.now());
+
+    // Parse tags (tags can be a string "env:prod, foo:bar" or array)
+    const rawTags = payload.tags;
+    const tags = this.normalizeConstructorTags(rawTags);
+
+    const project = tags['project'] || tags['service'] || 'datadog';
+    const environment = tags['env'] || tags['environment'] || 'production';
+
+    const status = String(payload.alert_type || payload.status || 'info').toLowerCase();
+    const severity = this.mapDatadogSeverity(status, String(payload.priority || ''));
+
+    const title = String(payload.title || payload.event_title || 'Datadog Alert');
+    const description = String(payload.body || payload.text || payload.message || '');
+
+    const occurredAt = this.parseTimestamp(String(payload.date || payload.timestamp || Date.now()));
+    const link = String(payload.link || payload.url || '');
+
+    // Create a fingerprint from ID or title + project/env
+    const fingerprint = `datadog:${sourceEventId}`;
+
+    return {
+      source: 'DATADOG',
+      sourceEventId,
+      project,
+      environment,
+      severity,
+      fingerprint,
+      title,
+      description,
+      tags,
+      occurredAt,
+      link: link || null,
+      userCount: null,
+    };
+  }
+
+  private normalizeConstructorTags(tags: unknown): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    if (typeof tags === 'string') {
+      // Handle comma separated tags "env:prod, role:db"
+      tags.split(',').forEach(tag => {
+        const [key, val] = tag.split(':').map(s => s.trim());
+        if (key && val) result[key] = val;
+      });
+    } else if (Array.isArray(tags)) {
+      // Handle array of strings ["env:prod", "role:db"]
+      tags.forEach(tag => {
+        if (typeof tag === 'string') {
+          const [key, val] = tag.split(':').map(s => s.trim());
+          if (key && val) result[key] = val;
+        }
+      });
+    } else if (tags && typeof tags === 'object' && !Array.isArray(tags)) {
+      Object.entries(tags as Record<string, unknown>).forEach(([key, val]) => {
+        result[key] = String(val);
+      });
+    }
+
+    return result;
+  }
+
+  private mapDatadogSeverity(status: string, priority: string): AlertSeverity {
+    const s = status.toLowerCase();
+    const p = priority.toLowerCase();
+
+    if (s === 'error' || p === 'p1') return 'CRITICAL';
+    if (s === 'warning' || p === 'p2') return 'HIGH';
+    if (s === 'success') return 'LOW'; // Recovery
+    return 'MEDIUM'; // Default for info/other
+  }
+
   normalizeSentry(payload: Record<string, unknown>): NormalizedAlert {
-    const payloadRecord = this.asRecord(payload);
-    const payloadData = this.asRecord(payloadRecord.data);
-    const event = this.asRecord(payloadRecord.event ?? payloadData.event ?? payloadRecord);
+    const data = this.asRecord(payload.data);
+    const event = this.asRecord(payload.event ?? data.event ?? payload);
 
     const sourceEventId =
       this.getString(event.event_id) ??
-      this.getString(payloadRecord.event_id) ??
-      this.getString(payloadRecord.id) ??
-      this.getString(payloadData.event_id);
+      this.getString(payload.event_id) ??
+      this.getString(payload.id) ??
+      this.getString(data.event_id);
+
     if (!sourceEventId) {
-      throw new Error('Missing Sentry event id');
+      throw new ValidationException('Missing Sentry event id');
     }
 
     const project =
-      this.getString(payloadRecord.project_slug) ??
-      this.getString(payloadRecord.project) ??
-      this.getString(payloadRecord.project_name) ??
+      this.getString(payload.project_slug) ??
+      this.getString(payload.project) ??
+      this.getString(payload.project_name) ??
       'unknown';
     const environment =
       this.getString(event.environment) ??
-      this.getString(payloadRecord.environment) ??
+      this.getString(payload.environment) ??
       this.findTag(event, 'environment') ??
       'unknown';
 
     const severity = this.mapSeverity(
-      this.getString(event.level) ?? this.getString(payloadRecord.level),
+      this.getString(event.level) ?? this.getString(payload.level),
     );
     const title =
-      this.getString(event.title) ?? this.getString(payloadRecord.title) ?? 'Sentry Issue';
+      this.getString(event.title) ?? this.getString(payload.title) ?? 'Sentry Issue';
     const description =
       this.getString(event.message) ??
-      this.getString(payloadRecord.message) ??
+      this.getString(payload.message) ??
       this.getString(event.culprit) ??
       '';
 
-    const tags = this.normalizeTags(event.tags ?? payloadRecord.tags);
+    const tags = this.normalizeTags(event.tags ?? payload.tags);
     const fingerprint = this.extractFingerprint(event, title, sourceEventId);
 
     const occurredAt = this.parseTimestamp(
-      this.getString(event.timestamp) ?? this.getString(payloadRecord.timestamp),
+      this.getString(event.timestamp) ?? this.getString(payload.timestamp),
     );
-    const link = this.getString(payloadRecord.url) ?? null;
+    const link = this.getString(payload.url) ?? null;
 
     // Impact Estimation: Extract user count from Sentry payload
-    const userCount = this.extractUserCount(payloadRecord, event);
+    const userCount = this.extractUserCount(payload, event);
 
     return {
       source: 'SENTRY',
@@ -69,17 +146,17 @@ export class NormalizationService {
   private mapSeverity(level?: string): AlertSeverity {
     switch ((level ?? '').toLowerCase()) {
       case 'fatal':
-        return 'critical';
+        return 'CRITICAL';
       case 'error':
-        return 'high';
+        return 'HIGH';
       case 'warning':
-        return 'med';
+        return 'MEDIUM';
       case 'info':
-        return 'low';
+        return 'LOW';
       case 'debug':
-        return 'info';
+        return 'INFO';
       default:
-        return 'info';
+        return 'INFO';
     }
   }
 
@@ -142,7 +219,7 @@ export class NormalizationService {
   }
 
   private asRecord(value: unknown): Record<string, unknown> {
-    if (value && typeof value === 'object') {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
       return value as Record<string, unknown>;
     }
     return {};

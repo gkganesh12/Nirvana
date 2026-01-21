@@ -16,6 +16,11 @@ enum WorkspaceRole {
 enum IntegrationType {
   SENTRY
   SLACK
+  PAGERDUTY
+  DATADOG
+  TEAMS
+  DISCORD
+  OPSGENIE
 }
 
 enum IntegrationStatus {
@@ -41,11 +46,21 @@ enum AlertStatus {
 
 enum NotificationTarget {
   SLACK
+  TEAMS
+  DISCORD
+  DATADOG
 }
 
 enum NotificationStatus {
   SENT
   FAILED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
 }
 
 model Workspace {
@@ -71,6 +86,11 @@ model Workspace {
   apiKeys          ApiKey[]
   emailIntegration EmailIntegration?
   auditLogs        AuditLog[]
+  samlConfig       SamlConfig?
+  rolePermissions  RolePermission[]
+  invitations      Invitation[]
+  remediationWorkflows RemediationWorkflow[]
+  customDashboards     CustomDashboard[]
 }
 
 model AuditLog {
@@ -179,6 +199,9 @@ model User {
   assignedAlertGroups AlertGroup[] @relation("AlertGroupAssignee")
   apiKeys             ApiKey[]
   auditLogs           AuditLog[]
+  invitationsCreated  Invitation[] @relation("Inviter")
+  workflowsCreated    RemediationWorkflow[] @relation("WorkflowCreator")
+  dashboardsCreated   CustomDashboard[] @relation("DashboardCreator")
 
   @@index([workspaceId])
 }
@@ -297,6 +320,9 @@ model AlertGroup {
   release       Release?          @relation(fields: [releaseId], references: [id])
   notifications NotificationLog[]
   alertEvents   AlertEvent[]
+  workflowExecutions WorkflowExecution[]
+  primaryCorrelations AlertCorrelation[] @relation("PrimaryAlert")
+  relatedCorrelations AlertCorrelation[] @relation("RelatedAlert")
 
   @@index([groupKey])
   @@index([workspaceId])
@@ -373,4 +399,159 @@ model CorrelationRule {
 
   @@unique([workspaceId, sourceGroupKey, targetGroupKey])
   @@index([workspaceId, sourceGroupKey])
+}
+
+// Phase 4: SAML SSO Configuration
+model SamlConfig {
+  id              String   @id @default(cuid())
+  workspaceId     String   @unique
+  enabled         Boolean  @default(false)
+  enforced        Boolean  @default(false) // Force SAML for all users
+  idpEntityId     String? // Identity Provider Entity ID
+  idpSsoUrl       String? // IdP Single Sign-On URL
+  idpCertificate  String?  @db.Text // IdP X.509 Certificate (PEM format)
+  spEntityId      String? // Service Provider Entity ID (auto-generated)
+  allowedDomains  String[] // Email domains allowed for SAML auth
+  jitProvisioning Boolean  @default(true) // Just-In-Time user creation
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+}
+
+// Phase 4: Enhanced RBAC - Permission Actions
+enum PermissionAction {
+  READ
+  WRITE
+  DELETE
+  MANAGE
+}
+
+// Phase 4: Enhanced RBAC - Permission Definition
+model Permission {
+  id          String           @id @default(cuid())
+  name        String           @unique // e.g., "alerts", "routing", "settings", "users"
+  description String?
+  rolePerms   RolePermission[]
+}
+
+// Phase 4: Enhanced RBAC - Role Permission Mapping
+model RolePermission {
+  id           String             @id @default(cuid())
+  workspaceId  String
+  role         WorkspaceRole // OWNER, ADMIN, MEMBER
+  permissionId String
+  actions      PermissionAction[]
+
+  workspace  Workspace  @relation(fields: [workspaceId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([workspaceId, role, permissionId])
+  @@index([workspaceId])
+  @@index([workspaceId, role])
+}
+
+model Invitation {
+  id          String           @id @default(cuid())
+  workspaceId String
+  email       String
+  role        WorkspaceRole    @default(MEMBER)
+  token       String           @unique
+  inviterId   String
+  status      InvitationStatus @default(PENDING)
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  inviter   User      @relation("Inviter", fields: [inviterId], references: [id])
+
+  @@index([workspaceId])
+  @@index([token])
+  @@index([email])
+}
+
+enum WorkflowExecutionStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+model RemediationWorkflow {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  trigger     Json
+  steps       Json
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace  Workspace           @relation(fields: [workspaceId], references: [id])
+  creator    User                @relation("WorkflowCreator", fields: [createdBy], references: [id])
+  executions WorkflowExecution[]
+
+  @@index([workspaceId])
+  @@index([enabled])
+}
+
+model WorkflowExecution {
+  id          String                  @id @default(cuid())
+  workflowId  String
+  alertId     String
+  status      WorkflowExecutionStatus @default(RUNNING)
+  startedAt   DateTime                @default(now())
+  completedAt DateTime?
+  result      Json?
+  error       String?
+  logs        Json?
+
+  workflow RemediationWorkflow @relation(fields: [workflowId], references: [id])
+  alert    AlertGroup          @relation(fields: [alertId], references: [id])
+
+  @@index([workflowId])
+  @@index([alertId])
+  @@index([status])
+}
+
+model AlertCorrelation {
+  id               String   @id @default(cuid())
+  primaryAlertId   String
+  relatedAlertId   String
+  correlationScore Float
+  reason           String
+  createdAt        DateTime @default(now())
+
+  primaryAlert AlertGroup @relation("PrimaryAlert", fields: [primaryAlertId], references: [id])
+  relatedAlert AlertGroup @relation("RelatedAlert", fields: [relatedAlertId], references: [id])
+
+  @@index([primaryAlertId])
+  @@index([relatedAlertId])
+  @@unique([primaryAlertId, relatedAlertId])
+}
+
+model CustomDashboard {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String?
+  layout      Json
+  widgets     Json
+  isDefault   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  creator   User      @relation("DashboardCreator", fields: [createdBy], references: [id])
+
+  @@index([workspaceId])
+  @@index([createdBy])
 }

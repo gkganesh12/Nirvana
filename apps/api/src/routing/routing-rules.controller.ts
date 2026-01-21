@@ -17,26 +17,24 @@ import {
     UseGuards,
     Logger,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { ClerkAuthGuard } from '../auth/clerk-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { RoutingRulesService } from './routing-rules.service';
 import { RulesEngineService } from './rules-engine.service';
+import { WorkspaceId } from '../common/decorators/workspace-id.decorator';
+import { DbUser } from '../common/decorators/db-user.decorator';
+import { User } from '@signalcraft/database';
 import {
     CreateRoutingRuleDto,
     UpdateRoutingRuleDto,
     TestRuleDto,
-    AlertForEvaluation,
-    ConditionGroup,
 } from '@signalcraft/shared';
 
-// Request context interface (populated by auth middleware)
-interface RequestWithUser {
-    user: { workspaceId: string };
-}
-
 @ApiTags('routing-rules')
+@ApiBearerAuth()
 @Controller('api/routing-rules')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RolesGuard)
 export class RoutingRulesController {
     private readonly logger = new Logger(RoutingRulesController.name);
 
@@ -52,14 +50,11 @@ export class RoutingRulesController {
     @ApiQuery({ name: 'offset', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'List of routing rules' })
     async listRules(
+        @WorkspaceId() workspaceId: string,
         @Query('enabled') enabled?: string,
         @Query('limit') limit?: string,
         @Query('offset') offset?: string,
-        // Note: workspaceId would come from request context in production
     ) {
-        // TODO: Extract workspaceId from authenticated request context
-        const workspaceId = 'demo-workspace'; // Placeholder
-
         return this.routingRulesService.listRules(workspaceId, {
             enabled: enabled !== undefined ? enabled === 'true' : undefined,
             limit: limit ? parseInt(limit, 10) : undefined,
@@ -71,8 +66,10 @@ export class RoutingRulesController {
     @ApiOperation({ summary: 'Get a single routing rule by ID' })
     @ApiResponse({ status: 200, description: 'Routing rule details' })
     @ApiResponse({ status: 404, description: 'Rule not found' })
-    async getRule(@Param('id') id: string) {
-        const workspaceId = 'demo-workspace'; // Placeholder
+    async getRule(
+        @WorkspaceId() workspaceId: string,
+        @Param('id') id: string,
+    ) {
         return this.routingRulesService.getRule(workspaceId, id);
     }
 
@@ -80,9 +77,12 @@ export class RoutingRulesController {
     @ApiOperation({ summary: 'Create a new routing rule' })
     @ApiResponse({ status: 201, description: 'Rule created successfully' })
     @ApiResponse({ status: 400, description: 'Validation error' })
-    async createRule(@Body() dto: CreateRoutingRuleDto) {
-        const workspaceId = 'demo-workspace'; // Placeholder
-        return this.routingRulesService.createRule(workspaceId, dto);
+    async createRule(
+        @WorkspaceId() workspaceId: string,
+        @DbUser() user: User,
+        @Body() dto: CreateRoutingRuleDto,
+    ) {
+        return this.routingRulesService.createRule(workspaceId, dto, user.id);
     }
 
     @Put(':id')
@@ -90,26 +90,35 @@ export class RoutingRulesController {
     @ApiResponse({ status: 200, description: 'Rule updated successfully' })
     @ApiResponse({ status: 404, description: 'Rule not found' })
     @ApiResponse({ status: 400, description: 'Validation error' })
-    async updateRule(@Param('id') id: string, @Body() dto: UpdateRoutingRuleDto) {
-        const workspaceId = 'demo-workspace'; // Placeholder
-        return this.routingRulesService.updateRule(workspaceId, id, dto);
+    async updateRule(
+        @WorkspaceId() workspaceId: string,
+        @DbUser() user: User,
+        @Param('id') id: string,
+        @Body() dto: UpdateRoutingRuleDto,
+    ) {
+        return this.routingRulesService.updateRule(workspaceId, id, dto, user.id);
     }
 
     @Delete(':id')
     @ApiOperation({ summary: 'Delete a routing rule' })
     @ApiResponse({ status: 200, description: 'Rule deleted successfully' })
     @ApiResponse({ status: 404, description: 'Rule not found' })
-    async deleteRule(@Param('id') id: string) {
-        const workspaceId = 'demo-workspace'; // Placeholder
-        return this.routingRulesService.deleteRule(workspaceId, id);
+    async deleteRule(
+        @WorkspaceId() workspaceId: string,
+        @DbUser() user: User,
+        @Param('id') id: string,
+    ) {
+        return this.routingRulesService.deleteRule(workspaceId, id, user.id);
     }
 
     @Post(':id/enable')
     @ApiOperation({ summary: 'Enable a routing rule' })
     @ApiResponse({ status: 200, description: 'Rule enabled successfully' })
     @ApiResponse({ status: 404, description: 'Rule not found' })
-    async enableRule(@Param('id') id: string) {
-        const workspaceId = 'demo-workspace'; // Placeholder
+    async enableRule(
+        @WorkspaceId() workspaceId: string,
+        @Param('id') id: string,
+    ) {
         return this.routingRulesService.enableRule(workspaceId, id);
     }
 
@@ -117,8 +126,10 @@ export class RoutingRulesController {
     @ApiOperation({ summary: 'Disable a routing rule' })
     @ApiResponse({ status: 200, description: 'Rule disabled successfully' })
     @ApiResponse({ status: 404, description: 'Rule not found' })
-    async disableRule(@Param('id') id: string) {
-        const workspaceId = 'demo-workspace'; // Placeholder
+    async disableRule(
+        @WorkspaceId() workspaceId: string,
+        @Param('id') id: string,
+    ) {
         return this.routingRulesService.disableRule(workspaceId, id);
     }
 
@@ -126,8 +137,10 @@ export class RoutingRulesController {
     @ApiOperation({ summary: 'Reorder routing rules by priority' })
     @ApiResponse({ status: 200, description: 'Rules reordered successfully' })
     @ApiResponse({ status: 400, description: 'Invalid rule IDs' })
-    async reorderRules(@Body() body: { ruleIds: string[] }) {
-        const workspaceId = 'demo-workspace'; // Placeholder
+    async reorderRules(
+        @WorkspaceId() workspaceId: string,
+        @Body() body: { ruleIds: string[] },
+    ) {
         return this.routingRulesService.reorderRules(workspaceId, body.ruleIds);
     }
 

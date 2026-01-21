@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { correlationClient } from '@/lib/services/correlation-client';
 import { CorrelationGroup } from '@/types/correlation';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Layers, AlertTriangle, CheckCircle } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { ArrowRight, Layers } from 'lucide-react';
+import { formatDistanceToNow } from '@/lib/utils';
 
 export default function CorrelationGroupsPage() {
   const [groups, setGroups] = useState<CorrelationGroup[]>([]);
@@ -53,7 +52,7 @@ export default function CorrelationGroupsPage() {
                       <div>
                          <h3 className="font-medium text-gray-900 dark:text-gray-100">Group #{group.id.slice(0, 6)}</h3>
                          <p className="text-xs text-gray-500">
-                           {formatDistanceToNow(new Date(group.createdAt), { addSuffix: true })}
+                           {formatDistanceToNow(new Date(group.createdAt))}
                          </p>
                       </div>
                    </div>

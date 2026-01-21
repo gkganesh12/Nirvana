@@ -1,10 +1,15 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
-import { WebClient } from '@slack/web-api';
+import { WebClient, AnyBlock } from '@slack/web-api';
 import { prisma, AlertStatus } from '@signalcraft/database';
 import { SlackOAuthService } from '../integrations/slack/oauth.service';
 import { SlackService } from '../integrations/slack/slack.service';
 import { AiService } from '../ai/ai.service';
 import { AlertsService } from '../alerts/alerts.service';
+import {
+  ResourceNotFoundException,
+  AuthenticationException,
+  InternalServerException,
+} from '../common/exceptions/base.exception';
 
 @Injectable()
 export class SlackNotificationService {
@@ -20,23 +25,23 @@ export class SlackNotificationService {
   async sendAlert(workspaceId: string, alertGroupId: string) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
     if (!token) {
-      throw new Error('Slack not connected');
+      throw new AuthenticationException('Slack not connected for this workspace');
     }
 
     const channelId = await this.slackService.getDefaultChannel(workspaceId);
     if (!channelId) {
-      throw new Error('Default Slack channel not configured');
+      throw new ResourceNotFoundException('Default Slack channel');
     }
 
     const group = await prisma.alertGroup.findFirst({
       where: { id: alertGroupId, workspaceId },
     });
     if (!group) {
-      throw new Error('Alert group not found');
+      throw new ResourceNotFoundException('Alert group', alertGroupId);
     }
 
     // AI Resolution Suggestion
-    let aiSuggestion = null;
+    let aiSuggestion: { suggestion: string; confidence: string } | null = null;
     if (this.aiService.isEnabled()) {
       try {
         const pastResolutions = await this.alertsService.findSimilarResolvedAlerts({
@@ -56,19 +61,24 @@ export class SlackNotificationService {
           );
         }
       } catch (error) {
-        this.logger.error('Failed to get AI suggestion', error);
+        this.logger.error(`Failed to get AI suggestion for alert ${alertGroupId}: ${error}`);
       }
     }
 
     const client = new WebClient(token);
     const blocks = this.buildBlocks(group, false, aiSuggestion);
-    const response = await client.chat.postMessage({
-      channel: channelId,
-      text: group.title,
-      blocks,
-    });
 
-    return { channelId, ts: response.ts };
+    try {
+      const response = await client.chat.postMessage({
+        channel: channelId,
+        text: group.title,
+        blocks,
+      });
+
+      return { channelId, ts: response.ts };
+    } catch (error) {
+      throw new InternalServerException('Failed to send Slack alert', { workspaceId, alertGroupId, error });
+    }
   }
 
   async updateMessage(
@@ -79,23 +89,28 @@ export class SlackNotificationService {
   ) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
     if (!token) {
-      throw new Error('Slack not connected');
+      throw new AuthenticationException('Slack not connected for this workspace');
     }
     const group = await prisma.alertGroup.findFirst({
       where: { id: alertGroupId, workspaceId },
     });
     if (!group) {
-      throw new Error('Alert group not found');
+      throw new ResourceNotFoundException('Alert group', alertGroupId);
     }
 
     const client = new WebClient(token);
     const blocks = this.buildBlocks(group, true, null);
-    await client.chat.update({
-      channel: channelId,
-      ts,
-      text: group.title,
-      blocks,
-    });
+
+    try {
+      await client.chat.update({
+        channel: channelId,
+        ts,
+        text: group.title,
+        blocks,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to update Slack message ${ts} in channel ${channelId}: ${error}`);
+    }
   }
 
   /**
@@ -118,11 +133,12 @@ export class SlackNotificationService {
     },
     disableActions = false,
     aiSuggestion?: { suggestion: string; confidence: string } | null,
-  ) {
+  ): AnyBlock[] {
     const severityEmoji = this.mapSeverity(group.severity);
     const statusLabel = group.status.toLowerCase();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const blocks: any[] = [];
+
+    // Using record for blocks to avoid @slack/web-api type dependency issues if they change
+    const blocks: AnyBlock[] = [];
 
     // Main alert section
     blocks.push({
@@ -252,14 +268,14 @@ export class SlackNotificationService {
   ) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
     if (!token) {
-      throw new Error('Slack not connected');
+      throw new AuthenticationException('Slack not connected for this workspace');
     }
 
     const group = await prisma.alertGroup.findFirst({
       where: { id: alertGroupId, workspaceId },
     });
     if (!group) {
-      throw new Error('Alert group not found');
+      throw new ResourceNotFoundException('Alert group', alertGroupId);
     }
 
     const client = new WebClient(token);
@@ -273,19 +289,23 @@ export class SlackNotificationService {
       text = `<!here> ${text}`;
     }
 
-    const response = await client.chat.postMessage({
-      channel: channelId,
-      text,
-      blocks,
-    });
+    try {
+      const response = await client.chat.postMessage({
+        channel: channelId,
+        text,
+        blocks,
+      });
 
-    this.logger.log(`Alert sent to channel`, {
-      alertGroupId,
-      channelId,
-      ts: response.ts,
-    });
+      this.logger.log(`Alert sent to channel`, {
+        alertGroupId,
+        channelId,
+        ts: response.ts,
+      });
 
-    return { channelId, ts: response.ts };
+      return { channelId, ts: response.ts };
+    } catch (error) {
+      throw new InternalServerException('Failed to send Slack alert to channel', { workspaceId, alertGroupId, channelId, error });
+    }
   }
 
   /**
@@ -300,14 +320,14 @@ export class SlackNotificationService {
   ) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
     if (!token) {
-      throw new Error('Slack not connected');
+      throw new AuthenticationException('Slack not connected for this workspace');
     }
 
     const group = await prisma.alertGroup.findFirst({
       where: { id: alertGroupId, workspaceId },
     });
     if (!group) {
-      throw new Error('Alert group not found');
+      throw new ResourceNotFoundException('Alert group', alertGroupId);
     }
 
     const client = new WebClient(token);
@@ -317,26 +337,30 @@ export class SlackNotificationService {
     const mention = mentionHere ? '<!here>' : '';
     const text = `${mention} 🚨 *ESCALATION (Level ${escalationLevel})* - ${group.title}`;
 
-    const response = await client.chat.postMessage({
-      channel: channelId,
-      text,
-      blocks,
-    });
+    try {
+      const response = await client.chat.postMessage({
+        channel: channelId,
+        text,
+        blocks,
+      });
 
-    this.logger.log(`Escalation notification sent`, {
-      alertGroupId,
-      channelId,
-      level: escalationLevel,
-      ts: response.ts,
-    });
+      this.logger.log(`Escalation notification sent`, {
+        alertGroupId,
+        channelId,
+        level: escalationLevel,
+        ts: response.ts,
+      });
 
-    return { channelId, ts: response.ts };
+      return { channelId, ts: response.ts };
+    } catch (error) {
+      throw new InternalServerException('Failed to send Slack escalation', { workspaceId, alertGroupId, channelId, error });
+    }
   }
 
   private buildEscalationBlocks(
     group: { id: string; title: string; severity: string; environment: string; count: number; status: AlertStatus },
     escalationLevel: number,
-  ) {
+  ): AnyBlock[] {
     const severityEmoji = this.mapSeverity(group.severity);
     const statusLabel = group.status.toLowerCase();
 

@@ -32,13 +32,18 @@ describe('GroupingService', () => {
         it('should generate consistent group key for same input', () => {
             const input = {
                 source: 'sentry',
+                sourceEventId: 'event_123',
                 project: 'web-app',
                 environment: 'production',
                 fingerprint: 'abc123',
                 title: 'TypeError',
                 message: 'Error message',
+                description: 'Detailed error message',
                 severity: 'high' as const,
+                tags: { tag1: 'val1' },
                 occurredAt: new Date(),
+                link: 'https://sentry.io/123',
+                userCount: 5,
             };
 
             const groupKey1 = service.generateGroupKey(input);
@@ -51,13 +56,18 @@ describe('GroupingService', () => {
         it('should generate different keys for different projects', () => {
             const input1 = {
                 source: 'sentry',
+                sourceEventId: 'event_123',
                 project: 'web-app',
                 environment: 'production',
                 fingerprint: 'abc123',
                 title: 'Error',
                 message: 'Error',
+                description: 'Error',
                 severity: 'high' as const,
+                tags: {},
                 occurredAt: new Date(),
+                link: null,
+                userCount: null,
             };
 
             const input2 = {
@@ -74,13 +84,18 @@ describe('GroupingService', () => {
         it('should generate different keys for different environments', () => {
             const input1 = {
                 source: 'sentry',
+                sourceEventId: 'event_123',
                 project: 'web-app',
                 environment: 'production',
                 fingerprint: 'abc123',
                 title: 'Error',
                 message: 'Error',
+                description: 'Error',
                 severity: 'high' as const,
+                tags: {},
                 occurredAt: new Date(),
+                link: null,
+                userCount: null,
             };
 
             const input2 = {
@@ -97,24 +112,34 @@ describe('GroupingService', () => {
         it('should normalize case when generating key', () => {
             const input1 = {
                 source: 'Sentry',
+                sourceEventId: 'event_123',
                 project: 'Web-App',
                 environment: 'Production',
                 fingerprint: 'ABC123',
                 title: 'Error',
                 message: 'Error',
+                description: 'Error',
                 severity: 'high' as const,
+                tags: {},
                 occurredAt: new Date(),
+                link: null,
+                userCount: null,
             };
 
             const input2 = {
                 source: 'sentry',
+                sourceEventId: 'event_123',
                 project: 'web-app',
                 environment: 'production',
                 fingerprint: 'abc123',
                 title: 'Error',
                 message: 'Error',
+                description: 'Error',
                 severity: 'high' as const,
+                tags: {},
                 occurredAt: new Date(),
+                link: null,
+                userCount: null,
             };
 
             const groupKey1 = service.generateGroupKey(input1);
@@ -125,29 +150,29 @@ describe('GroupingService', () => {
         });
     });
 
-    describe('mapSeverityRank', () => {
+    describe('mapSeverityToRank', () => {
         it('should rank CRITICAL as highest', () => {
-            const rank = service['mapSeverityRank']('CRITICAL' as any);
+            const rank = service['mapSeverityToRank']('critical' as any);
             expect(rank).toBe(5);
         });
 
         it('should rank HIGH appropriately', () => {
-            const rank = service['mapSeverityRank']('HIGH' as any);
+            const rank = service['mapSeverityToRank']('high' as any);
             expect(rank).toBe(4);
         });
 
         it('should rank MEDIUM in middle', () => {
-            const rank = service['mapSeverityRank']('MEDIUM' as any);
+            const rank = service['mapSeverityToRank']('med' as any);
             expect(rank).toBe(3);
         });
 
         it('should rank LOW lower', () => {
-            const rank = service['mapSeverityRank']('LOW' as any);
+            const rank = service['mapSeverityToRank']('low' as any);
             expect(rank).toBe(2);
         });
 
         it('should rank INFO as lowest', () => {
-            const rank = service['mapSeverityRank']('INFO' as any);
+            const rank = service['mapSeverityToRank']('info' as any);
             expect(rank).toBe(1);
         });
     });

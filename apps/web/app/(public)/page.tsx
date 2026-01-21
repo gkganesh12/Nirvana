@@ -225,7 +225,7 @@ export default function HomePage() {
             Simple, transparent pricing
           </p>
           <p className="mt-6 text-lg leading-8 text-red-100/60">
-            Choose the plan that fits your team's needs. All plans include unlimited monitoring integrations.
+            Choose the plan that fits your team&apos;s needs. All plans include unlimited monitoring integrations.
           </p>
         </div>
         

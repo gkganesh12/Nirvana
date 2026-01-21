@@ -7,9 +7,12 @@ import { PagerDutyController } from './pagerduty.controller';
 import { OpsgenieService } from './opsgenie.service';
 import { OpsgenieController } from './opsgenie.controller';
 
+import { SlackService } from './slack/slack.service';
+import { SlackOAuthService } from './slack/oauth.service';
+
 @Module({
   controllers: [IntegrationsController, SlackController, PagerDutyController, OpsgenieController],
-  providers: [IntegrationsService, PagerDutyService, OpsgenieService],
-  exports: [IntegrationsService, PagerDutyService, OpsgenieService],
+  providers: [IntegrationsService, PagerDutyService, OpsgenieService, SlackService, SlackOAuthService],
+  exports: [IntegrationsService, PagerDutyService, OpsgenieService, SlackService, SlackOAuthService],
 })
 export class IntegrationsModule { }

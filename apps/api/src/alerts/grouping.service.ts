@@ -1,28 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import crypto from 'crypto';
-import { prisma, AlertStatus, AlertSeverity } from '@signalcraft/database';
+import { prisma, AlertStatus, AlertSeverity, AlertGroup } from '@signalcraft/database';
 import { NormalizedAlert, AlertSeverity as NormalizedSeverity } from '@signalcraft/shared';
 import { AnomalyDetectionService } from './anomaly-detection.service';
 
-const severityRank: Record<NormalizedSeverity, number> = {
-  info: 1,
-  low: 2,
-  med: 3,
-  high: 4,
-  critical: 5,
+const severityRank: Record<AlertSeverity, number> = {
+  [AlertSeverity.INFO]: 1,
+  [AlertSeverity.LOW]: 2,
+  [AlertSeverity.MEDIUM]: 3,
+  [AlertSeverity.HIGH]: 4,
+  [AlertSeverity.CRITICAL]: 5,
 };
 
 const normalizeSeverity = (severity: NormalizedSeverity): AlertSeverity => {
-  switch (severity) {
-    case 'critical':
+  // Assuming NormalizedSeverity might be string or enum, force string comparison safely or cast
+  const s = String(severity).toUpperCase();
+  switch (s) {
+    case 'CRITICAL':
+    case 'FATAL':
       return AlertSeverity.CRITICAL;
-    case 'high':
+    case 'HIGH':
+    case 'ERROR':
       return AlertSeverity.HIGH;
-    case 'med':
+    case 'MEDIUM':
+    case 'MED':
+    case 'WARNING':
       return AlertSeverity.MEDIUM;
-    case 'low':
+    case 'LOW':
+    case 'SUCCESS':
       return AlertSeverity.LOW;
-    case 'info':
+    case 'INFO':
+    case 'DEBUG':
     default:
       return AlertSeverity.INFO;
   }
@@ -44,7 +52,7 @@ export class GroupingService {
     return crypto.createHash('sha256').update(rawKey).digest('hex');
   }
 
-  async upsertGroup(workspaceId: string, alert: NormalizedAlert) {
+  async upsertGroup(workspaceId: string, alert: NormalizedAlert): Promise<AlertGroup> {
     const groupKey = this.generateGroupKey(alert);
     const windowStart = new Date(Date.now() - this.windowMinutes * 60_000);
 
@@ -78,8 +86,8 @@ export class GroupingService {
         });
       }
 
-      const existingSeverity = this.mapSeverityRank(existing.severity);
-      const incomingSeverity = severityRank[alert.severity];
+      const existingSeverityRank = this.mapSeverityToRank(existing.severity);
+      const incomingSeverityRank = severityRank[alert.severity];
 
       // Calculate velocity: occurrences per hour since first seen
       const hoursSinceFirstSeen = Math.max(
@@ -95,12 +103,13 @@ export class GroupingService {
         newVelocity
       );
 
-      // Upgrade severity if anomalous
+      // Upgrade severity if incoming is higher or if anomalous
       let finalSeverity = existing.severity;
-      if (incomingSeverity > existingSeverity) {
+      if (incomingSeverityRank > existingSeverityRank) {
         finalSeverity = normalizeSeverity(alert.severity);
       }
-      if (isAnomalous && this.mapSeverityRank(finalSeverity) < severityRank.high) {
+
+      if (isAnomalous && this.mapSeverityToRank(finalSeverity) < severityRank[AlertSeverity.HIGH]) {
         finalSeverity = AlertSeverity.HIGH; // Auto-escalate to at least HIGH
       }
 
@@ -124,19 +133,21 @@ export class GroupingService {
     });
   }
 
-  private mapSeverityRank(severity: AlertSeverity): number {
-    switch (severity) {
-      case AlertSeverity.CRITICAL:
-        return severityRank.critical;
-      case AlertSeverity.HIGH:
-        return severityRank.high;
-      case AlertSeverity.MEDIUM:
-        return severityRank.med;
-      case AlertSeverity.LOW:
-        return severityRank.low;
-      case AlertSeverity.INFO:
+  private mapSeverityToRank(severity: string): number {
+    const s = severity.toUpperCase();
+    switch (s) {
+      case 'CRITICAL':
+        return severityRank[AlertSeverity.CRITICAL];
+      case 'HIGH':
+        return severityRank[AlertSeverity.HIGH];
+      case 'MED':
+      case 'MEDIUM':
+        return severityRank[AlertSeverity.MEDIUM];
+      case 'LOW':
+        return severityRank[AlertSeverity.LOW];
+      case 'INFO':
       default:
-        return severityRank.info;
+        return severityRank[AlertSeverity.INFO];
     }
   }
 }

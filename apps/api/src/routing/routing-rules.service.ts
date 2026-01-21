@@ -15,6 +15,7 @@ import {
     RuleCondition,
 } from '@signalcraft/shared';
 import { RulesEngineService } from './rules-engine.service';
+import { AuditService } from '../audit/audit.service';
 
 // Allowed fields for conditions
 const ALLOWED_FIELDS = [
@@ -48,7 +49,10 @@ const ALLOWED_OPERATORS = [
 export class RoutingRulesService {
     private readonly logger = new Logger(RoutingRulesService.name);
 
-    constructor(private readonly rulesEngine: RulesEngineService) { }
+    constructor(
+        private readonly rulesEngine: RulesEngineService,
+        private readonly auditService: AuditService,
+    ) { }
 
     /**
      * List all routing rules for a workspace
@@ -100,7 +104,7 @@ export class RoutingRulesService {
     /**
      * Create a new routing rule
      */
-    async createRule(workspaceId: string, dto: CreateRoutingRuleDto) {
+    async createRule(workspaceId: string, dto: CreateRoutingRuleDto, actorId?: string) {
         // Validate conditions and actions
         this.validateConditions(dto.conditions);
         this.validateActions(dto.actions);
@@ -123,7 +127,16 @@ export class RoutingRulesService {
         // Invalidate cache
         this.rulesEngine.invalidateCache(workspaceId);
 
-        this.logger.log(`Routing rule created: ${rule.id}`, { workspaceId, ruleName: rule.name });
+        if (actorId) {
+            await this.auditService.log({
+                workspaceId,
+                userId: actorId,
+                action: 'CREATE_ROUTING_RULE',
+                resourceType: 'RoutingRule',
+                resourceId: rule.id,
+                metadata: { name: rule.name },
+            });
+        }
 
         return this.formatRule(rule);
     }
@@ -131,7 +144,7 @@ export class RoutingRulesService {
     /**
      * Update an existing routing rule
      */
-    async updateRule(workspaceId: string, ruleId: string, dto: UpdateRoutingRuleDto) {
+    async updateRule(workspaceId: string, ruleId: string, dto: UpdateRoutingRuleDto, actorId?: string) {
         // Verify rule exists
         const existing = await prisma.routingRule.findFirst({
             where: { id: ruleId, workspaceId },
@@ -165,7 +178,16 @@ export class RoutingRulesService {
         // Invalidate cache
         this.rulesEngine.invalidateCache(workspaceId);
 
-        this.logger.log(`Routing rule updated: ${rule.id}`, { workspaceId, ruleName: rule.name });
+        if (actorId) {
+            await this.auditService.log({
+                workspaceId,
+                userId: actorId,
+                action: 'UPDATE_ROUTING_RULE',
+                resourceType: 'RoutingRule',
+                resourceId: rule.id,
+                metadata: { name: rule.name },
+            });
+        }
 
         return this.formatRule(rule);
     }
@@ -173,7 +195,7 @@ export class RoutingRulesService {
     /**
      * Delete a routing rule
      */
-    async deleteRule(workspaceId: string, ruleId: string) {
+    async deleteRule(workspaceId: string, ruleId: string, actorId?: string) {
         const existing = await prisma.routingRule.findFirst({
             where: { id: ruleId, workspaceId },
         });
@@ -189,7 +211,16 @@ export class RoutingRulesService {
         // Invalidate cache
         this.rulesEngine.invalidateCache(workspaceId);
 
-        this.logger.log(`Routing rule deleted: ${ruleId}`, { workspaceId });
+        if (actorId) {
+            await this.auditService.log({
+                workspaceId,
+                userId: actorId,
+                action: 'DELETE_ROUTING_RULE',
+                resourceType: 'RoutingRule',
+                resourceId: ruleId,
+                metadata: { name: existing.name },
+            });
+        }
 
         return { success: true };
     }
