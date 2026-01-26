@@ -1,4 +1,4 @@
-# SignalCraft
+# Nirvana
 
 A lightweight "done-right" layer on top of existing monitoring tools that **reduces alert noise, prevents missed critical alerts, and makes incidents actionable** — without needing a full SRE/DevOps team.
 
