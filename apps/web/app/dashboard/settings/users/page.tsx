@@ -36,36 +36,36 @@ export default function UsersSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Users</h1>
-          <p className="text-zinc-400">Manage team members and roles</p>
+          <h1 className="text-2xl font-bold text-stone-900">Users</h1>
+          <p className="text-stone-500">Manage team members and roles</p>
         </div>
-        <Button className="bg-red-600 hover:bg-red-700 text-white border-0">
+        <Button className="bg-red-600 hover:bg-red-700 text-stone-900 border-0">
           <UserPlus className="w-4 h-4 mr-2" />
           Invite User
         </Button>
       </div>
 
-      <div className="bg-zinc-900/50 border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-white/90 border border-stone-200 rounded-xl overflow-hidden">
         <table className="min-w-full divide-y divide-white/5">
-          <thead className="bg-black/20">
+          <thead className="bg-white/70">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">User</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">Joined</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">User</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Joined</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {users.map((user) => (
-              <tr key={user.id} className="hover:bg-white/5">
+              <tr key={user.id} className="hover:bg-stone-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="h-8 w-8 rounded-full bg-red-900/20 flex items-center justify-center text-red-500 font-medium border border-red-900/30">
+                    <div className="h-8 w-8 rounded-full bg-red-50 flex items-center justify-center text-red-500 font-medium border border-red-200">
                       {(user.displayName || user.email).charAt(0).toUpperCase()}
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-zinc-200">{user.displayName || 'Unknown Name'}</div>
-                      <div className="text-sm text-zinc-500 flex items-center gap-1">
+                      <div className="text-sm font-medium text-stone-700">{user.displayName || 'Unknown Name'}</div>
+                      <div className="text-sm text-stone-500 flex items-center gap-1">
                         <Mail className="w-3 h-3" />
                         {user.email}
                       </div>
@@ -75,23 +75,23 @@ export default function UsersSettingsPage() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                     user.role === 'ADMIN' || user.role === 'OWNER' 
-                      ? 'bg-purple-900/30 text-purple-300 border border-purple-900/50' 
-                      : 'bg-green-900/30 text-green-300 border border-green-900/50'
+                      ? 'bg-purple-50 text-purple-700 border border-purple-200' 
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                   }`}>
                     {user.role}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white hover:bg-white/10">Edit</Button>
+                  <Button variant="ghost" size="sm" className="text-stone-500 hover:text-stone-900 hover:bg-stone-100">Edit</Button>
                 </td>
               </tr>
             ))}
             {users.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-zinc-500">No users found</td>
+                <td colSpan={4} className="px-6 py-8 text-center text-stone-500">No users found</td>
               </tr>
             )}
           </tbody>

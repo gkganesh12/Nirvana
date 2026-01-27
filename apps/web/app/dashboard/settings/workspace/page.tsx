@@ -63,49 +63,49 @@ export default function WorkspaceSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Workspace Settings</h1>
-        <p className="text-zinc-400">Manage your workspace preferences</p>
+        <h1 className="text-2xl font-bold text-stone-900">Workspace Settings</h1>
+        <p className="text-stone-500">Manage your workspace preferences</p>
       </div>
 
-      <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6 max-w-2xl space-y-6">
+      <div className="bg-white/90 border border-stone-200 rounded-xl p-6 max-w-2xl space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="workspace-id" className="text-zinc-300">Workspace ID</Label>
+          <Label htmlFor="workspace-id" className="text-stone-600">Workspace ID</Label>
           <Input 
             id="workspace-id" 
             value={id} 
             disabled 
-            className="bg-black/40 border-white/5 font-mono text-sm text-zinc-500" 
+            className="bg-white/80 border-stone-200 font-mono text-sm text-stone-500" 
           />
-          <p className="text-xs text-zinc-500">Unique identifier for this workspace</p>
+          <p className="text-xs text-stone-500">Unique identifier for this workspace</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="workspace-name" className="text-zinc-300">Workspace Name</Label>
+          <Label htmlFor="workspace-name" className="text-stone-600">Workspace Name</Label>
           <Input 
             id="workspace-name" 
             value={name} 
             onChange={(e) => setName(e.target.value)} 
-            className="bg-black/20 border-white/10 text-white focus:border-red-500/50 focus:ring-red-500/20"
+            className="bg-white/70 border-stone-200 text-stone-900 focus:border-red-500/50 focus:ring-red-500/20"
           />
         </div>
         
         {createdAt && (
-          <div className="text-sm text-zinc-500">
+          <div className="text-sm text-stone-500">
             Created on {new Date(createdAt).toLocaleDateString()}
           </div>
         )}
       </div>
 
       {/* Impact Threshold Configuration */}
-      <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6 max-w-2xl space-y-6">
+      <div className="bg-white/90 border border-stone-200 rounded-xl p-6 max-w-2xl space-y-6">
         <div>
-          <h2 className="text-lg font-semibold text-white">Impact Thresholds</h2>
-          <p className="text-sm text-zinc-400">Configure when alerts are labeled as high or medium impact</p>
+          <h2 className="text-lg font-semibold text-stone-900">Impact Thresholds</h2>
+          <p className="text-sm text-stone-500">Configure when alerts are labeled as high or medium impact</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="high-impact" className="text-zinc-300">
+            <Label htmlFor="high-impact" className="text-stone-600">
               🔴 High Impact Users
             </Label>
             <Input 
@@ -114,15 +114,15 @@ export default function WorkspaceSettingsPage() {
               min="1"
               value={highImpactUserThreshold} 
               onChange={(e) => setHighImpactUserThreshold(parseInt(e.target.value) || 50)} 
-              className="bg-black/20 border-white/10 text-white focus:border-red-500/50 focus:ring-red-500/20"
+              className="bg-white/70 border-stone-200 text-stone-900 focus:border-red-500/50 focus:ring-red-500/20"
             />
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-stone-500">
               Show 🔴 when ≥ {highImpactUserThreshold} users affected
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="medium-impact" className="text-zinc-300">
+            <Label htmlFor="medium-impact" className="text-stone-600">
               🟠 Medium Impact Users
             </Label>
             <Input 
@@ -131,15 +131,15 @@ export default function WorkspaceSettingsPage() {
               min="1"
               value={mediumImpactUserThreshold} 
               onChange={(e) => setMediumImpactUserThreshold(parseInt(e.target.value) || 10)} 
-              className="bg-black/20 border-white/10 text-white focus:border-red-500/50 focus:ring-red-500/20"
+              className="bg-white/70 border-stone-200 text-stone-900 focus:border-red-500/50 focus:ring-red-500/20"
             />
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-stone-500">
               Show 🟠 when ≥ {mediumImpactUserThreshold} users affected
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="high-velocity" className="text-zinc-300">
+            <Label htmlFor="high-velocity" className="text-stone-600">
               ⚡ High Velocity (/hr)
             </Label>
             <Input 
@@ -149,9 +149,9 @@ export default function WorkspaceSettingsPage() {
               step="0.1"
               value={highVelocityThreshold} 
               onChange={(e) => setHighVelocityThreshold(parseFloat(e.target.value) || 10)} 
-              className="bg-black/20 border-white/10 text-white focus:border-red-500/50 focus:ring-red-500/20"
+              className="bg-white/70 border-stone-200 text-stone-900 focus:border-red-500/50 focus:ring-red-500/20"
             />
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-stone-500">
               Show ⚡ when ≥ {highVelocityThreshold} events/hour
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function WorkspaceSettingsPage() {
         <Button 
           onClick={handleSave} 
           disabled={saving}
-          className="bg-red-600 hover:bg-red-700 text-white border-0"
+          className="bg-red-600 hover:bg-red-700 text-stone-900 border-0"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </Button>

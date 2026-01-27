@@ -23,8 +23,8 @@ export default function SettingsLayout({
     <div className="flex gap-8">
       {/* Sidebar */}
       <aside className="w-64 shrink-0">
-        <nav className="bg-zinc-950 border border-red-900/10 rounded-xl p-4 sticky top-24">
-          <h2 className="font-semibold text-white mb-4">Settings</h2>
+        <nav className="bg-white border border-stone-200 rounded-xl p-4 sticky top-24">
+          <h2 className="font-semibold text-stone-900 mb-4">Settings</h2>
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.href}>
@@ -33,8 +33,8 @@ export default function SettingsLayout({
                   className={cn(
                     'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                     pathname === item.href
-                      ? 'bg-red-900/20 text-red-400 font-medium border border-red-900/20'
-                      : 'text-zinc-500 hover:bg-zinc-900 hover:text-red-300'
+                      ? 'bg-red-50 text-red-600 font-medium border border-red-200'
+                      : 'text-stone-500 hover:bg-stone-100 hover:text-red-600'
                   )}
                 >
                   <span>{item.icon}</span>

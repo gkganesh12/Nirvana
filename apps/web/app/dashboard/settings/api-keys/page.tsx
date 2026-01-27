@@ -118,12 +118,12 @@ export default function ApiKeysPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">API Keys</h1>
-          <p className="text-zinc-400 mt-1">Manage programmatic access to your workspace</p>
+          <h1 className="text-3xl font-bold text-stone-900">API Keys</h1>
+          <p className="text-stone-500 mt-1">Manage programmatic access to your workspace</p>
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-zinc-900/50 rounded-xl animate-pulse"></div>
+            <div key={i} className="h-20 bg-white/90 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -135,12 +135,12 @@ export default function ApiKeysPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">API Keys</h1>
-          <p className="text-zinc-400 mt-1">Manage programmatic access to your workspace</p>
+          <h1 className="text-3xl font-bold text-stone-900">API Keys</h1>
+          <p className="text-stone-500 mt-1">Manage programmatic access to your workspace</p>
         </div>
         <button
           onClick={() => setShowCreateDialog(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-stone-900 rounded-lg hover:bg-red-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create API Key
@@ -149,17 +149,17 @@ export default function ApiKeysPage() {
 
       {/* Newly Created Key Alert */}
       {newlyCreatedKey?.key && (
-        <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-xl p-6">
+        <div className="bg-yellow-50 border border-yellow-700/50 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <AlertCircle className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-semibold text-white mb-2">Save your API key now!</h3>
-              <p className="text-sm text-zinc-300 mb-4">
+              <h3 className="font-semibold text-stone-900 mb-2">Save your API key now!</h3>
+              <p className="text-sm text-stone-600 mb-4">
                 For security reasons, this is the only time you&apos;ll be able to see this key.
                 Copy it now and store it securely.
               </p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 bg-black/50 px-4 py-2 rounded-lg font-mono text-sm text-white overflow-x-auto">
+                <code className="flex-1 bg-white/90 px-4 py-2 rounded-lg font-mono text-sm text-stone-900 overflow-x-auto">
                   {newlyCreatedKey.key}
                 </code>
                 <button
@@ -168,13 +168,13 @@ export default function ApiKeysPage() {
                 >
                   {copied ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-green-400" />
-                      <span className="text-green-400">Copied!</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span className="text-emerald-600">Copied!</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4" />
-                      <span className="text-white">Copy</span>
+                      <span className="text-stone-900">Copy</span>
                     </>
                   )}
                 </button>
@@ -186,12 +186,12 @@ export default function ApiKeysPage() {
 
       {/* Create Dialog */}
       {showCreateDialog && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 border border-white/10 rounded-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-white mb-4">Create API Key</h2>
+        <div className="fixed inset-0 bg-white/80 flex items-center justify-center z-50">
+          <div className="bg-white border border-stone-200 rounded-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-stone-900 mb-4">Create API Key</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                <label className="block text-sm font-medium text-stone-500 mb-2">
                   Key Name
                 </label>
                 <input
@@ -199,7 +199,7 @@ export default function ApiKeysPage() {
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
                   placeholder="e.g., CI/CD Pipeline, Mobile App"
-                  className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-red-500"
+                  className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-red-500"
                   autoFocus
                 />
               </div>
@@ -207,7 +207,7 @@ export default function ApiKeysPage() {
                 <button
                   onClick={handleCreateKey}
                   disabled={creating || !newKeyName.trim()}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-red-600 text-stone-900 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                 >
                   {creating ? 'Creating...' : 'Create Key'}
                 </button>
@@ -216,7 +216,7 @@ export default function ApiKeysPage() {
                     setShowCreateDialog(false);
                     setNewKeyName('');
                   }}
-                  className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                  className="px-4 py-2 bg-stone-100 text-stone-900 rounded-lg hover:bg-stone-200 transition-colors"
                 >
                   Cancel
                 </button>
@@ -228,38 +228,38 @@ export default function ApiKeysPage() {
 
       {/* API Keys List */}
       {apiKeys.length === 0 ? (
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-12 text-center">
-          <Key className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No API keys yet</h3>
-          <p className="text-zinc-500 mb-4">
-            Create an API key to access SignalCraft programmatically
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-12 text-center">
+          <Key className="w-12 h-12 text-stone-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-stone-900 mb-2">No API keys yet</h3>
+          <p className="text-stone-500 mb-4">
+            Create an API key to access Nirvana programmatically
           </p>
           <button
             onClick={() => setShowCreateDialog(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-stone-900 rounded-lg hover:bg-red-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
             Create Your First API Key
           </button>
         </div>
       ) : (
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl overflow-hidden">
+        <div className="bg-white/90 border border-stone-200 rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider px-6 py-3">
+              <tr className="border-b border-stone-200">
+                <th className="text-left text-xs font-medium text-stone-500 uppercase tracking-wider px-6 py-3">
                   Name
                 </th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider px-6 py-3">
+                <th className="text-left text-xs font-medium text-stone-500 uppercase tracking-wider px-6 py-3">
                   Key Prefix
                 </th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider px-6 py-3">
+                <th className="text-left text-xs font-medium text-stone-500 uppercase tracking-wider px-6 py-3">
                   Created
                 </th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider px-6 py-3">
+                <th className="text-left text-xs font-medium text-stone-500 uppercase tracking-wider px-6 py-3">
                   Last Used
                 </th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider px-6 py-3">
+                <th className="text-left text-xs font-medium text-stone-500 uppercase tracking-wider px-6 py-3">
                   Actions
                 </th>
               </tr>
@@ -269,24 +269,24 @@ export default function ApiKeysPage() {
                 <tr key={key.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <Key className="w-4 h-4 text-zinc-500" />
-                      <span className="text-white font-medium">{key.name}</span>
+                      <Key className="w-4 h-4 text-stone-500" />
+                      <span className="text-stone-900 font-medium">{key.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <code className="text-sm text-zinc-400 font-mono">{key.prefix}...</code>
+                    <code className="text-sm text-stone-500 font-mono">{key.prefix}...</code>
                   </td>
-                  <td className="px-6 py-4 text-zinc-400 text-sm">
+                  <td className="px-6 py-4 text-stone-500 text-sm">
                     {formatDate(key.createdAt)}
                   </td>
                   <td className="px-6 py-4">
                     {key.lastUsedAt ? (
-                      <div className="flex items-center gap-2 text-green-400 text-sm">
+                      <div className="flex items-center gap-2 text-emerald-600 text-sm">
                         <CheckCircle2 className="w-4 h-4" />
                         {formatDate(key.lastUsedAt)}
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 text-zinc-600 text-sm">
+                      <div className="flex items-center gap-2 text-stone-500 text-sm">
                         <Clock className="w-4 h-4" />
                         Never used
                       </div>
@@ -295,7 +295,7 @@ export default function ApiKeysPage() {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleRevokeKey(key.id)}
-                      className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Revoke API key"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -309,17 +309,17 @@ export default function ApiKeysPage() {
       )}
 
       {/* Info Box */}
-      <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+      <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
         <div className="flex items-start gap-4">
-          <div className="p-2 bg-blue-900/20 rounded-lg">
-            <Key className="w-5 h-5 text-blue-400" />
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <Key className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h3 className="font-medium text-white mb-1">Using API Keys</h3>
-            <p className="text-sm text-zinc-500 mb-3">
+            <h3 className="font-medium text-stone-900 mb-1">Using API Keys</h3>
+            <p className="text-sm text-stone-500 mb-3">
               Include your API key in the Authorization header when making requests:
             </p>
-            <code className="block bg-black/50 px-4 py-3 rounded-lg font-mono text-sm text-zinc-300">
+            <code className="block bg-white/90 px-4 py-3 rounded-lg font-mono text-sm text-stone-600">
               curl -H &quot;Authorization: Bearer sk_live_...&quot; https://api.signalcraft.com/api/...
             </code>
           </div>

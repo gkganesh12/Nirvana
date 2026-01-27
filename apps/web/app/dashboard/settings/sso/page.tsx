@@ -111,9 +111,9 @@ export default function SSOSettingsPage() {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-950 border-red-900/10">
+      <Card className="bg-white border-stone-200">
         <CardHeader>
-          <CardTitle className="text-white">SSO / SAML Settings</CardTitle>
+          <CardTitle className="text-stone-900">SSO / SAML Settings</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center py-8">
           <Spinner />
@@ -124,32 +124,32 @@ export default function SSOSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-zinc-950 border-red-900/10">
+      <Card className="bg-white border-stone-200">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="text-stone-900 flex items-center gap-2">
             🔐 SSO / SAML Configuration
           </CardTitle>
-          <CardDescription className="text-zinc-500">
+          <CardDescription className="text-stone-500">
             Configure SAML-based Single Sign-On for enterprise authentication.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {error && (
-            <div className="bg-red-950/20 border border-red-900/30 text-red-400 p-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm">
               ⚠️ {error}
             </div>
           )}
           {success && (
-            <div className="bg-emerald-950/20 border border-emerald-900/30 text-emerald-400 p-3 rounded-lg text-sm">
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 p-3 rounded-lg text-sm">
               ✓ {success}
             </div>
           )}
 
           {/* Enable SAML */}
-          <div className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-lg border border-white/5">
+          <div className="flex items-center justify-between p-4 bg-white/90 rounded-lg border border-stone-200">
             <div>
-              <Label className="text-white font-medium">Enable SAML SSO</Label>
-              <p className="text-sm text-zinc-500 mt-1">
+              <Label className="text-stone-900 font-medium">Enable SAML SSO</Label>
+              <p className="text-sm text-stone-500 mt-1">
                 Allow users to authenticate using your identity provider
               </p>
             </div>
@@ -164,16 +164,16 @@ export default function SSOSettingsPage() {
             <>
               {/* SP Metadata */}
               {config?.spEntityId && (
-                <div className="p-4 bg-blue-950/10 rounded-lg border border-blue-900/20">
-                  <Label className="text-blue-400 font-medium">Service Provider Info</Label>
-                  <p className="text-sm text-zinc-400 mt-2">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <Label className="text-blue-600 font-medium">Service Provider Info</Label>
+                  <p className="text-sm text-stone-500 mt-2">
                     <strong>Entity ID:</strong> {config.spEntityId}
                   </p>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={downloadMetadata}
-                    className="mt-3 border-blue-900/30 text-blue-400 hover:bg-blue-950/20"
+                    className="mt-3 border-blue-200 text-blue-600 hover:bg-blue-50"
                   >
                     📄 Download SP Metadata XML
                   </Button>
@@ -182,33 +182,33 @@ export default function SSOSettingsPage() {
 
               {/* IdP Configuration */}
               <div className="space-y-4">
-                <h3 className="text-white font-medium">Identity Provider Configuration</h3>
+                <h3 className="text-stone-900 font-medium">Identity Provider Configuration</h3>
                 
                 <div className="space-y-2">
-                  <Label className="text-zinc-300">IdP Entity ID</Label>
+                  <Label className="text-stone-600">IdP Entity ID</Label>
                   <Input
                     value={idpEntityId}
                     onChange={(e) => setIdpEntityId(e.target.value)}
                     placeholder="https://idp.example.com/saml"
-                    className="bg-black/20 border-white/10 text-white placeholder:text-zinc-600"
+                    className="bg-white/70 border-stone-200 text-stone-900 placeholder:text-stone-500"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-zinc-300">IdP SSO URL</Label>
+                  <Label className="text-stone-600">IdP SSO URL</Label>
                   <Input
                     value={idpSsoUrl}
                     onChange={(e) => setIdpSsoUrl(e.target.value)}
                     placeholder="https://idp.example.com/sso/saml"
-                    className="bg-black/20 border-white/10 text-white placeholder:text-zinc-600"
+                    className="bg-white/70 border-stone-200 text-stone-900 placeholder:text-stone-500"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-zinc-300">
+                  <Label className="text-stone-600">
                     IdP Certificate (X.509 PEM format)
                     {config?.hasCertificate && (
-                      <span className="ml-2 text-emerald-400 text-xs">✓ Certificate configured</span>
+                      <span className="ml-2 text-emerald-600 text-xs">✓ Certificate configured</span>
                     )}
                   </Label>
                   <textarea
@@ -216,9 +216,9 @@ export default function SSOSettingsPage() {
                     onChange={(e) => setIdpCertificate(e.target.value)}
                     placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
                     rows={4}
-                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-md text-white text-sm font-mono placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                    className="w-full px-3 py-2 bg-white/70 border border-stone-200 rounded-md text-stone-900 text-sm font-mono placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-red-500/50"
                   />
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-stone-500">
                     {config?.hasCertificate
                       ? 'Leave empty to keep existing certificate, or paste a new one to replace it.'
                       : 'Paste the X.509 certificate from your IdP.'}
@@ -228,23 +228,23 @@ export default function SSOSettingsPage() {
 
               {/* Domain Restrictions */}
               <div className="space-y-2">
-                <Label className="text-zinc-300">Allowed Email Domains</Label>
+                <Label className="text-stone-600">Allowed Email Domains</Label>
                 <Input
                   value={allowedDomains}
                   onChange={(e) => setAllowedDomains(e.target.value)}
                   placeholder="example.com, corp.example.com"
-                  className="bg-black/20 border-white/10 text-white placeholder:text-zinc-600"
+                  className="bg-white/70 border-stone-200 text-stone-900 placeholder:text-stone-500"
                 />
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-stone-500">
                   Comma-separated list of email domains allowed for SAML authentication
                 </p>
               </div>
 
               {/* JIT Provisioning */}
-              <div className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-lg border border-white/5">
+              <div className="flex items-center justify-between p-4 bg-white/90 rounded-lg border border-stone-200">
                 <div>
-                  <Label className="text-white font-medium">Just-In-Time Provisioning</Label>
-                  <p className="text-sm text-zinc-500 mt-1">
+                  <Label className="text-stone-900 font-medium">Just-In-Time Provisioning</Label>
+                  <p className="text-sm text-stone-500 mt-1">
                     Automatically create user accounts on first SAML login
                   </p>
                 </div>
@@ -256,10 +256,10 @@ export default function SSOSettingsPage() {
               </div>
 
               {/* Enforce SAML */}
-              <div className="flex items-center justify-between p-4 bg-amber-950/10 rounded-lg border border-amber-900/20">
+              <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
                 <div>
-                  <Label className="text-amber-400 font-medium">Enforce SAML-only Authentication</Label>
-                  <p className="text-sm text-zinc-500 mt-1">
+                  <Label className="text-amber-600 font-medium">Enforce SAML-only Authentication</Label>
+                  <p className="text-sm text-stone-500 mt-1">
                     Require all users with allowed domains to use SAML authentication
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export default function SSOSettingsPage() {
           )}
 
           {/* Save Button */}
-          <div className="flex justify-end pt-4 border-t border-white/5">
+          <div className="flex justify-end pt-4 border-t border-stone-200">
             <Button
               onClick={handleSave}
               disabled={saving}

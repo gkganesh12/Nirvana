@@ -115,9 +115,9 @@ export default function PermissionsPage() {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-950 border-red-900/10">
+      <Card className="bg-white border-stone-200">
         <CardHeader>
-          <CardTitle className="text-white">Role Permissions</CardTitle>
+          <CardTitle className="text-stone-900">Role Permissions</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center py-8">
           <Spinner />
@@ -130,29 +130,29 @@ export default function PermissionsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-zinc-950 border-red-900/10">
+      <Card className="bg-white border-stone-200">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="text-stone-900 flex items-center gap-2">
             🛡️ Role Permissions
           </CardTitle>
-          <CardDescription className="text-zinc-500">
+          <CardDescription className="text-stone-500">
             Configure granular permissions for each role. OWNER permissions cannot be modified.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {error && (
-            <div className="bg-red-950/20 border border-red-900/30 text-red-400 p-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm">
               ⚠️ {error}
             </div>
           )}
           {success && (
-            <div className="bg-emerald-950/20 border border-emerald-900/30 text-emerald-400 p-3 rounded-lg text-sm">
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 p-3 rounded-lg text-sm">
               ✓ {success}
             </div>
           )}
 
           {/* Role Tabs */}
-          <div className="flex gap-2 border-b border-white/10 pb-4">
+          <div className="flex gap-2 border-b border-stone-200 pb-4">
             {ROLES.map((role) => (
               <button
                 key={role}
@@ -160,7 +160,7 @@ export default function PermissionsPage() {
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                   selectedRole === role
                     ? 'bg-red-600 text-white'
-                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                    : 'bg-white text-stone-500 hover:bg-stone-100 hover:text-stone-900'
                 }`}
               >
                 {role}
@@ -169,7 +169,7 @@ export default function PermissionsPage() {
           </div>
 
           {selectedRole === 'OWNER' && (
-            <div className="bg-amber-950/10 border border-amber-900/20 p-4 rounded-lg text-amber-400 text-sm">
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg text-amber-600 text-sm">
               ⚠️ Owner permissions are locked and cannot be modified. Owners have full access to all resources.
             </div>
           )}
@@ -178,10 +178,10 @@ export default function PermissionsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-zinc-400 font-medium">Resource</th>
+                <tr className="border-b border-stone-200">
+                  <th className="text-left py-3 px-4 text-stone-500 font-medium">Resource</th>
                   {ACTIONS.map((action) => (
-                    <th key={action} className="text-center py-3 px-4 text-zinc-400 font-medium">
+                    <th key={action} className="text-center py-3 px-4 text-stone-500 font-medium">
                       {action}
                     </th>
                   ))}
@@ -189,8 +189,8 @@ export default function PermissionsPage() {
               </thead>
               <tbody>
                 {resources.map((resource) => (
-                  <tr key={resource} className="border-b border-white/5 hover:bg-zinc-900/30 transition-colors">
-                    <td className="py-3 px-4 text-white">{RESOURCE_LABELS[resource]}</td>
+                  <tr key={resource} className="border-b border-stone-200 hover:bg-white/80 transition-colors">
+                    <td className="py-3 px-4 text-stone-900">{RESOURCE_LABELS[resource]}</td>
                     {ACTIONS.map((action) => {
                       const hasPermission = hasAction(selectedRole, resource, action);
                       const disabled = selectedRole === 'OWNER';
@@ -202,12 +202,12 @@ export default function PermissionsPage() {
                             disabled={disabled}
                             className={`w-8 h-8 rounded-md border transition-all ${
                               hasPermission
-                                ? 'bg-emerald-600/20 border-emerald-500/30 text-emerald-400'
-                                : 'bg-zinc-900 border-white/10 text-zinc-600'
+                                ? 'bg-emerald-600/20 border-emerald-500/30 text-emerald-600'
+                                : 'bg-white border-stone-200 text-stone-500'
                             } ${
                               disabled
                                 ? 'cursor-not-allowed opacity-60'
-                                : 'hover:border-white/20 cursor-pointer'
+                                : 'hover:border-stone-300 cursor-pointer'
                             }`}
                           >
                             {hasPermission ? '✓' : ''}
@@ -223,18 +223,18 @@ export default function PermissionsPage() {
 
           {/* Action Buttons */}
           {selectedRole !== 'OWNER' && (
-            <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
+            <div className="flex justify-end gap-3 pt-4 border-t border-stone-200">
               <Button
                 variant="outline"
                 onClick={handleReset}
-                className="border-white/10 text-zinc-400 hover:bg-zinc-900 hover:text-white"
+                className="border-stone-200 text-stone-500 hover:bg-white hover:text-stone-900"
               >
                 Reset to Defaults
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]"
+                className="bg-red-600 hover:bg-red-700 text-stone-900 shadow-[0_0_15px_rgba(220,38,38,0.3)]"
               >
                 {saving ? 'Saving...' : 'Save Permissions'}
               </Button>
@@ -244,27 +244,27 @@ export default function PermissionsPage() {
       </Card>
 
       {/* Legend */}
-      <Card className="bg-zinc-950 border-red-900/10">
+      <Card className="bg-white border-stone-200">
         <CardHeader>
-          <CardTitle className="text-white text-sm">Permission Legend</CardTitle>
+          <CardTitle className="text-stone-900 text-sm">Permission Legend</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-zinc-300">READ</span>
-              <span className="text-zinc-500">View resources</span>
+              <span className="font-medium text-stone-600">READ</span>
+              <span className="text-stone-500">View resources</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-zinc-300">WRITE</span>
-              <span className="text-zinc-500">Create & update</span>
+              <span className="font-medium text-stone-600">WRITE</span>
+              <span className="text-stone-500">Create & update</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-zinc-300">DELETE</span>
-              <span className="text-zinc-500">Remove resources</span>
+              <span className="font-medium text-stone-600">DELETE</span>
+              <span className="text-stone-500">Remove resources</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-zinc-300">MANAGE</span>
-              <span className="text-zinc-500">Full control</span>
+              <span className="font-medium text-stone-600">MANAGE</span>
+              <span className="text-stone-500">Full control</span>
             </div>
           </div>
         </CardContent>
