@@ -32,9 +32,10 @@ describe('SlackNotificationService', () => {
     beforeEach(async () => {
         aiService = {
             isEnabled: jest.fn().mockReturnValue(true),
-            getResolutionSuggestion: jest.fn().mockResolvedValue({ suggestion: 'Fix it', confidence: 'high' }),
         };
-        alertsService = {};
+        alertsService = {
+            getAiSuggestion: jest.fn().mockResolvedValue({ enabled: false, suggestion: null }),
+        };
 
         mockPostMessage = jest.fn().mockResolvedValue({ ts: '1234.5678' });
         (WebClient as unknown as jest.Mock).mockImplementation(() => ({

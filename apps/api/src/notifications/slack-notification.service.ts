@@ -20,7 +20,7 @@ export class SlackNotificationService {
     private readonly slackService: SlackService,
     private readonly aiService: AiService,
     @Inject(forwardRef(() => AlertsService)) private readonly alertsService: AlertsService,
-  ) { }
+  ) {}
 
   async sendAlert(workspaceId: string, alertGroupId: string) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
@@ -44,21 +44,9 @@ export class SlackNotificationService {
     let aiSuggestion: { suggestion: string; confidence: string } | null = null;
     if (this.aiService.isEnabled()) {
       try {
-        const pastResolutions = await this.alertsService.findSimilarResolvedAlerts({
-          title: group.title,
-          project: group.project,
-        });
-
-        if (pastResolutions.length > 0) {
-          aiSuggestion = await this.aiService.generateResolutionSuggestion(
-            {
-              title: group.title,
-              description: `Severity: ${group.severity}, Environment: ${group.environment}`,
-              environment: group.environment,
-              project: group.project,
-            },
-            pastResolutions
-          );
+        const result = await this.alertsService.getAiSuggestion(workspaceId, alertGroupId);
+        if (result?.enabled && result.suggestion) {
+          aiSuggestion = result.suggestion;
         }
       } catch (error) {
         this.logger.error(`Failed to get AI suggestion for alert ${alertGroupId}: ${error}`);
@@ -77,16 +65,15 @@ export class SlackNotificationService {
 
       return { channelId, ts: response.ts };
     } catch (error) {
-      throw new InternalServerException('Failed to send Slack alert', { workspaceId, alertGroupId, error });
+      throw new InternalServerException('Failed to send Slack alert', {
+        workspaceId,
+        alertGroupId,
+        error,
+      });
     }
   }
 
-  async updateMessage(
-    workspaceId: string,
-    channelId: string,
-    ts: string,
-    alertGroupId: string,
-  ) {
+  async updateMessage(workspaceId: string, channelId: string, ts: string, alertGroupId: string) {
     const token = await this.slackOAuth.getDecryptedToken(workspaceId);
     if (!token) {
       throw new AuthenticationException('Slack not connected for this workspace');
@@ -113,6 +100,33 @@ export class SlackNotificationService {
     }
   }
 
+  async postStatusUpdate(workspaceId: string, channelId: string, alertGroupId: string) {
+    const token = await this.slackOAuth.getDecryptedToken(workspaceId);
+    if (!token) {
+      throw new AuthenticationException('Slack not connected for this workspace');
+    }
+
+    const group = await prisma.alertGroup.findFirst({
+      where: { id: alertGroupId, workspaceId },
+    });
+    if (!group) {
+      throw new ResourceNotFoundException('Alert group', alertGroupId);
+    }
+
+    const client = new WebClient(token);
+    const blocks = this.buildBlocks(group, true, null);
+
+    try {
+      await client.chat.postMessage({
+        channel: channelId,
+        text: `Alert ${group.status.toLowerCase()}: ${group.title}`,
+        blocks,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to post Slack status update to ${channelId}: ${error}`);
+    }
+  }
+
   /**
    * Extended group interface for enriched Slack messages
    */
@@ -130,6 +144,7 @@ export class SlackNotificationService {
       avgResolutionMins?: number | null;
       userCount?: number | null;
       velocityPerHour?: number | null;
+      jiraIssueUrl?: string | null;
     },
     disableActions = false,
     aiSuggestion?: { suggestion: string; confidence: string } | null,
@@ -156,7 +171,12 @@ export class SlackNotificationService {
 
     // AI Suggestion (Differentiation Feature)
     if (aiSuggestion) {
-      const confidenceEmoji = aiSuggestion.confidence === 'high' ? '🟢' : aiSuggestion.confidence === 'medium' ? '🟡' : '⚪';
+      const confidenceEmoji =
+        aiSuggestion.confidence === 'high'
+          ? '🟢'
+          : aiSuggestion.confidence === 'medium'
+            ? '🟡'
+            : '⚪';
       blocks.push({
         type: 'section',
         text: {
@@ -181,10 +201,12 @@ export class SlackNotificationService {
       const timeInfo = group.avgResolutionMins ? ` (avg ${group.avgResolutionMins} min)` : '';
       blocks.push({
         type: 'context',
-        elements: [{
-          type: 'mrkdwn',
-          text: `🔄 *Previous fix${resolverInfo}${timeInfo}:* "${group.resolutionNotes}"`,
-        }],
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `🔄 *Previous fix${resolverInfo}${timeInfo}:* "${group.resolutionNotes}"`,
+          },
+        ],
       });
     }
 
@@ -197,7 +219,16 @@ export class SlackNotificationService {
     } else {
       blocks.push({
         type: 'context',
-        elements: [{ type: 'mrkdwn', text: '⚠️ No runbook for this alert type. Consider adding one!' }],
+        elements: [
+          { type: 'mrkdwn', text: '⚠️ No runbook for this alert type. Consider adding one!' },
+        ],
+      });
+    }
+
+    if (group.jiraIssueUrl) {
+      blocks.push({
+        type: 'section',
+        text: { type: 'mrkdwn', text: `🎫 *Jira:* <${group.jiraIssueUrl}|View Ticket>` },
       });
     }
 
@@ -232,6 +263,43 @@ export class SlackNotificationService {
     });
 
     return blocks;
+  }
+
+  async sendJiraTicketNotification(
+    workspaceId: string,
+    alertGroupId: string,
+    issueKey: string | null,
+    issueUrl: string | null,
+  ) {
+    const token = await this.slackOAuth.getDecryptedToken(workspaceId);
+    if (!token) {
+      return;
+    }
+
+    const channelId = await this.slackService.getDefaultChannel(workspaceId);
+    if (!channelId) {
+      return;
+    }
+
+    const group = await prisma.alertGroup.findFirst({
+      where: { id: alertGroupId, workspaceId },
+    });
+    if (!group) {
+      return;
+    }
+
+    const client = new WebClient(token);
+    const linkText = issueKey && issueUrl ? `<${issueUrl}|${issueKey}>` : 'Jira ticket';
+    const text = `🎫 ${linkText} created for *${group.title}*`;
+
+    try {
+      await client.chat.postMessage({
+        channel: channelId,
+        text,
+      });
+    } catch (error) {
+      this.logger.error('Failed to post Jira ticket to Slack', error);
+    }
   }
 
   /**
@@ -304,7 +372,12 @@ export class SlackNotificationService {
 
       return { channelId, ts: response.ts };
     } catch (error) {
-      throw new InternalServerException('Failed to send Slack alert to channel', { workspaceId, alertGroupId, channelId, error });
+      throw new InternalServerException('Failed to send Slack alert to channel', {
+        workspaceId,
+        alertGroupId,
+        channelId,
+        error,
+      });
     }
   }
 
@@ -353,12 +426,24 @@ export class SlackNotificationService {
 
       return { channelId, ts: response.ts };
     } catch (error) {
-      throw new InternalServerException('Failed to send Slack escalation', { workspaceId, alertGroupId, channelId, error });
+      throw new InternalServerException('Failed to send Slack escalation', {
+        workspaceId,
+        alertGroupId,
+        channelId,
+        error,
+      });
     }
   }
 
   private buildEscalationBlocks(
-    group: { id: string; title: string; severity: string; environment: string; count: number; status: AlertStatus },
+    group: {
+      id: string;
+      title: string;
+      severity: string;
+      environment: string;
+      count: number;
+      status: AlertStatus;
+    },
     escalationLevel: number,
   ): AnyBlock[] {
     const severityEmoji = this.mapSeverity(group.severity);

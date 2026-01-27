@@ -14,6 +14,15 @@ interface SendAlertEmailDto {
   alertUrl: string;
 }
 
+interface StatusPageUpdateDto {
+  pageTitle: string;
+  incidentTitle: string;
+  status: string;
+  impact: string;
+  message: string;
+  statusUrl: string;
+}
+
 @Injectable()
 export class EmailNotificationService {
   private readonly logger = new Logger(EmailNotificationService.name);
@@ -21,7 +30,7 @@ export class EmailNotificationService {
   constructor(
     private readonly encryptionService: EncryptionService,
     private readonly secretsService: SecretsService,
-  ) { }
+  ) {}
 
   /**
    * Internal helper to set SendGrid API key securely
@@ -76,10 +85,7 @@ export class EmailNotificationService {
   /**
    * Send an alert notification email
    */
-  async sendAlertNotification(
-    workspaceId: string,
-    dto: SendAlertEmailDto,
-  ): Promise<boolean> {
+  async sendAlertNotification(workspaceId: string, dto: SendAlertEmailDto): Promise<boolean> {
     try {
       // Get email integration for workspace (still needed for fromEmail/fromName)
       const emailIntegration = await prisma.emailIntegration.findUnique({
@@ -193,7 +199,10 @@ export class EmailNotificationService {
       const msg = {
         to,
         from: {
-          email: emailIntegration?.fromEmail || process.env.DEFAULT_FROM_EMAIL || 'alerts@signalcraft.dev',
+          email:
+            emailIntegration?.fromEmail ||
+            process.env.DEFAULT_FROM_EMAIL ||
+            'alerts@signalcraft.dev',
           name: emailIntegration?.fromName || 'SignalCraft',
         },
         subject: `You've been invited to join ${workspaceName} on SignalCraft`,
@@ -279,6 +288,88 @@ export class EmailNotificationService {
     } catch (error: any) {
       this.logger.error(`Test email failed:`, error);
       return { success: false, error: error.message };
+    }
+  }
+
+  async sendStatusPageVerification(
+    workspaceId: string,
+    to: string,
+    pageTitle: string,
+    verifyUrl: string,
+  ) {
+    try {
+      const emailIntegration = await prisma.emailIntegration.findUnique({
+        where: { workspaceId },
+      });
+
+      await this.configureSendGrid(workspaceId, emailIntegration?.apiKey);
+
+      const msg = {
+        to,
+        from: {
+          email:
+            emailIntegration?.fromEmail ||
+            process.env.DEFAULT_FROM_EMAIL ||
+            'status@signalcraft.dev',
+          name: emailIntegration?.fromName || 'SignalCraft Status',
+        },
+        subject: `Confirm subscription to ${pageTitle}`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #0f172a;">Confirm your subscription</h2>
+            <p style="color: #475569;">You requested updates for <strong>${pageTitle}</strong>.</p>
+            <div style="margin: 24px 0;">
+              <a href="${verifyUrl}" style="background-color: #dc2626; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">Confirm Subscription</a>
+            </div>
+            <p style="color: #94a3b8; font-size: 12px;">If you did not request this, you can ignore this email.</p>
+          </div>
+        `,
+      };
+
+      await sgMail.send(msg);
+      return true;
+    } catch (error) {
+      this.logger.error('Failed to send status page verification email', error);
+      return false;
+    }
+  }
+
+  async sendStatusPageUpdate(workspaceId: string, to: string, dto: StatusPageUpdateDto) {
+    try {
+      const emailIntegration = await prisma.emailIntegration.findUnique({
+        where: { workspaceId },
+      });
+
+      await this.configureSendGrid(workspaceId, emailIntegration?.apiKey);
+
+      const msg = {
+        to,
+        from: {
+          email:
+            emailIntegration?.fromEmail ||
+            process.env.DEFAULT_FROM_EMAIL ||
+            'status@signalcraft.dev',
+          name: emailIntegration?.fromName || 'SignalCraft Status',
+        },
+        subject: `[${dto.status}] ${dto.pageTitle} - ${dto.incidentTitle}`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #0f172a; margin-bottom: 6px;">${dto.incidentTitle}</h2>
+            <p style="color: #475569; margin-top: 0;">Status: <strong>${dto.status}</strong> • Impact: <strong>${dto.impact}</strong></p>
+            <p style="color: #334155; line-height: 1.5;">${dto.message || 'No additional details provided.'}</p>
+            <div style="margin: 20px 0;">
+              <a href="${dto.statusUrl}" style="background-color: #0f172a; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600;">View Status Page</a>
+            </div>
+            <p style="color: #94a3b8; font-size: 12px;">You are receiving this email because you subscribed to updates.</p>
+          </div>
+        `,
+      };
+
+      await sgMail.send(msg);
+      return true;
+    } catch (error) {
+      this.logger.error('Failed to send status page update email', error);
+      return false;
     }
   }
 
