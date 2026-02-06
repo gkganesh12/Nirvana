@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: starter
     rootDir: ./
-    buildCommand: npm ci && npm run build -w @signalcraft/database && npm run build -w @signalcraft/api
+    buildCommand: npm ci --include=dev && npm run build -w @signalcraft/database && npm run build -w @signalcraft/api
     startCommand: cd apps/api && node dist/main.js
     healthCheckPath: /health
     envVars:
@@ -43,7 +43,7 @@ services:
     region: oregon
     plan: starter
     rootDir: ./
-    buildCommand: npm ci && npm run build -w @signalcraft/web
+    buildCommand: npm ci --include=dev && npm run build -w @signalcraft/web
     startCommand: cd apps/web && npm run start
     envVars:
       - key: NODE_ENV
@@ -62,7 +62,7 @@ services:
     region: oregon
     plan: starter
     rootDir: ./
-    buildCommand: npm ci && npm run build -w @signalcraft/database && npm run build -w @signalcraft/api
+    buildCommand: npm ci --include=dev && npm run build -w @signalcraft/database && npm run build -w @signalcraft/api
     startCommand: cd apps/api && node dist/queues/worker.js
     envVars:
       - key: NODE_ENV

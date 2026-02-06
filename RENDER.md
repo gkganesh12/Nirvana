@@ -117,7 +117,7 @@ Before starting, ensure you have:
 
 **Build Command:**
 ```bash
-npm ci && npm run build -w @signalcraft/database && npm run build -w @signalcraft/api
+npm ci --include=dev && npm run build -w @signalcraft/database && npm run build -w @signalcraft/api
 ```
 
 **Start Command:**
