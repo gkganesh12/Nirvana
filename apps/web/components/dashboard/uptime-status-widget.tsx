@@ -18,19 +18,19 @@ interface UptimeCheck {
 
 const statusColors: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
     up: {
-        bg: 'bg-green-900/30',
-        text: 'text-green-400',
-        icon: <ArrowUpCircle className="w-4 h-4 text-green-400" />,
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
+        icon: <ArrowUpCircle className="w-4 h-4 text-emerald-600" />,
     },
     down: {
-        bg: 'bg-red-900/30',
-        text: 'text-red-400',
-        icon: <ArrowDownCircle className="w-4 h-4 text-red-400" />,
+        bg: 'bg-red-50',
+        text: 'text-red-700',
+        icon: <ArrowDownCircle className="w-4 h-4 text-red-600" />,
     },
     degraded: {
-        bg: 'bg-yellow-900/30',
-        text: 'text-yellow-400',
-        icon: <Clock className="w-4 h-4 text-yellow-400" />,
+        bg: 'bg-amber-50',
+        text: 'text-amber-700',
+        icon: <Clock className="w-4 h-4 text-amber-600" />,
     },
 };
 
@@ -61,14 +61,14 @@ export function UptimeStatusWidget() {
 
     if (loading) {
         return (
-            <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+            <div className="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-lg shadow-stone-900/5">
                 <div className="flex items-center gap-2 mb-4">
-                    <Activity className="w-5 h-5 text-red-500" />
-                    <h3 className="font-semibold text-white">Uptime Monitoring</h3>
+                    <Activity className="w-5 h-5 text-red-600" />
+                    <h3 className="font-semibold text-stone-800">Uptime Monitoring</h3>
                 </div>
                 <div className="animate-pulse space-y-2">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-12 bg-zinc-800/50 rounded-lg"></div>
+                        <div key={i} className="h-12 rounded-xl bg-stone-100"></div>
                     ))}
                 </div>
             </div>
@@ -77,14 +77,14 @@ export function UptimeStatusWidget() {
 
     if (checks.length === 0) {
         return (
-            <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+            <div className="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-lg shadow-stone-900/5">
                 <div className="flex items-center gap-2 mb-4">
-                    <Activity className="w-5 h-5 text-red-500" />
-                    <h3 className="font-semibold text-white">Uptime Monitoring</h3>
+                    <Activity className="w-5 h-5 text-red-600" />
+                    <h3 className="font-semibold text-stone-800">Uptime Monitoring</h3>
                 </div>
                 <div className="text-center py-4">
-                    <p className="text-zinc-500 text-sm">No uptime checks configured.</p>
-                    <p className="text-zinc-600 text-xs mt-1">
+                    <p className="text-sm text-stone-500">No uptime checks configured.</p>
+                    <p className="mt-1 text-xs text-stone-400">
                         Add endpoint monitors to track service availability.
                     </p>
                 </div>
@@ -96,22 +96,22 @@ export function UptimeStatusWidget() {
     const anyDown = checks.some((c) => c.lastStatus === 'down');
 
     return (
-        <div className={`border rounded-xl p-6 ${
+        <div className={`rounded-2xl border p-6 shadow-lg shadow-stone-900/5 ${
             anyDown 
-                ? 'bg-gradient-to-r from-red-950/30 to-zinc-900/50 border-red-900/20' 
-                : 'bg-zinc-900/50 border-white/5'
+                ? 'border-red-200/60 bg-gradient-to-r from-red-50 to-amber-50' 
+                : 'border-stone-200 bg-white/90'
         }`}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-red-500" />
-                    <h3 className="font-semibold text-white">Uptime Monitoring</h3>
+                    <Activity className="w-5 h-5 text-red-600" />
+                    <h3 className="font-semibold text-stone-800">Uptime Monitoring</h3>
                 </div>
-                <span className={`px-2 py-1 text-xs rounded-full border ${
+                <span className={`rounded-full border px-2 py-1 text-xs ${
                     allUp 
-                        ? 'bg-green-900/30 text-green-400 border-green-900/50' 
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700' 
                         : anyDown 
-                            ? 'bg-red-900/30 text-red-400 border-red-900/50' 
-                            : 'bg-yellow-900/30 text-yellow-400 border-yellow-900/50'
+                            ? 'border-red-200 bg-red-50 text-red-700' 
+                            : 'border-amber-200 bg-amber-50 text-amber-700'
                 }`}>
                     {allUp ? 'All Systems Operational' : anyDown ? 'System Issues' : 'Degraded'}
                 </span>
@@ -124,13 +124,13 @@ export function UptimeStatusWidget() {
                     return (
                         <div
                             key={check.id}
-                            className={`flex items-center justify-between p-3 rounded-lg border ${statusStyle.bg} border-white/5`}
+                            className={`flex items-center justify-between rounded-xl border border-stone-200 px-4 py-3 ${statusStyle.bg}`}
                         >
                             <div className="flex items-center gap-3">
                                 {statusStyle.icon}
                                 <div>
-                                    <p className="text-sm font-medium text-white">{check.name}</p>
-                                    <p className="text-xs text-zinc-500 truncate max-w-[200px]">{check.url}</p>
+                                    <p className="text-sm font-medium text-stone-800">{check.name}</p>
+                                    <p className="max-w-[200px] truncate text-xs text-stone-500">{check.url}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4 text-right">
@@ -138,10 +138,10 @@ export function UptimeStatusWidget() {
                                     <p className={`text-sm font-medium ${statusStyle.text}`}>
                                         {check.uptimePercentage}%
                                     </p>
-                                    <p className="text-xs text-zinc-500">uptime</p>
+                                    <p className="text-xs text-stone-500">uptime</p>
                                 </div>
                                 {check.avgResponseTime && (
-                                    <div className="flex items-center gap-1 text-zinc-400">
+                                    <div className="flex items-center gap-1 text-stone-500">
                                         <Zap className="w-3 h-3" />
                                         <span className="text-xs">{check.avgResponseTime}ms</span>
                                     </div>

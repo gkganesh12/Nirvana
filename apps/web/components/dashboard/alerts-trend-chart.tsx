@@ -22,35 +22,35 @@ export function AlertsTrendChart({ data }: AlertsTrendChartProps) {
   }));
 
   return (
-    <div className="rounded-xl bg-zinc-950 border border-red-900/10 p-6 shadow-sm">
-      <h3 className="text-sm font-medium text-zinc-400 mb-4">Alerts Trend (24h)</h3>
+    <div className="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-lg shadow-stone-900/5">
+      <h3 className="mb-4 text-sm font-medium text-stone-500">Alerts Trend (24h)</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e7e2d9" />
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 11, fill: '#71717a' }}
+              tick={{ fontSize: 11, fill: '#8b8376' }}
               tickLine={false}
-              axisLine={{ stroke: '#27272a' }}
+              axisLine={{ stroke: '#e7e2d9' }}
               interval="preserveStartEnd"
             />
             <YAxis
-              tick={{ fontSize: 11, fill: '#71717a' }}
+              tick={{ fontSize: 11, fill: '#8b8376' }}
               tickLine={false}
-              axisLine={{ stroke: '#27272a' }}
+              axisLine={{ stroke: '#e7e2d9' }}
               width={40}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#09090b',
-                border: '1px solid #27272a',
+                backgroundColor: '#ffffff',
+                border: '1px solid #e7e2d9',
                 borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
-                color: '#fff'
+                boxShadow: '0 8px 20px -12px rgba(24, 25, 23, 0.35)',
+                color: '#1c1917'
               }}
-              labelStyle={{ color: '#a1a1aa', fontWeight: 600 }}
-              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#6b6459', fontWeight: 600 }}
+              itemStyle={{ color: '#1c1917' }}
             />
             <Line
               type="monotone"
@@ -58,7 +58,7 @@ export function AlertsTrendChart({ data }: AlertsTrendChartProps) {
               stroke="#dc2626"
               strokeWidth={2}
               dot={{ fill: '#dc2626', r: 3, strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: '#ef4444', stroke: '#7f1d1d', strokeWidth: 2 }}
+              activeDot={{ r: 5, fill: '#ef4444', stroke: '#fecaca', strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>

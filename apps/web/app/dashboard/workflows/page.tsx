@@ -60,15 +60,15 @@ export default function WorkflowsPage() {
   }
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Loading workflows...</div>;
+    return <div className="p-8 text-center text-stone-500">Loading workflows...</div>;
   }
 
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Auto-Remediation Workflows</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="text-2xl font-bold text-stone-900">Auto-Remediation Workflows</h1>
+          <p className="mt-1 text-sm text-stone-500">
             Automate responses to alerts with conditional logic and actions.
           </p>
         </div>
@@ -80,9 +80,9 @@ export default function WorkflowsPage() {
       </div>
 
       {workflows.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center dark:border-gray-700">
-          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No workflows</h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <div className="rounded-lg border-2 border-dashed border-stone-300 p-12 text-center border-stone-300">
+          <h3 className="mt-2 text-sm font-medium text-stone-900">No workflows</h3>
+          <p className="mt-1 text-sm text-stone-500">
             Create your first automation workflow to handle alerts automatically.
           </p>
           <div className="mt-6">
@@ -92,26 +92,26 @@ export default function WorkflowsPage() {
           </div>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+        <div className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow border-stone-200 bg-white">
+          <table className="min-w-full divide-y divide-stone-200 divide-stone-200">
+            <thead className="bg-stone-50 bg-white">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Trigger</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Runs</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-500">Name</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-500">Trigger</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-500">Status</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-500">Runs</th>
                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-gray-900">
+            <tbody className="divide-y divide-stone-200 bg-white divide-stone-200 bg-white">
               {workflows.map((workflow) => (
                 <tr key={workflow.id}>
                   <td className="whitespace-nowrap px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{workflow.name}</div>
-                    <div className="text-sm text-gray-500">{workflow.description}</div>
+                    <div className="text-sm font-medium text-stone-900">{workflow.name}</div>
+                    <div className="text-sm text-stone-500">{workflow.description}</div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span className="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-900 text-blue-200">
                       {workflow.trigger.type}
                     </span>
                   </td>
@@ -120,20 +120,20 @@ export default function WorkflowsPage() {
                       variant="ghost" 
                       size="sm" 
                       onClick={() => handleToggle(workflow.id, workflow.isEnabled)}
-                      className={workflow.isEnabled ? "text-green-600" : "text-gray-400"}
+                      className={workflow.isEnabled ? "text-green-600" : "text-stone-400"}
                     >
                       {workflow.isEnabled ? <Play className="mr-1 h-4 w-4" /> : <Pause className="mr-1 h-4 w-4" />}
                       {workflow.isEnabled ? 'Active' : 'Paused'}
                     </Button>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-stone-500">
                     {workflow.runCount}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     <div className="flex justify-end gap-2">
                       <Link href={`/dashboard/workflows/${workflow.id}/history`}>
                          <Button size="icon" variant="ghost" title="Run History">
-                           <History className="h-4 w-4 text-gray-500" />
+                           <History className="h-4 w-4 text-stone-500" />
                          </Button>
                       </Link>
                       <Link href={`/dashboard/workflows/${workflow.id}/edit`}>

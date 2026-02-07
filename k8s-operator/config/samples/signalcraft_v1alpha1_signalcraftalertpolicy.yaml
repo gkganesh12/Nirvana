@@ -1,0 +1,12 @@
+apiVersion: signalcraft.io/v1alpha1
+kind: SignalCraftAlertPolicy
+metadata:
+  name: critical-db-alerts
+spec:
+  severity: critical
+  routing_key: db-team
+  conditions:
+    - type: metric_threshold
+      metric: cpu_usage
+      operator: gt
+      value: 90

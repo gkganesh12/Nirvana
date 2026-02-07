@@ -10,7 +10,7 @@ export async function GET() {
     }
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5050';
         const res = await fetch(`${apiUrl}/api/api-keys`, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5050';
         const res = await fetch(`${apiUrl}/api/api-keys`, {
             method: 'POST',
             headers: {
@@ -86,7 +86,7 @@ export async function DELETE(request: NextRequest) {
 
     try {
         const { keyId } = await request.json();
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5050';
         const res = await fetch(`${apiUrl}/api/api-keys/${keyId}`, {
             method: 'DELETE',
             headers: {

@@ -1,14 +1,14 @@
 import { BadRequestException, Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ClerkAuthGuard } from '../auth/clerk-auth.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ApiOrClerkAuthGuard } from '../auth/api-or-clerk-auth.guard';
+import { WorkspaceId } from '../common/decorators/workspace-id.decorator';
 import { SlackOAuthService } from './slack/oauth.service';
 import { SlackService } from './slack/slack.service';
-import { prisma } from '@signalcraft/database';
+import { PermissionsGuard, RequirePermission, RESOURCES } from '../permissions/permissions.guard';
 
 @ApiTags('integrations')
 @ApiBearerAuth()
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ApiOrClerkAuthGuard, PermissionsGuard)
 @Controller('integrations')
 export class IntegrationsController {
   constructor(
@@ -17,8 +17,8 @@ export class IntegrationsController {
   ) { }
 
   @Get('slack/status')
-  async slackStatus(@CurrentUser() user: { clerkId: string }) {
-    const workspaceId = await this.getWorkspaceId(user.clerkId);
+  @RequirePermission(RESOURCES.INTEGRATIONS, 'READ')
+  async slackStatus(@WorkspaceId() workspaceId: string) {
     const integration = await this.slackOAuth.getIntegration(workspaceId);
     if (!integration) {
       return { connected: false };
@@ -32,11 +32,8 @@ export class IntegrationsController {
   }
 
   @Post('slack/install')
-  async slackInstall(
-    @CurrentUser() user: { clerkId: string },
-    @Body() payload: { code: string },
-  ) {
-    const workspaceId = await this.getWorkspaceId(user.clerkId);
+  @RequirePermission(RESOURCES.INTEGRATIONS, 'WRITE')
+  async slackInstall(@WorkspaceId() workspaceId: string, @Body() payload: { code: string }) {
     if (!payload.code) {
       throw new BadRequestException('Missing Slack code');
     }
@@ -46,24 +43,22 @@ export class IntegrationsController {
   }
 
   @Post('slack/disconnect')
-  async slackDisconnect(@CurrentUser() user: { clerkId: string }) {
-    const workspaceId = await this.getWorkspaceId(user.clerkId);
+  @RequirePermission(RESOURCES.INTEGRATIONS, 'WRITE')
+  async slackDisconnect(@WorkspaceId() workspaceId: string) {
     await this.slackOAuth.disconnect(workspaceId);
     return { status: 'ok' };
   }
 
   @Get('slack/channels')
-  async slackChannels(@CurrentUser() user: { clerkId: string }) {
-    const workspaceId = await this.getWorkspaceId(user.clerkId);
+  async slackChannels(@WorkspaceId() workspaceId: string) {
     return this.slackService.listChannels(workspaceId);
   }
 
   @Post('slack/default-channel')
   async setDefaultChannel(
-    @CurrentUser() user: { clerkId: string },
+    @WorkspaceId() workspaceId: string,
     @Body() payload: { channelId: string },
   ) {
-    const workspaceId = await this.getWorkspaceId(user.clerkId);
     if (!payload.channelId) {
       throw new BadRequestException('Missing channelId');
     }
@@ -73,8 +68,7 @@ export class IntegrationsController {
   }
 
   @Post('slack/test')
-  async slackTest(@CurrentUser() user: { clerkId: string }) {
-    const workspaceId = await this.getWorkspaceId(user.clerkId);
+  async slackTest(@WorkspaceId() workspaceId: string) {
     try {
       await this.slackService.sendTestMessage(workspaceId);
       return { status: 'ok', message: 'Test message sent' };
@@ -82,13 +76,5 @@ export class IntegrationsController {
       const msg = e instanceof Error ? e.message : 'Unknown error';
       throw new BadRequestException(`Test failed: ${msg}`);
     }
-  }
-
-  private async getWorkspaceId(clerkId: string) {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user) {
-      throw new BadRequestException('Workspace not found');
-    }
-    return user.workspaceId;
   }
 }

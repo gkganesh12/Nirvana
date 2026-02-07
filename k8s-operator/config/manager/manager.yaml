@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: signalcraft-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: signalcraft-operator
+  namespace: signalcraft-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: signalcraft-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: signalcraft-operator
+subjects:
+  - kind: ServiceAccount
+    name: signalcraft-operator
+    namespace: signalcraft-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signalcraft-operator
+  namespace: signalcraft-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signalcraft-operator
+  template:
+    metadata:
+      labels:
+        app: signalcraft-operator
+    spec:
+      serviceAccountName: signalcraft-operator
+      containers:
+        - name: manager
+          image: signalcraft/operator:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - '--metrics-bind-address=:8080'
+          env:
+            - name: SIGNALCRAFT_API_URL
+              value: 'https://api.signalcraft.io'
+            - name: SIGNALCRAFT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: signalcraft-api
+                  key: apiKey
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi

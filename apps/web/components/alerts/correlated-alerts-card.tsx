@@ -41,27 +41,27 @@ export function CorrelatedAlertsCard({ alertId }: { alertId: string }) {
   }
 
   return (
-    <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
-      <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+    <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
+      <h3 className="font-semibold text-stone-900 mb-4 flex items-center gap-2">
         <span className="text-lg">🔗</span> Correlated Alerts
-        <span className="text-xs font-normal text-zinc-500 ml-2">
+        <span className="text-xs font-normal text-stone-500 ml-2">
           (Alerts that frequently occur with this one)
         </span>
       </h3>
       
       <div className="space-y-3">
         {correlatedAlerts.map((alert) => (
-          <div key={alert.id} className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg group hover:bg-zinc-800 transition-colors border border-white/5">
+          <div key={alert.id} className="flex items-center justify-between p-3 bg-stone-100/80 rounded-lg group hover:bg-stone-100 transition-colors border border-stone-200">
             <div className="flex items-center gap-3">
               <SeverityBadge severity={alert.severity} className="shrink-0" />
               <div className="min-w-0">
                 <Link 
                   href={`/dashboard/alerts/${alert.id}`}
-                  className="font-medium text-white truncate hover:text-red-400 block transition-colors"
+                  className="font-medium text-stone-900 truncate hover:text-red-600 block transition-colors"
                 >
                   {alert.title}
                 </Link>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-stone-500">
                   Last seen {new Date(alert.lastSeenAt).toLocaleString()}
                 </p>
               </div>

@@ -38,7 +38,7 @@ const severityColors: Record<string, string> = {
   HIGH: 'bg-orange-500',
   MEDIUM: 'bg-yellow-500',
   LOW: 'bg-blue-500',
-  INFO: 'bg-zinc-500',
+  INFO: 'bg-stone-400',
 };
 
 export default function AnalyticsPage() {
@@ -113,13 +113,13 @@ export default function AnalyticsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Analytics</h1>
-            <p className="text-zinc-400 mt-1">Operational insights and metrics</p>
+            <h1 className="text-3xl font-bold text-stone-900">Analytics</h1>
+            <p className="text-stone-500 mt-1">Operational insights and metrics</p>
           </div>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-32 bg-zinc-900/50 rounded-xl animate-pulse"></div>
+            <div key={i} className="h-32 bg-white/90 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -136,8 +136,8 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Analytics</h1>
-          <p className="text-zinc-400 mt-1">Operational insights and metrics</p>
+          <h1 className="text-3xl font-bold text-stone-900">Analytics</h1>
+          <p className="text-stone-500 mt-1">Operational insights and metrics</p>
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard/analytics/custom">
@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
               className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                 timeRange === range
                   ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                  : 'bg-stone-100 text-stone-500 hover:bg-stone-200 hover:text-stone-900'
               }`}
             >
               {range === '24h' ? '24 Hours' : range === '7d' ? '7 Days' : '30 Days'}
@@ -164,60 +164,60 @@ export default function AnalyticsPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-red-900/30 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
+            <div className="p-2 bg-red-50 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-zinc-400">Total Alerts</span>
+            <span className="text-sm text-stone-500">Total Alerts</span>
           </div>
-          <p className="text-3xl font-bold text-white">{data.totalAlerts}</p>
-          <p className="text-xs text-zinc-500 mt-1">in selected period</p>
+          <p className="text-3xl font-bold text-stone-900">{data.totalAlerts}</p>
+          <p className="text-xs text-stone-500 mt-1">in selected period</p>
         </div>
 
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-green-900/30 rounded-lg">
-              <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <div className="p-2 bg-emerald-50 rounded-lg">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             </div>
-            <span className="text-sm text-zinc-400">Resolution Rate</span>
+            <span className="text-sm text-stone-500">Resolution Rate</span>
           </div>
-          <p className="text-3xl font-bold text-white">{data.resolutionRate}%</p>
-          <p className="text-xs text-zinc-500 mt-1">{data.resolvedAlerts} resolved</p>
+          <p className="text-3xl font-bold text-stone-900">{data.resolutionRate}%</p>
+          <p className="text-xs text-stone-500 mt-1">{data.resolvedAlerts} resolved</p>
         </div>
 
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-blue-900/30 rounded-lg">
-              <Clock className="w-5 h-5 text-blue-400" />
+            <div className="p-2 bg-sky-50 rounded-lg">
+              <Clock className="w-5 h-5 text-sky-600" />
             </div>
-            <span className="text-sm text-zinc-400">Avg. Resolution Time</span>
+            <span className="text-sm text-stone-500">Avg. Resolution Time</span>
           </div>
-          <p className="text-3xl font-bold text-white">
+          <p className="text-3xl font-bold text-stone-900">
             {data.mttr < 60 ? `${data.mttr}m` : `${(data.mttr / 60).toFixed(1)}h`}
           </p>
-          <p className="text-xs text-zinc-500 mt-1">mean time to resolution</p>
+          <p className="text-xs text-stone-500 mt-1">mean time to resolution</p>
         </div>
 
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-orange-900/30 rounded-lg">
-              <XCircle className="w-5 h-5 text-orange-400" />
+            <div className="p-2 bg-amber-50 rounded-lg">
+              <XCircle className="w-5 h-5 text-amber-600" />
             </div>
-            <span className="text-sm text-zinc-400">Open Alerts</span>
+            <span className="text-sm text-stone-500">Open Alerts</span>
           </div>
-          <p className="text-3xl font-bold text-white">{data.openAlerts}</p>
-          <p className="text-xs text-zinc-500 mt-1">require attention</p>
+          <p className="text-3xl font-bold text-stone-900">{data.openAlerts}</p>
+          <p className="text-xs text-stone-500 mt-1">require attention</p>
         </div>
       </div>
 
       {/* Charts Row */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Alerts Over Time */}
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-6">
             <Activity className="w-5 h-5 text-red-500" />
-            <h3 className="font-semibold text-white">Alerts Over Time</h3>
+            <h3 className="font-semibold text-stone-900">Alerts Over Time</h3>
           </div>
           <div className="h-48 flex items-end gap-1">
             {data.alertsOverTime.map((day, i) => (
@@ -228,7 +228,7 @@ export default function AnalyticsPage() {
                   title={`${day.date}: ${day.count} alerts`}
                 ></div>
                 {data.alertsOverTime.length <= 7 && (
-                  <span className="text-[10px] text-zinc-600">{day.date}</span>
+                  <span className="text-[10px] text-stone-500">{day.date}</span>
                 )}
               </div>
             ))}
@@ -236,21 +236,21 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Alerts by Severity */}
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-6">
             <Zap className="w-5 h-5 text-red-500" />
-            <h3 className="font-semibold text-white">Alerts by Severity</h3>
+            <h3 className="font-semibold text-stone-900">Alerts by Severity</h3>
           </div>
           <div className="space-y-3">
             {data.alertsBySeverity.map((item) => (
               <div key={item.severity} className="space-y-1">
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-400">{item.severity}</span>
-                  <span className="text-white font-medium">{item.count}</span>
+                  <span className="text-stone-500">{item.severity}</span>
+                  <span className="text-stone-900 font-medium">{item.count}</span>
                 </div>
-                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${severityColors[item.severity] || 'bg-zinc-500'} rounded-full transition-all`}
+                    className={`h-full ${severityColors[item.severity] || 'bg-stone-400'} rounded-full transition-all`}
                     style={{ width: `${(item.count / totalBySeverity) * 100}%` }}
                   ></div>
                 </div>
@@ -263,29 +263,29 @@ export default function AnalyticsPage() {
       {/* Breakdown Tables */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* By Project */}
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-red-500" />
-            <h3 className="font-semibold text-white">Top Projects</h3>
+            <h3 className="font-semibold text-stone-900">Top Projects</h3>
           </div>
           <div className="space-y-3">
             {data.alertsByProject.map((item, i) => (
               <div key={item.project} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-600 w-4">{i + 1}</span>
-                  <span className="text-sm text-zinc-300">{item.project}</span>
+                  <span className="text-xs text-stone-500 w-4">{i + 1}</span>
+                  <span className="text-sm text-stone-600">{item.project}</span>
                 </div>
-                <span className="text-sm font-medium text-white">{item.count}</span>
+                <span className="text-sm font-medium text-stone-900">{item.count}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* By Environment */}
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Users className="w-5 h-5 text-red-500" />
-            <h3 className="font-semibold text-white">Alerts by Environment</h3>
+            <h3 className="font-semibold text-stone-900">Alerts by Environment</h3>
           </div>
           <div className="space-y-4">
             {data.alertsByEnvironment.map((item) => {
@@ -293,10 +293,10 @@ export default function AnalyticsPage() {
               return (
                 <div key={item.environment} className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-zinc-300 capitalize">{item.environment}</span>
-                    <span className="text-sm text-zinc-400">{percentage.toFixed(1)}%</span>
+                    <span className="text-sm text-stone-600 capitalize">{item.environment}</span>
+                    <span className="text-sm text-stone-500">{percentage.toFixed(1)}%</span>
                   </div>
-                  <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-3 bg-stone-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-red-600 to-red-500 rounded-full"
                       style={{ width: `${percentage}%` }}

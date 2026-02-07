@@ -1,18 +1,20 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { ClerkAuthGuard } from '../auth/clerk-auth.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ApiOrClerkAuthGuard } from '../auth/api-or-clerk-auth.guard';
+import { WorkspaceId } from '../common/decorators/workspace-id.decorator';
+import { PermissionsGuard, RequirePermission, RESOURCES } from '../permissions/permissions.guard';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiBearerAuth()
-  @UseGuards(ClerkAuthGuard)
+  @UseGuards(ApiOrClerkAuthGuard, PermissionsGuard)
+  @RequirePermission(RESOURCES.USERS, 'READ')
   @Get()
-  async list(@CurrentUser() user: { clerkId: string }) {
-    return this.usersService.listByClerkId(user.clerkId);
+  async list(@WorkspaceId() workspaceId: string) {
+    return this.usersService.listByWorkspace(workspaceId);
   }
 }

@@ -8,14 +8,23 @@ export interface ResolutionSuggestion {
     sources: Array<{ title: string; notes: string; resolvedBy: string | null }>;
 }
 
+export interface ResolutionSuggestionContext {
+    recentLogs?: string;
+    deploymentContext?: string;
+    changeEvents?: string;
+    crossProjectNote?: string;
+}
+
 @Injectable()
 export class AiService {
     private readonly logger = new Logger(AiService.name);
     private readonly apiKey: string | undefined;
+    private readonly model: string;
     private readonly apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
     constructor(private readonly configService: ConfigService) {
         this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY');
+        this.model = this.configService.get<string>('OPENROUTER_MODEL') || 'openai/gpt-oss-120b';
         if (!this.apiKey) {
             this.logger.warn('OPENROUTER_API_KEY not configured - AI suggestions disabled');
         } else {
@@ -28,7 +37,14 @@ export class AiService {
      */
     async generateResolutionSuggestion(
         currentAlert: { title: string; description: string; environment: string; project: string },
-        pastResolutions: Array<{ title: string; resolutionNotes: string | null; lastResolvedBy: string | null }>
+        pastResolutions: Array<{
+            title: string;
+            resolutionNotes: string | null;
+            lastResolvedBy: string | null;
+            project?: string | null;
+            environment?: string | null;
+        }>,
+        context: ResolutionSuggestionContext = {},
     ): Promise<ResolutionSuggestion | null> {
         // Filter to only resolutions that have notes
         const validResolutions = pastResolutions.filter(r => r.resolutionNotes);
@@ -38,7 +54,7 @@ export class AiService {
         }
 
         try {
-            const prompt = this.buildPrompt(currentAlert, validResolutions);
+            const prompt = this.buildPrompt(currentAlert, validResolutions, context);
             const response = await this.callLLM(prompt);
 
             if (!response) {
@@ -63,11 +79,28 @@ export class AiService {
 
     private buildPrompt(
         currentAlert: { title: string; description: string; environment: string; project: string },
-        pastResolutions: Array<{ title: string; resolutionNotes: string | null }>
+        pastResolutions: Array<{
+            title: string;
+            resolutionNotes: string | null;
+            project?: string | null;
+            environment?: string | null;
+        }>,
+        context: ResolutionSuggestionContext,
     ): string {
         const resolutionExamples = pastResolutions
-            .map((r, i) => `${i + 1}. "${r.resolutionNotes}"`)
+            .map((r, i) => {
+                const projectLabel = r.project ? ` [${r.project}${r.environment ? `/${r.environment}` : ''}]` : '';
+                const note = this.truncateText(r.resolutionNotes || '', 280);
+                return `${i + 1}. "${note}"${projectLabel}`;
+            })
             .join('\n');
+
+        const contextSections = [
+            context.recentLogs ? `RECENT LOG CONTEXT:\n${context.recentLogs}` : null,
+            context.deploymentContext ? `DEPLOYMENT CONTEXT:\n${context.deploymentContext}` : null,
+            context.changeEvents ? `CHANGE EVENTS NEAR INCIDENT:\n${context.changeEvents}` : null,
+            context.crossProjectNote ? `CROSS-PROJECT CONTEXT:\n${context.crossProjectNote}` : null,
+        ].filter(Boolean).join('\n\n');
 
         return `You are an experienced SRE helping an on-call engineer quickly fix an alert.
 
@@ -77,7 +110,7 @@ CURRENT ALERT:
 - Environment: ${currentAlert.environment}
 - Project: ${currentAlert.project}
 
-PAST RESOLUTIONS FOR SIMILAR ALERTS:
+${contextSections ? `${contextSections}\n\n` : ''}PAST RESOLUTIONS FOR SIMILAR ALERTS:
 ${resolutionExamples}
 
 Based on these past resolutions, provide a BRIEF, ACTIONABLE suggestion for how to fix this alert.
@@ -85,6 +118,7 @@ Based on these past resolutions, provide a BRIEF, ACTIONABLE suggestion for how 
 - Focus on the most likely fix
 - Include specific commands or steps if mentioned in past resolutions
 - If past resolutions vary, mention the most common approach
+- If some resolutions are from other projects, adapt them to the current project/environment
 
 SUGGESTION:`;
     }
@@ -100,11 +134,11 @@ SUGGESTION:`;
                     'X-Title': 'SignalCraft AI',
                 },
                 body: JSON.stringify({
-                    model: 'google/gemini-flash-1.5',
+                    model: this.model,
                     messages: [
                         { role: 'user', content: prompt }
                     ],
-                    max_tokens: 150,
+                    max_tokens: 220,
                     temperature: 0.3,
                 }),
             });
@@ -115,7 +149,10 @@ SUGGESTION:`;
                 return null;
             }
 
-            const data = await response.json() as any;
+            interface OpenRouterResponse {
+                choices?: Array<{ message?: { content?: string } }>;
+            }
+            const data = await response.json() as OpenRouterResponse;
             const text = data?.choices?.[0]?.message?.content;
             return text?.trim() || null;
         } catch (error) {
@@ -128,6 +165,13 @@ SUGGESTION:`;
         if (resolutionCount >= 3) return 'high';
         if (resolutionCount >= 2) return 'medium';
         return 'low';
+    }
+
+    private truncateText(value: string, maxLength: number): string {
+        if (!value) return '';
+        if (value.length <= maxLength) return value;
+        const clipped = value.slice(0, Math.max(0, maxLength - 3));
+        return `${clipped}...`;
     }
 
     /**

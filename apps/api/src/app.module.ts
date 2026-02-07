@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -33,6 +33,19 @@ import { InvitationsModule } from './invitations/invitations.module';
 import { WorkflowModule } from './workflows/workflow.module';
 import { CorrelationModule } from './correlation/correlation.module';
 import { CustomDashboardModule } from './dashboards/dashboard.module';
+import { OnCallModule } from './oncall/oncall.module';
+import { PagingModule } from './paging/paging.module';
+import { StatusPagesModule } from './status-pages/status-pages.module';
+import { ChangeEventsModule } from './change-events/change-events.module';
+import { ChatOpsModule } from './chatops/chatops.module';
+import { ServiceAccountsModule } from './service-accounts/service-accounts.module';
+import { IdempotencyModule } from './common/idempotency/idempotency.module';
+import { IdempotencyInterceptor } from './common/idempotency/idempotency.interceptor';
+import { TeamsModule } from './teams/teams.module';
+import { EscalationPoliciesModule } from './escalation-policies/escalation-policies.module';
+import { AlertPoliciesModule } from './alert-policies/alert-policies.module';
+import { SyncModule } from './sync/sync.module';
+import { IncidentsModule } from './incidents/incidents.module';
 
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -42,10 +55,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
-      envFilePath: [
-        path.resolve(process.cwd(), '.env'),
-        path.resolve(process.cwd(), '../../.env'),
-      ],
+      envFilePath: [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')],
     }),
     LoggerModule.forRoot({
       pinoHttp: {
@@ -58,7 +68,12 @@ import { ScheduleModule } from '@nestjs/schedule';
               options: { colorize: true, singleLine: true },
             },
         redact: {
-          paths: ['req.headers.authorization', 'req.headers.cookie', 'req.body.password', 'req.body.token'],
+          paths: [
+            'req.headers.authorization',
+            'req.headers.cookie',
+            'req.body.password',
+            'req.body.token',
+          ],
           remove: true,
         },
         autoLogging: true,
@@ -98,13 +113,28 @@ import { ScheduleModule } from '@nestjs/schedule';
     WorkflowModule,
     CorrelationModule,
     CustomDashboardModule,
+    OnCallModule,
+    PagingModule,
+    StatusPagesModule,
+    ChangeEventsModule,
+    ChatOpsModule,
+    ServiceAccountsModule,
+    IdempotencyModule,
+    TeamsModule,
+    EscalationPoliciesModule,
+    AlertPoliciesModule,
+    SyncModule,
+    IncidentsModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: IdempotencyInterceptor,
+    },
   ],
 })
 export class AppModule { }
-

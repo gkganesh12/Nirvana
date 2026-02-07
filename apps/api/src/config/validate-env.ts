@@ -19,6 +19,7 @@ const envSchema = z.object({
   CORS_ORIGINS: z.string().optional(),
   REDIS_URL: z.string().optional(),
   OPENROUTER_API_KEY: z.string().optional(),
+  OPENROUTER_MODEL: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
 });
 

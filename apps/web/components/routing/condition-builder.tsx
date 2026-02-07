@@ -75,11 +75,11 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
         <select
           value={condition.value as string}
           onChange={(e) => updateCondition(index, { value: e.target.value })}
-          className="flex h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          className="flex h-10 w-full rounded-md border border-stone-200 bg-white/70 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
-          <option value="" className="bg-zinc-900">Select severity...</option>
+          <option value="" className="bg-white">Select severity...</option>
           {SEVERITY_OPTIONS.map((sev) => (
-            <option key={sev} value={sev} className="bg-zinc-900">
+            <option key={sev} value={sev} className="bg-white">
               {sev.charAt(0).toUpperCase() + sev.slice(1)}
             </option>
           ))}
@@ -98,7 +98,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
             updateCondition(index, { value: values });
           }}
           placeholder="value1, value2, value3"
-          className="bg-black/20 border-white/10 text-white placeholder:text-zinc-600 focus:border-red-500/50 focus:ring-red-500/20"
+          className="bg-white/70 border-stone-200 text-stone-900 placeholder:text-stone-500 focus:border-red-500/50 focus:ring-red-500/20"
         />
       );
     }
@@ -109,7 +109,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
         value={condition.value as string}
         onChange={(e) => updateCondition(index, { value: e.target.value })}
         placeholder="Enter value..."
-        className="bg-black/20 border-white/10 text-white placeholder:text-zinc-600 focus:border-red-500/50 focus:ring-red-500/20"
+        className="bg-white/70 border-stone-200 text-stone-900 placeholder:text-stone-500 focus:border-red-500/50 focus:ring-red-500/20"
       />
     );
   };
@@ -117,7 +117,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
   return (
     <div className="space-y-3">
       {allConditions.length === 0 && (
-        <p className="text-sm text-zinc-500 italic">No conditions defined. Add one to filter alerts.</p>
+        <p className="text-sm text-stone-500 italic">No conditions defined. Add one to filter alerts.</p>
       )}
 
       {allConditions.map((condition, index) => (
@@ -126,10 +126,10 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
           <select
             value={condition.field}
             onChange={(e) => updateCondition(index, { field: e.target.value })}
-            className="flex h-10 rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 min-w-[140px]"
+            className="flex h-10 rounded-md border border-stone-200 bg-white/70 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-red-500/50 min-w-[140px]"
           >
             {FIELDS.map((field) => (
-              <option key={field.value} value={field.value} className="bg-zinc-900">
+              <option key={field.value} value={field.value} className="bg-white">
                 {field.label}
               </option>
             ))}
@@ -139,10 +139,10 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
           <select
             value={condition.operator}
             onChange={(e) => updateCondition(index, { operator: e.target.value })}
-            className="flex h-10 rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 min-w-[130px]"
+            className="flex h-10 rounded-md border border-stone-200 bg-white/70 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-red-500/50 min-w-[130px]"
           >
             {OPERATORS.map((op) => (
-              <option key={op.value} value={op.value} className="bg-zinc-900">
+              <option key={op.value} value={op.value} className="bg-white">
                 {op.label}
               </option>
             ))}
@@ -157,7 +157,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
             variant="ghost"
             size="sm"
             onClick={() => removeCondition(index)}
-            className="text-red-500 hover:text-red-400 hover:bg-red-900/20 px-2 h-10 w-10 shrink-0"
+            className="text-red-500 hover:text-red-600 hover:bg-red-50 px-2 h-10 w-10 shrink-0"
           >
             ✕
           </Button>
@@ -169,7 +169,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
         variant="outline" 
         size="sm" 
         onClick={addCondition}
-        className="bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white"
+        className="bg-white/5 border-stone-200 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
       >
         + Add Condition
       </Button>

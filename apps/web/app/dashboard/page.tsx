@@ -47,10 +47,28 @@ export default function DashboardPage() {
   const fetchDashboard = useCallback(async () => {
     try {
       const res = await fetch('/api/dashboard/overview');
-      if (!res.ok) {
-        throw new Error('Failed to fetch dashboard data');
+      let payload: DashboardData | { error?: string; message?: string; _debug_error?: boolean } | null = null;
+      try {
+        payload = await res.json();
+      } catch {
+        payload = null;
       }
-      const dashboardData = await res.json();
+
+      if (!res.ok) {
+        const message = payload && 'error' in payload && payload.error
+          ? payload.error
+          : payload && 'message' in payload && payload.message
+            ? payload.message
+            : `Failed to fetch dashboard data (${res.status})`;
+        throw new Error(message);
+      }
+
+      if (payload && '_debug_error' in payload && payload._debug_error) {
+        const message = payload.message || 'Failed to fetch dashboard data';
+        throw new Error(message);
+      }
+
+      const dashboardData = payload as DashboardData;
       setData(dashboardData);
       setLastUpdated(new Date());
       setError(null);
@@ -87,10 +105,10 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="relative mx-auto h-16 w-16 mb-6">
-            <div className="absolute inset-0 bg-red-600 rounded-full blur-xl opacity-20 animate-pulse"></div>
-            <Image src="/logo.png" alt="Loading..." width={64} height={64} className="relative object-contain animate-bounce" />
+            <div className="absolute inset-0 rounded-full bg-red-500/20 blur-xl animate-pulse"></div>
+            <Image src="/logo.png" alt="Loading..." width={80} height={80} className="relative object-contain animate-bounce" />
           </div>
-          <p className="text-zinc-500 animate-pulse">Loading dashboard...</p>
+          <p className="text-stone-500 animate-pulse">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -100,11 +118,11 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="bg-red-900/20 text-red-500 p-4 rounded-lg border border-red-900/30">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
             <p className="font-medium">Error loading dashboard</p>
-            <p className="text-sm mt-1">{error}</p>
+            <p className="mt-1 text-sm">{error}</p>
           </div>
-          <Button onClick={fetchDashboard} className="mt-4 bg-red-600 hover:bg-red-700 text-white">
+          <Button onClick={fetchDashboard} className="mt-4 bg-red-600 text-stone-900 hover:bg-red-700">
             Retry
           </Button>
         </div>
@@ -117,22 +135,29 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-stone-900">Dashboard</h1>
+          <p className="mt-1 text-stone-600">
             Overview of your alert activity and system health
           </p>
         </div>
         <div className="flex items-center gap-4">
           {lastUpdated && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-stone-500">
               Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
-          <Button onClick={fetchDashboard} variant="outline" size="sm" className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">
+          <Button
+            onClick={fetchDashboard}
+            variant="outline"
+            size="sm"
+            className="border-stone-300 bg-white text-stone-700 hover:bg-stone-50 hover:text-stone-900"
+          >
             Refresh
           </Button>
           <Link href="/dashboard/alerts">
-            <Button className="bg-red-600 hover:bg-red-700 text-white border-0">View All Alerts</Button>
+            <Button className="border-0 bg-red-600 text-stone-900 hover:bg-red-700">
+              View All Alerts
+            </Button>
           </Link>
         </div>
       </div>

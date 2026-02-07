@@ -2,7 +2,6 @@
 
 import { UserButton } from '@clerk/nextjs';
 import { Bell } from 'lucide-react';
-import { dark } from '@clerk/themes';
 import { useState, useEffect } from 'react';
 import { 
   DropdownMenu, 
@@ -14,29 +13,38 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 
+import Image from 'next/image';
+
 export function Header() {
   return (
-    <header className="sticky top-0 z-30 flex h-[65px] items-center justify-between border-b border-red-900/20 bg-black px-6">
+    <header className="sticky top-0 z-30 flex h-[65px] items-center justify-between border-b border-stone-200 bg-white/80 px-6 backdrop-blur">
       <div>
-        <h1 className="text-lg font-semibold text-white">Operations Dashboard</h1>
+         <div className="group flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 bg-white px-3 py-1.5 transition-colors hover:border-stone-300 hover:bg-stone-50/70">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 bg-stone-50 transition-colors group-hover:border-red-300/70">
+              <Image src="/logo.png" alt="Team Logo" width={24} height={24} className="object-contain" />
+            </div>
+            <div className="flex flex-col">
+               <span className="text-sm font-medium text-stone-800">Nirvana</span>
+               <span className="text-xs text-stone-500">Free Team</span>
+            </div>
+         </div>
       </div>
       <div className="flex items-center gap-4">
         <NotificationsDropdown />
-        <div className="h-6 w-px bg-red-900/20" />
+        <div className="h-6 w-px bg-stone-200" />
         <UserButton 
           afterSignOutUrl="/" 
           appearance={{
-            baseTheme: dark,
             variables: {
               colorPrimary: '#dc2626', // red-600
-              colorBackground: '#09090b', // zinc-950
-              colorText: '#ffffff',
-              colorTextSecondary: '#a1a1aa', // zinc-400
+              colorBackground: '#ffffff',
+              colorText: '#1c1917',
+              colorTextSecondary: '#78716c',
             },
             elements: {
-              userButtonPopoverCard: 'border border-white/10 shadow-xl',
+              userButtonPopoverCard: 'border border-stone-200 shadow-xl',
               userButtonPopoverFooter: 'hidden',
-              avatarBox: 'h-9 w-9 ring-2 ring-white/10 hover:ring-red-500/50 transition-all',
+              avatarBox: 'h-9 w-9 ring-2 ring-stone-200 hover:ring-red-400/50 transition-all',
             }
           }}
         />
@@ -75,40 +83,40 @@ function NotificationsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative text-red-500/60 hover:text-red-400 transition-colors outline-none">
+        <button className="relative text-stone-500 transition-colors outline-none hover:text-red-600">
            <Bell className="h-5 w-5" />
            {hasNew && (
-             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600 ring-2 ring-black animate-pulse" />
+             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600 ring-2 ring-white animate-pulse" />
            )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border-white/10 text-white">
+      <DropdownMenuContent align="end" className="w-80 border-stone-200 bg-white text-stone-900 shadow-xl">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none text-white">Notifications</p>
-            <p className="text-xs leading-none text-zinc-400">
+            <p className="text-sm font-medium leading-none text-stone-900">Notifications</p>
+            <p className="text-xs leading-none text-stone-500">
               Recent critical & high priority alerts
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-white/10" />
+        <DropdownMenuSeparator className="bg-stone-200" />
         
         {loading ? (
-          <div className="p-4 text-center text-xs text-zinc-500">Loading...</div>
+          <div className="p-4 text-center text-xs text-stone-500">Loading...</div>
         ) : alerts.length === 0 ? (
-          <div className="p-4 text-center text-xs text-zinc-500">No new alerts</div>
+          <div className="p-4 text-center text-xs text-stone-500">No new alerts</div>
         ) : (
           alerts.map(alert => (
-            <DropdownMenuItem key={alert.id} className="focus:bg-zinc-900 focus:text-white cursor-pointer" asChild>
+            <DropdownMenuItem key={alert.id} className="cursor-pointer focus:bg-stone-50 focus:text-stone-900" asChild>
               <Link href={`/dashboard/alerts/${alert.id}`} className="flex flex-col items-start gap-1 py-3 px-3">
                 <div className="flex items-center gap-2 w-full">
                   <span className={`h-2 w-2 rounded-full ${alert.severity === 'CRITICAL' ? 'bg-red-500' : 'bg-orange-500'}`} />
                   <span className="font-semibold text-xs truncate flex-1">{alert.title}</span>
-                  <span className="text-[10px] text-zinc-500 whitespace-nowrap">
+                  <span className="text-[10px] text-stone-500 whitespace-nowrap">
                     {new Date(alert.lastSeenAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                   </span>
                 </div>
-                <p className="text-xs text-zinc-400 line-clamp-2 pl-4">
+                <p className="text-xs text-stone-500 line-clamp-2 pl-4">
                   {alert.environment} • {alert.project}
                 </p>
               </Link>
@@ -116,8 +124,8 @@ function NotificationsDropdown() {
           ))
         )}
         
-        <DropdownMenuSeparator className="bg-white/10" />
-        <DropdownMenuItem className="focus:bg-zinc-900 focus:text-white cursor-pointer justify-center text-xs text-zinc-500 hover:text-white" asChild>
+        <DropdownMenuSeparator className="bg-stone-200" />
+        <DropdownMenuItem className="cursor-pointer justify-center text-xs text-stone-500 hover:text-stone-900 focus:bg-stone-50 focus:text-stone-900" asChild>
           <Link href="/dashboard/alerts">View all alerts</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

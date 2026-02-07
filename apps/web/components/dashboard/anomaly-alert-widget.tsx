@@ -15,11 +15,11 @@ interface AnomalyAlert {
 }
 
 const severityColors: Record<string, string> = {
-    CRITICAL: 'bg-red-950/50 text-red-400 border-red-900/30',
-    HIGH: 'bg-orange-950/50 text-orange-400 border-orange-900/30',
-    MEDIUM: 'bg-yellow-950/50 text-yellow-400 border-yellow-900/30',
-    LOW: 'bg-blue-950/50 text-blue-400 border-blue-900/30',
-    INFO: 'bg-zinc-800 text-zinc-400 border-zinc-700',
+    CRITICAL: 'bg-red-50 text-red-700 border-red-200',
+    HIGH: 'bg-orange-50 text-orange-700 border-orange-200',
+    MEDIUM: 'bg-amber-50 text-amber-700 border-amber-200',
+    LOW: 'bg-sky-50 text-sky-700 border-sky-200',
+    INFO: 'bg-stone-100 text-stone-500 border-stone-200',
 };
 
 export function AnomalyAlertWidget() {
@@ -49,14 +49,14 @@ export function AnomalyAlertWidget() {
 
     if (loading) {
         return (
-            <div className="bg-gradient-to-r from-red-950/30 to-orange-950/30 border border-red-900/20 rounded-xl p-6">
+            <div className="rounded-2xl border border-red-200/60 bg-gradient-to-r from-red-50 to-amber-50 p-6 shadow-lg shadow-stone-900/5">
                 <div className="flex items-center gap-2 mb-4">
-                    <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse" />
-                    <h3 className="font-semibold text-white">Anomaly Detection</h3>
+                    <AlertTriangle className="w-5 h-5 text-red-600 animate-pulse" />
+                    <h3 className="font-semibold text-stone-800">Anomaly Detection</h3>
                 </div>
                 <div className="animate-pulse space-y-2">
-                    <div className="h-8 bg-zinc-800/50 rounded"></div>
-                    <div className="h-8 bg-zinc-800/50 rounded w-3/4"></div>
+                    <div className="h-8 rounded bg-red-100/70"></div>
+                    <div className="h-8 w-3/4 rounded bg-amber-100/70"></div>
                 </div>
             </div>
         );
@@ -64,29 +64,29 @@ export function AnomalyAlertWidget() {
 
     if (anomalies.length === 0) {
         return (
-            <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+            <div className="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-lg shadow-stone-900/5">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-green-500" />
-                        <h3 className="font-semibold text-white">Anomaly Detection</h3>
+                        <Activity className="w-5 h-5 text-emerald-600" />
+                        <h3 className="font-semibold text-stone-800">Anomaly Detection</h3>
                     </div>
-                    <span className="px-2 py-1 bg-green-900/30 text-green-400 text-xs rounded-full border border-green-900/50">
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs text-emerald-700">
                         All Normal
                     </span>
                 </div>
-                <p className="text-zinc-500 text-sm">No anomalies detected. Error rates are within normal bounds.</p>
+                <p className="text-sm text-stone-500">No anomalies detected. Error rates are within normal bounds.</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-gradient-to-r from-red-950/30 to-orange-950/30 border border-red-900/20 rounded-xl p-6">
+        <div className="rounded-2xl border border-red-200/60 bg-gradient-to-r from-red-50 to-amber-50 p-6 shadow-lg shadow-stone-900/5">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse" />
-                    <h3 className="font-semibold text-white">Anomaly Detection</h3>
+                    <AlertTriangle className="w-5 h-5 text-red-600 animate-pulse" />
+                    <h3 className="font-semibold text-stone-800">Anomaly Detection</h3>
                 </div>
-                <span className="px-2 py-1 bg-red-900/30 text-red-400 text-xs rounded-full border border-red-900/50 animate-pulse">
+                <span className="rounded-full border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700 animate-pulse">
                     {anomalies.length} Detected
                 </span>
             </div>
@@ -96,10 +96,10 @@ export function AnomalyAlertWidget() {
                     <Link
                         key={anomaly.alertGroupId}
                         href={`/dashboard/alerts/${anomaly.alertGroupId}`}
-                        className="block p-3 rounded-lg bg-zinc-900/50 border border-white/5 hover:bg-zinc-800/50 transition-colors"
+                        className="block rounded-xl border border-stone-200 bg-white/90 p-3 transition-colors hover:border-stone-300 hover:bg-stone-50/70"
                     >
                         <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-white font-medium truncate max-w-[60%]">
+                            <span className="max-w-[60%] truncate text-sm font-medium text-stone-800">
                                 {anomaly.title}
                             </span>
                             <span className={`px-2 py-0.5 text-xs rounded-full border ${severityColors[anomaly.severity] || severityColors.INFO}`}>
@@ -107,11 +107,11 @@ export function AnomalyAlertWidget() {
                             </span>
                         </div>
                         <div className="flex items-center gap-3 text-xs">
-                            <div className="flex items-center gap-1 text-red-400">
+                            <div className="flex items-center gap-1 text-red-600">
                                 <TrendingUp className="w-3 h-3" />
                                 <span>+{Math.round(anomaly.percentageIncrease)}%</span>
                             </div>
-                            <span className="text-zinc-500">
+                            <span className="text-stone-500">
                                 {anomaly.currentVelocity.toFixed(1)}/hr (baseline: {anomaly.baselineVelocity.toFixed(1)}/hr)
                             </span>
                         </div>
@@ -121,7 +121,7 @@ export function AnomalyAlertWidget() {
 
             {anomalies.length > 5 && (
                 <div className="mt-3 text-center">
-                    <Link href="/dashboard/alerts" className="text-xs text-red-400 hover:text-red-300">
+                    <Link href="/dashboard/alerts" className="text-xs text-red-600 hover:text-red-500">
                         View all {anomalies.length} anomalies →
                     </Link>
                 </div>

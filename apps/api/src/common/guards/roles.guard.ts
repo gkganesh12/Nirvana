@@ -6,7 +6,7 @@ import { prisma } from '@signalcraft/database';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) { }
+  constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<WorkspaceRole[]>(ROLES_KEY, [
@@ -19,17 +19,29 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const clerkId = request.user?.clerkId as string | undefined;
-    if (!clerkId) {
-      throw new ForbiddenException('Missing user context');
+    const prismaClient = prisma as any;
+
+    let user = request.dbUser as any;
+
+    if (!user) {
+      const clerkId = request.user?.clerkId as string | undefined;
+      if (clerkId) {
+        user = await prisma.user.findUnique({ where: { clerkId } });
+      } else if (request.user?.serviceAccountId) {
+        const serviceAccount = await prismaClient.serviceAccount.findUnique({
+          where: { id: request.user.serviceAccountId },
+          select: { createdBy: true },
+        });
+        if (serviceAccount?.createdBy) {
+          user = await prisma.user.findUnique({ where: { id: serviceAccount.createdBy } });
+        }
+      }
     }
 
-    const user = await prisma.user.findUnique({ where: { clerkId } });
     if (!user) {
       throw new ForbiddenException('User not found');
     }
 
-    // Attach DB user to request for use in controllers
     request.dbUser = user;
 
     if (!requiredRoles.includes(user.role as WorkspaceRole)) {

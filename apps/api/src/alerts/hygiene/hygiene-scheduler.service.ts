@@ -76,7 +76,7 @@ export class HygieneSchedulerService implements OnModuleInit, OnModuleDestroy {
                     pattern: '*/5 * * * *', // Every 5 minutes
                 },
                 removeOnComplete: true,
-                removeOnFail: false,
+                removeOnFail: false
             },
         );
         if (snoozeCheckJob.id) {

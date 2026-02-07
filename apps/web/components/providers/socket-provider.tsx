@@ -31,7 +31,10 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       if (!isSignedIn) return;
 
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_BASE_URL ??
+        process.env.NEXT_PUBLIC_API_URL ??
+        'http://localhost:5050';
       
       // Remove /api if present at the end for socket URL (socket usually on root or specific path)
       // NestJS gateway namespace is /events

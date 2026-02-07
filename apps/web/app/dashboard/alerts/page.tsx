@@ -139,13 +139,13 @@ export default function AlertsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Alert Inbox</h1>
-          <p className="text-zinc-500 mt-1">
+          <h1 className="text-3xl font-bold text-stone-900">Alert Inbox</h1>
+          <p className="text-stone-500 mt-1">
             {data?.total ?? 0} total alerts
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Button onClick={fetchAlerts} variant="outline" size="sm" className="border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white">
+          <Button onClick={fetchAlerts} variant="outline" size="sm" className="border-stone-200 text-stone-600 hover:bg-stone-100 hover:text-stone-900">
             Refresh
           </Button>
         </div>
@@ -161,7 +161,7 @@ export default function AlertsPage() {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-950/20 text-red-400 border border-red-900/30 p-4 rounded-lg">
+        <div className="bg-red-50 text-red-600 border border-red-200 p-4 rounded-lg">
           {error}
         </div>
       )}
@@ -187,7 +187,7 @@ export default function AlertsPage() {
 
           {/* Pagination */}
           <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-stone-500">
               Showing {(data.page - 1) * data.limit + 1} to{' '}
               {Math.min(data.page * data.limit, data.total)} of {data.total}
             </p>
@@ -197,11 +197,11 @@ export default function AlertsPage() {
                 size="sm"
                 disabled={!data.hasPrevious}
                 onClick={() => setPage(page - 1)}
-                className="border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+                className="border-stone-200 text-stone-600 hover:bg-stone-100 hover:text-stone-900 disabled:opacity-30 disabled:hover:bg-transparent"
               >
                 Previous
               </Button>
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-stone-500">
                 Page {data.page} of {data.totalPages}
               </span>
               <Button
@@ -209,7 +209,7 @@ export default function AlertsPage() {
                 size="sm"
                 disabled={!data.hasNext}
                 onClick={() => setPage(page + 1)}
-                className="border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+                className="border-stone-200 text-stone-600 hover:bg-stone-100 hover:text-stone-900 disabled:opacity-30 disabled:hover:bg-transparent"
               >
                 Next
               </Button>

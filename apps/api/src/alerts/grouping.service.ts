@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import crypto from 'crypto';
-import { prisma, AlertStatus, AlertSeverity, AlertGroup } from '@signalcraft/database';
+import {
+  prisma,
+  AlertStatus,
+  AlertSeverity,
+  AlertGroup,
+  IncidentTimelineEventType,
+} from '@signalcraft/database';
 import { NormalizedAlert, AlertSeverity as NormalizedSeverity } from '@signalcraft/shared';
 import { AnomalyDetectionService } from './anomaly-detection.service';
+import { ReleasesService } from '../releases/releases.service';
 
 const severityRank: Record<AlertSeverity, number> = {
   [AlertSeverity.INFO]: 1,
@@ -42,7 +49,8 @@ export class GroupingService {
 
   constructor(
     private readonly anomalyDetectionService: AnomalyDetectionService,
-  ) { }
+    private readonly releasesService: ReleasesService,
+  ) {}
 
   generateGroupKey(alert: NormalizedAlert): string {
     const rawKey = [alert.source, alert.project, alert.environment, alert.fingerprint]
@@ -67,7 +75,7 @@ export class GroupingService {
       });
 
       if (!existing) {
-        return tx.alertGroup.create({
+        const created = await tx.alertGroup.create({
           data: {
             workspaceId,
             groupKey,
@@ -84,6 +92,54 @@ export class GroupingService {
             velocityPerHour: null, // Will be calculated on updates
           },
         });
+
+        await tx.incidentTimelineEntry.create({
+          data: {
+            alertGroupId: created.id,
+            type: IncidentTimelineEventType.ALERT_CREATED,
+            title: 'Alert triggered',
+            message: alert.title,
+            source: alert.source,
+            metadataJson: {
+              severity: alert.severity,
+              environment: alert.environment,
+              project: alert.project,
+            },
+            occurredAt: alert.occurredAt,
+          },
+        });
+
+        const project = alert.project?.trim() || 'default';
+        const recentRelease = await this.releasesService.findRecentRelease(
+          workspaceId,
+          project,
+          alert.environment,
+          15,
+        );
+
+        if (recentRelease) {
+          await tx.alertGroup.update({
+            where: { id: created.id },
+            data: { releaseId: recentRelease.id },
+          });
+
+          await tx.incidentTimelineEntry.create({
+            data: {
+              alertGroupId: created.id,
+              type: IncidentTimelineEventType.DEPLOYMENT_CORRELATED,
+              title: 'Suspect deployment detected',
+              message: `${recentRelease.version} (${recentRelease.environment})`,
+              source: 'release',
+              metadataJson: {
+                releaseId: recentRelease.id,
+                project: recentRelease.project ?? project,
+                deployedAt: recentRelease.deployedAt,
+              },
+            },
+          });
+        }
+
+        return created;
       }
 
       const existingSeverityRank = this.mapSeverityToRank(existing.severity);
@@ -92,7 +148,7 @@ export class GroupingService {
       // Calculate velocity: occurrences per hour since first seen
       const hoursSinceFirstSeen = Math.max(
         (alert.occurredAt.getTime() - existing.firstSeenAt.getTime()) / (1000 * 60 * 60),
-        0.1 // Minimum 6 minutes to avoid division issues
+        0.1, // Minimum 6 minutes to avoid division issues
       );
       const newVelocity = (existing.count + 1) / hoursSinceFirstSeen;
 
@@ -100,7 +156,7 @@ export class GroupingService {
       const isAnomalous = await this.anomalyDetectionService.checkVelocityAnomaly(
         workspaceId,
         existing.id,
-        newVelocity
+        newVelocity,
       );
 
       // Upgrade severity if incoming is higher or if anomalous
@@ -114,10 +170,7 @@ export class GroupingService {
       }
 
       // Aggregate user count (take max)
-      const updatedUserCount = Math.max(
-        existing.userCount ?? 0,
-        alert.userCount ?? 0
-      ) || null;
+      const updatedUserCount = Math.max(existing.userCount ?? 0, alert.userCount ?? 0) || null;
 
       return tx.alertGroup.update({
         where: { id: existing.id },

@@ -13,10 +13,10 @@ export function AlertCountWidget({ title, data, loading, error }: AlertCountWidg
   return (
     <WidgetWrapper title={title} loading={loading} error={error}>
       <div className="flex h-full flex-col items-center justify-center">
-        <div className="text-4xl font-bold text-gray-900 dark:text-white">
+        <div className="text-4xl font-bold text-stone-900">
           {data?.count ?? '-'}
         </div>
-        <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">Total Alerts</div>
+        <div className="mt-1 text-sm text-stone-500">Total Alerts</div>
       </div>
     </WidgetWrapper>
   );

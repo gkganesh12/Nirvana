@@ -17,7 +17,7 @@ export class QueueService implements OnModuleDestroy {
     this.createQueue('notifications');
     this.createQueue('escalations');
     this.createQueue('alert-processing');
-
+    this.createQueue('paging');
   }
 
   private createQueue(name: string) {

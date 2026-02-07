@@ -42,7 +42,13 @@ export async function authenticateWebSocket(
         }
 
         // Verify token with Clerk
-        const issuer = `https://clerk.${process.env.CLERK_PUBLISHABLE_KEY?.split('_')[1] || 'clerk'}.com`;
+        // Use configured issuer from env to match HTTP guard
+        const issuer = process.env.CLERK_ISSUER;
+
+        if (!issuer) {
+            logger.error('CLERK_ISSUER not configured');
+            throw new UnauthorizedException('Server authentication configuration missing');
+        }
 
         const verifiedToken = await verifyToken(token, {
             secretKey: clerkSecret,

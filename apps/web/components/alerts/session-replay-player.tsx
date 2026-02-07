@@ -45,7 +45,7 @@ export function SessionReplayPlayer({ alertGroupId }: SessionReplayPlayerProps) 
                 variant="outline"
                 size="sm"
                 disabled
-                className="border-zinc-700 text-zinc-500"
+                className="border-stone-200 text-stone-500"
             >
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Checking replay...
@@ -59,7 +59,7 @@ export function SessionReplayPlayer({ alertGroupId }: SessionReplayPlayerProps) 
                 variant="outline"
                 size="sm"
                 disabled
-                className="border-zinc-700 text-zinc-500"
+                className="border-stone-200 text-stone-500"
                 title="No session replay available for this alert"
             >
                 <Film className="w-4 h-4 mr-2" />
@@ -79,7 +79,7 @@ export function SessionReplayPlayer({ alertGroupId }: SessionReplayPlayerProps) 
         <>
             <Button
                 onClick={() => setPlayerOpen(true)}
-                className="bg-violet-600 hover:bg-violet-700 text-white"
+                className="bg-violet-600 hover:bg-violet-700 text-stone-900"
             >
                 <Play className="w-4 h-4 mr-2" />
                 Watch Replay
@@ -92,47 +92,47 @@ export function SessionReplayPlayer({ alertGroupId }: SessionReplayPlayerProps) 
 
             {/* Replay Modal */}
             {playerOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-                    <div className="bg-zinc-900 rounded-xl border border-white/10 w-[90vw] max-w-6xl max-h-[90vh] overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+                    <div className="bg-white rounded-xl border border-stone-200 w-[90vw] max-w-6xl max-h-[90vh] overflow-hidden">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200">
                             <div className="flex items-center gap-3">
                                 <Film className="w-5 h-5 text-violet-400" />
-                                <span className="font-medium text-white">Session Replay</span>
-                                <span className="text-sm text-zinc-500">
+                                <span className="font-medium text-stone-900">Session Replay</span>
+                                <span className="text-sm text-stone-500">
                                     Session: {replayData.sessionId?.slice(0, 8)}...
                                 </span>
                             </div>
                             <button
                                 onClick={() => setPlayerOpen(false)}
-                                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
                             >
-                                <XCircle className="w-5 h-5 text-zinc-400" />
+                                <XCircle className="w-5 h-5 text-stone-500" />
                             </button>
                         </div>
 
                         {/* Player */}
-                        <div className="relative bg-zinc-950 aspect-video flex items-center justify-center">
+                        <div className="relative bg-white aspect-video flex items-center justify-center">
                             {/* Placeholder for rrweb-player */}
                             <div className="text-center">
-                                <Film className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-                                <p className="text-zinc-500 text-lg">Session Replay Player</p>
-                                <p className="text-zinc-600 text-sm mt-2">
+                                <Film className="w-16 h-16 text-stone-400 mx-auto mb-4" />
+                                <p className="text-stone-500 text-lg">Session Replay Player</p>
+                                <p className="text-stone-500 text-sm mt-2">
                                     Install rrweb-player to enable playback
                                 </p>
-                                <code className="text-xs text-zinc-600 mt-4 block">
+                                <code className="text-xs text-stone-500 mt-4 block">
                                     npm install rrweb-player
                                 </code>
                             </div>
                         </div>
 
                         {/* Controls */}
-                        <div className="flex items-center justify-center gap-4 px-4 py-3 border-t border-white/10">
+                        <div className="flex items-center justify-center gap-4 px-4 py-3 border-t border-stone-200">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setPlaying(!playing)}
-                                className="border-zinc-700 text-white hover:bg-zinc-800"
+                                className="border-stone-200 text-stone-900 hover:bg-stone-100"
                             >
                                 {playing ? (
                                     <Pause className="w-4 h-4 mr-2" />
@@ -142,7 +142,7 @@ export function SessionReplayPlayer({ alertGroupId }: SessionReplayPlayerProps) 
                                 {playing ? 'Pause' : 'Play'}
                             </Button>
                             {replayData.duration && (
-                                <span className="text-sm text-zinc-500">
+                                <span className="text-sm text-stone-500">
                                     Duration: {formatDuration(replayData.duration)}
                                 </span>
                             )}

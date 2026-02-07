@@ -12,17 +12,28 @@ import { HygieneProcessor } from './hygiene/hygiene.processor';
 import { AnomalyDetectionService } from './anomaly-detection.service';
 import { CorrelationService } from './correlation.service';
 import { CorrelationRulesController } from './correlation-rules.controller';
-import { PostmortemService } from './postmortem.service';
 import { EscalationsModule } from '../escalations/escalations.module';
 import { RoutingModule } from '../routing/routing.module';
 import { AiModule } from '../ai/ai.module';
 import { AuditModule } from '../audit/audit.module';
+import { IntegrationsModule } from '../integrations/integrations.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { ReleasesModule } from '../releases/releases.module';
+import { ChangeEventsModule } from '../change-events/change-events.module';
+import { EscalationPoliciesModule } from '../escalation-policies/escalation-policies.module';
+import { SyncModule } from '../sync/sync.module';
 
 @Module({
   imports: [
     QueueModule,
     forwardRef(() => EscalationsModule),
     forwardRef(() => RoutingModule),
+    forwardRef(() => IntegrationsModule),
+    forwardRef(() => NotificationsModule),
+    ReleasesModule,
+    ChangeEventsModule,
+    EscalationPoliciesModule,
+    SyncModule,
     AiModule,
     AuditModule,
   ],
@@ -37,10 +48,13 @@ import { AuditModule } from '../audit/audit.module';
     HygieneProcessor,
     AnomalyDetectionService,
     CorrelationService,
-    PostmortemService,
   ],
-  exports: [AlertProcessorService, AlertsService, HygieneService, CorrelationService, PostmortemService],
+  exports: [
+    AlertProcessorService,
+    AlertsService,
+    NormalizationService,
+    HygieneService,
+    CorrelationService,
+  ],
 })
 export class AlertsModule { }
-
-

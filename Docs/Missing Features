@@ -1,0 +1,31 @@
+📱 1. Mobile Application (Critical Gap)
+Missing: A native iOS/Android app.
+Industry Standard: PagerDuty/Opsgenie rely heavily on mobile apps for critical "wake-up" alerts (push notifications that override Do Not Disturb), managing incidents on the go, and acknowledge/resolve actions.
+Current State: Responsive web only.
+🔌 2. Integration Ecosystem
+Missing: Native integrations for major Cloud Providers (AWS CloudWatch, Azure, GCP), Ticketing Systems (Jira, ServiceNow, Zendesk), and other observability tools (New Relic, Dynatrace, Prometheus, Grafana, Splunk).
+Industry Standard: 700+ integrations.
+Current State: Supports Sentry, Slack, PagerDuty, Opsgenie, Datadog, Teams, Discord.
+🔥 3. Incident Management Lifecycle
+Missing:
+War Rooms: Automatic creation of Zoom bridges or Slack channels dedicated to an incident.
+Post-Mortems: Automated generation of incident timelines and post-mortem documents.
+Status Pages: Public or private status pages to communicate downtime (e.g., statuspage.io integration).
+Incident Roles: Explicit roles like "Incident Commander", "Scribe", "Liaison".
+Current State: Basic Alert Grouping and Resolution.
+🗓️ 4. Advanced On-Call Logic
+Missing:
+Complex Rotations: "Follow-the-sun" (24/7 global), multi-layered schedules with fallbacks.
+Temporary Overrides: Vacation coverage logic, calendar integrations (GCal/Outlook).
+Current State: Supports basic Rotations, Layers, and Overrides (UI appears to exist, but logic might be simple).
+🤖 5. Proactive AI & Intelligence
+Missing:
+Anomaly Detection: Predicting incidents based on metric deviations before they trigger hard thresholds.
+Root Cause Analysis: Deep linking of related deployment events or changelogs to alerts.
+Current State: Reactive "Resolution Suggestions" via LLM (RAG-lite).
+🛠️ 6. Infrastructure as Code (IaC)
+Missing: Terraform Provider or Kubernetes Operator to manage SignalCraft configuration (Teams, Services, Rules) as code.
+Industry Standard: Enterprise users demand managing monitoring config via git (GitOps).
+🔄 7. Bi-Directional Sync
+Missing: Deep two-way sync. If I mute an alert in SignalCraft, does it mute in Datadog? If I resolve in PagerDuty, does false-positive feedback loop back?
+Current State: Likely one-way ingestion or simple webhook callbacks.

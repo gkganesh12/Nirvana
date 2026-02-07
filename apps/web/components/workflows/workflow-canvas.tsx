@@ -14,7 +14,7 @@ export function WorkflowCanvas({ steps, onStepClick }: WorkflowCanvasProps) {
   const gap = 40;
 
   return (
-    <div className="relative min-h-[600px] w-full overflow-auto rounded-xl bg-slate-50 p-8 dark:bg-slate-900/50">
+    <div className="relative min-h-[600px] w-full overflow-auto rounded-xl bg-slate-50 p-8 bg-white">
       <svg className="absolute left-0 top-0 h-full w-full pointer-events-none">
         {/* Draw lines between nodes */}
         {steps.map((step, index) => (
@@ -44,13 +44,13 @@ export function WorkflowCanvas({ steps, onStepClick }: WorkflowCanvasProps) {
 
       <div className="flex flex-col items-center gap-[40px]">
         {/* Trigger Node */}
-        <div className="relative z-10 flex h-[80px] w-[280px] cursor-pointer items-center gap-4 rounded-lg border-2 border-blue-200 bg-blue-50 p-4 shadow-sm transition hover:border-blue-400 dark:border-blue-800 dark:bg-blue-900/20">
-           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+        <div className="relative z-10 flex h-[80px] w-[280px] cursor-pointer items-center gap-4 rounded-lg border-2 border-blue-200 bg-blue-50 p-4 shadow-sm transition hover:border-blue-400 border-blue-800 bg-blue-900/20">
+           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 bg-blue-900 text-blue-400">
              <Zap className="h-5 w-5" />
            </div>
            <div>
-             <div className="font-semibold text-gray-900 dark:text-gray-100">Trigger</div>
-             <div className="text-xs text-gray-500">Alert Created</div>
+             <div className="font-semibold text-stone-900 text-gray-100">Trigger</div>
+             <div className="text-xs text-stone-500">Alert Created</div>
            </div>
         </div>
 
@@ -59,25 +59,25 @@ export function WorkflowCanvas({ steps, onStepClick }: WorkflowCanvasProps) {
           <div 
             key={step.id} 
             onClick={() => onStepClick(step.id)}
-            className="relative z-10 flex h-[80px] w-[280px] cursor-pointer items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-400 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+            className="relative z-10 flex h-[80px] w-[280px] cursor-pointer items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 shadow-sm transition hover:border-blue-400 hover:shadow-md border-stone-200 bg-stone-100"
           >
-             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-100 text-stone-600 bg-gray-700 text-gray-300">
                {step.type === 'condition' ? <GitBranch className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
              </div>
              <div className="flex-1">
-               <div className="font-medium text-gray-900 dark:text-gray-100">
+               <div className="font-medium text-stone-900 text-gray-100">
                  {step.type === 'condition' ? 'Check Condition' : 'Execute Action'}
                </div>
-               <div className="text-xs text-gray-500">
+               <div className="text-xs text-stone-500">
                  {step.config.action || 'Configure step...'}
                </div>
              </div>
-             <Settings className="h-4 w-4 text-gray-400" />
+             <Settings className="h-4 w-4 text-stone-500" />
           </div>
         ))}
 
         {/* Add Step Node */}
-        <div className="relative z-10 flex h-[60px] w-[60px] items-center justify-center rounded-full border-2 border-dashed border-gray-300 bg-transparent text-gray-400">
+        <div className="relative z-10 flex h-[60px] w-[60px] items-center justify-center rounded-full border-2 border-dashed border-gray-300 bg-transparent text-stone-500">
           <span className="text-xs mt-1">End</span>
         </div>
       </div>

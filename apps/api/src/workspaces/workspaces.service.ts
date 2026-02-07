@@ -4,7 +4,9 @@ import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class WorkspacesService {
-  constructor(private readonly auditService: AuditService) { }
+  private readonly prismaClient = prisma as any;
+
+  constructor(private readonly auditService: AuditService) {}
 
   async getByClerkId(clerkId: string) {
     const user = await prisma.user.findUnique({
@@ -15,13 +17,18 @@ export class WorkspacesService {
     return user?.workspace ?? null;
   }
 
+  async getByWorkspaceId(workspaceId: string) {
+    return prisma.workspace.findUnique({ where: { id: workspaceId } });
+  }
+
   async getMembers(workspaceId: string) {
-    return prisma.user.findMany({
+    return this.prismaClient.user.findMany({
       where: { workspaceId },
       select: {
         id: true,
         email: true,
         displayName: true,
+        phoneNumber: true,
         role: true,
         createdAt: true,
       },
@@ -29,20 +36,28 @@ export class WorkspacesService {
     });
   }
 
-  async updateMemberRole(workspaceId: string, userId: string, role: any, actorId?: string) {
-    const user = await prisma.user.update({
+  async updateMemberRole(
+    workspaceId: string,
+    userId: string,
+    updates: { role?: any; phoneNumber?: string | null },
+    actorId?: string,
+  ) {
+    const user = await this.prismaClient.user.update({
       where: { id: userId, workspaceId },
-      data: { role },
+      data: {
+        role: updates.role ?? undefined,
+        phoneNumber: updates.phoneNumber ?? undefined,
+      },
     });
 
     if (actorId) {
       await this.auditService.log({
         workspaceId,
         userId: actorId,
-        action: 'UPDATE_MEMBER_ROLE',
+        action: 'UPDATE_MEMBER',
         resourceType: 'User',
         resourceId: userId,
-        metadata: { role },
+        metadata: { role: updates.role, phoneNumber: updates.phoneNumber },
       });
     }
 

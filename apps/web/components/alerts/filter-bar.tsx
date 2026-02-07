@@ -43,7 +43,7 @@ export function FilterBar({ filters, options, onFiltersChange, onClear }: Filter
     filters.search.length > 0;
 
   return (
-    <div className="bg-zinc-950 border border-red-900/10 rounded-xl p-4 space-y-4">
+    <div className="bg-white border border-stone-200 rounded-xl p-4 space-y-4">
       {/* Search */}
       <div>
         <input
@@ -51,13 +51,13 @@ export function FilterBar({ filters, options, onFiltersChange, onClear }: Filter
           placeholder="Search alerts..."
           value={filters.search}
           onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
-          className="w-full px-4 py-2 rounded-lg bg-black border border-red-900/20 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          className="w-full px-4 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
         />
       </div>
 
       {/* Status Filters */}
       <div>
-        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Status</label>
+        <label className="text-xs font-medium text-stone-500 uppercase tracking-wide">Status</label>
         <div className="flex flex-wrap gap-2 mt-2">
           {options.statuses.map((status) => (
             <button
@@ -66,7 +66,7 @@ export function FilterBar({ filters, options, onFiltersChange, onClear }: Filter
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 filters.status.includes(status)
                   ? 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.3)]'
-                  : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                  : 'bg-white text-stone-500 hover:bg-stone-100 hover:text-stone-900'
               }`}
             >
               {status}
@@ -77,7 +77,7 @@ export function FilterBar({ filters, options, onFiltersChange, onClear }: Filter
 
       {/* Severity Filters */}
       <div>
-        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Severity</label>
+        <label className="text-xs font-medium text-stone-500 uppercase tracking-wide">Severity</label>
         <div className="flex flex-wrap gap-2 mt-2">
           {options.severities.map((severity) => (
             <button
@@ -86,7 +86,7 @@ export function FilterBar({ filters, options, onFiltersChange, onClear }: Filter
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 filters.severity.includes(severity)
                   ? 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.3)]'
-                  : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                  : 'bg-white text-stone-500 hover:bg-stone-100 hover:text-stone-900'
               }`}
             >
               {severity}
@@ -98,7 +98,7 @@ export function FilterBar({ filters, options, onFiltersChange, onClear }: Filter
       {/* Clear Filters */}
       {hasActiveFilters && (
         <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={onClear} className="border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <Button variant="outline" size="sm" onClick={onClear} className="border-stone-200 text-stone-500 hover:bg-stone-100 hover:text-stone-900">
             Clear Filters
           </Button>
         </div>

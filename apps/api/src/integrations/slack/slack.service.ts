@@ -21,7 +21,7 @@ export class SlackService {
     private readonly configService: ConfigService,
     private readonly secretsService: SecretsService,
     private readonly slackOAuth: SlackOAuthService,
-  ) { }
+  ) {}
 
   /**
    * Get or create Slack client for workspace
@@ -48,7 +48,7 @@ export class SlackService {
     try {
       // ✅ SECURE: Get from Secrets Manager instead of .env
       const config = await this.secretsService.getSecretJson<SlackConfig>(
-        `signalcraft/${workspaceId}/slack`
+        `signalcraft/${workspaceId}/slack`,
       );
 
       this.logger.log(`Retrieved Slack config for workspace ${workspaceId}`);
@@ -115,5 +115,59 @@ export class SlackService {
     });
 
     return true;
+  }
+
+  async createWarRoomChannel(
+    workspaceId: string,
+    params: {
+      name: string;
+      topic?: string;
+      inviteEmails?: string[];
+    },
+  ) {
+    const client = await this.getClient(workspaceId);
+
+    const response = await client.conversations.create({
+      name: params.name,
+      is_private: true,
+    });
+
+    const channelId = response.channel?.id;
+    if (!channelId) {
+      throw new Error('Failed to create Slack channel');
+    }
+
+    if (params.topic) {
+      await client.conversations.setTopic({
+        channel: channelId,
+        topic: params.topic,
+      });
+    }
+
+    if (params.inviteEmails?.length) {
+      const userIds: string[] = [];
+      for (const email of params.inviteEmails) {
+        try {
+          const lookup = await client.users.lookupByEmail({ email });
+          if (lookup.user?.id) {
+            userIds.push(lookup.user.id);
+          }
+        } catch (error) {
+          this.logger.warn(`Slack user lookup failed for ${email}`, error as Error);
+        }
+      }
+
+      if (userIds.length) {
+        await client.conversations.invite({
+          channel: channelId,
+          users: userIds.join(','),
+        });
+      }
+    }
+
+    return {
+      channelId,
+      channelName: response.channel?.name ?? params.name,
+    };
   }
 }

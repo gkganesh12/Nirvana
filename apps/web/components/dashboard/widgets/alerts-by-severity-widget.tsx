@@ -19,7 +19,7 @@ const severityColors: Record<string, string> = {
   HIGH: 'bg-orange-500',
   MEDIUM: 'bg-yellow-500',
   LOW: 'bg-blue-500',
-  INFO: 'bg-gray-500',
+  INFO: 'bg-stone-500',
 };
 
 export function AlertsBySeverityWidget({ title, data, loading, error }: AlertsBySeverityWidgetProps) {
@@ -31,19 +31,19 @@ export function AlertsBySeverityWidget({ title, data, loading, error }: AlertsBy
         {data?.map((item) => (
           <div key={item.severity} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-gray-700 dark:text-gray-300">{item.severity}</span>
-              <span className="text-gray-500">{item.count}</span>
+              <span className="font-medium text-stone-700">{item.severity}</span>
+              <span className="text-stone-500">{item.count}</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100 bg-stone-100">
               <div
-                className={`h-full rounded-full ${severityColors[item.severity] || 'bg-gray-500'}`}
+                className={`h-full rounded-full ${severityColors[item.severity] || 'bg-stone-500'}`}
                 style={{ width: `${(item.count / maxCount) * 100}%` }}
               />
             </div>
           </div>
         ))}
         {(!data || data.length === 0) && !loading && !error && (
-            <div className="flex h-full items-center justify-center text-sm text-gray-500">
+            <div className="flex h-full items-center justify-center text-sm text-stone-500">
                 No data available
             </div>
         )}

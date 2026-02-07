@@ -64,7 +64,7 @@ export function AiSuggestionCard({ alertId }: AiSuggestionCardProps) {
   const confidenceColors = {
     high: 'bg-emerald-950/50 text-emerald-400 border-emerald-800/30',
     medium: 'bg-yellow-950/50 text-yellow-400 border-yellow-800/30',
-    low: 'bg-zinc-800 text-zinc-400 border-zinc-700',
+    low: 'bg-stone-100 text-stone-500 border-stone-200',
   };
 
   const confidenceLabels = {
@@ -85,11 +85,11 @@ export function AiSuggestionCard({ alertId }: AiSuggestionCardProps) {
              {confidenceLabels[confidence]}
            </span>
          </div>
-         <p className="text-zinc-200 whitespace-pre-wrap leading-relaxed">
+         <p className="text-stone-700 whitespace-pre-wrap leading-relaxed">
            {suggestion}
          </p>
          <div className="mt-4 pt-4 border-t border-violet-800/30 text-xs text-violet-500">
-           Based on similar resolved alerts in this project
+          Based on similar resolved alerts and recent incident context
          </div>
        </CardContent>
     </Card>

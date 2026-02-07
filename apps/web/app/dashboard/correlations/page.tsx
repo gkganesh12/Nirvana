@@ -27,14 +27,14 @@ export default function CorrelationGroupsPage() {
     }
   }
 
-  if (loading) return <div className="p-12 text-center text-gray-500">Loading correlations...</div>;
+  if (loading) return <div className="p-12 text-center text-stone-500">Loading correlations...</div>;
 
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Correlation Groups</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="text-2xl font-bold text-stone-900">Correlation Groups</h1>
+          <p className="mt-1 text-sm text-stone-500">
              Intelligent grouping of related alerts to reduce noise.
           </p>
         </div>
@@ -42,16 +42,16 @@ export default function CorrelationGroupsPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {groups.map((group) => (
-          <div key={group.id} className="relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+          <div key={group.id} className="relative flex flex-col overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition-all hover:shadow-md">
              <div className="flex flex-1 flex-col p-6">
                 <div className="flex items-start justify-between">
                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                          <Layers className="h-4 w-4" />
                       </div>
                       <div>
-                         <h3 className="font-medium text-gray-900 dark:text-gray-100">Group #{group.id.slice(0, 6)}</h3>
-                         <p className="text-xs text-gray-500">
+                         <h3 className="font-medium text-stone-900">Group #{group.id.slice(0, 6)}</h3>
+                         <p className="text-xs text-stone-500">
                            {formatDistanceToNow(new Date(group.createdAt))}
                          </p>
                       </div>
@@ -63,34 +63,34 @@ export default function CorrelationGroupsPage() {
                 
                 <div className="mt-4 space-y-3">
                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Primary Alert</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-200 truncate max-w-[150px]">
+                      <span className="text-stone-500">Primary Alert</span>
+                      <span className="font-medium text-stone-900 truncate max-w-[150px]">
                         {group.primaryAlertId}
                       </span>
                    </div>
                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Related Alerts</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-200">
+                      <span className="text-stone-500">Related Alerts</span>
+                      <span className="font-medium text-stone-900">
                         {group.relatedAlertIds.length}
                       </span>
                    </div>
                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Confidence</span>
-                      <span className="font-medium text-green-600 dark:text-green-400">
+                      <span className="text-stone-500">Confidence</span>
+                      <span className="font-medium text-emerald-600">
                         {(group.confidenceScore * 100).toFixed(0)}%
                       </span>
                    </div>
                 </div>
                 
                 {group.rootCauseAnalysis && (
-                   <div className="mt-4 rounded-md bg-gray-50 p-3 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                   <div className="mt-4 rounded-md bg-stone-100 p-3 text-xs text-stone-600">
                       <strong>AI Analysis:</strong> {group.rootCauseAnalysis}
                    </div>
                 )}
              </div>
              
-             <div className="bg-gray-50 px-6 py-4 dark:bg-gray-800/50">
-                <Link href={`/dashboard/alerts/${group.primaryAlertId}`} className="flex items-center justify-end text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+             <div className="bg-stone-50 px-6 py-4">
+                <Link href={`/dashboard/alerts/${group.primaryAlertId}`} className="flex items-center justify-end text-sm font-medium text-blue-600 hover:text-blue-500">
                    View Incident <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
              </div>
@@ -98,7 +98,7 @@ export default function CorrelationGroupsPage() {
         ))}
 
         {groups.length === 0 && (
-           <div className="col-span-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center text-gray-500 dark:border-gray-700">
+           <div className="col-span-full rounded-lg border-2 border-dashed border-stone-300 p-12 text-center text-stone-500">
               No correlation groups active.
            </div>
         )}

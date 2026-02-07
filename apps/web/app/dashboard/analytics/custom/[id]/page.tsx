@@ -78,7 +78,7 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
         return <RecentAlertsWidget title={widget.title} data={data as Alert[] | null} loading={false} />;
       default:
         return (
-          <div className="flex h-full items-center justify-center rounded-lg border bg-gray-50 p-4 text-gray-500">
+          <div className="flex h-full items-center justify-center rounded-lg border bg-stone-50 p-4 text-stone-500">
             Unknown Widget Type: {widget.type}
           </div>
         );
@@ -89,8 +89,8 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
-           <p className="text-gray-500">Loading Dashboard...</p>
+           <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-blue-600"></div>
+           <p className="text-stone-500">Loading Dashboard...</p>
         </div>
       </div>
     );
@@ -100,7 +100,7 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
     return (
       <div className="mx-auto max-w-7xl p-6 text-center">
         <h1 className="text-2xl font-bold">Dashboard Not Found</h1>
-        <p className="mt-2 text-gray-500">The dashboard you are looking for does not exist or you do not have permission to view it.</p>
+        <p className="mt-2 text-stone-500">The dashboard you are looking for does not exist or you do not have permission to view it.</p>
         <Link href="/dashboard/analytics/custom" className="mt-4 inline-block text-blue-600 hover:underline">
           &larr; Back to Dashboards
         </Link>
@@ -109,24 +109,24 @@ export default function ViewDashboardPage({ params }: { params: { id: string } }
   }
 
   return (
-    <div className="space-y-6 bg-gray-50/50 p-6 min-h-screen dark:bg-black/20">
+    <div className="space-y-6 bg-stone-50/50 p-6 min-h-screen bg-white/70">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-             <Link href="/dashboard/analytics/custom" className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
-               <ArrowLeft className="h-5 w-5 text-gray-500" />
+             <Link href="/dashboard/analytics/custom" className="rounded-full p-2 hover:bg-stone-100 hover:bg-stone-100">
+               <ArrowLeft className="h-5 w-5 text-stone-500" />
              </Link>
              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{dashboard.name}</h1>
+                <h1 className="text-3xl font-bold text-stone-900">{dashboard.name}</h1>
                 {dashboard.description && (
-                  <p className="mt-1 text-gray-500 dark:text-gray-400">{dashboard.description}</p>
+                  <p className="mt-1 text-stone-500">{dashboard.description}</p>
                 )}
              </div>
           </div>
           <div className="flex items-center gap-3">
              {lastRefreshed && (
-               <span className="text-xs text-gray-400">
+               <span className="text-xs">
                  Updated {formatDistanceToNow(lastRefreshed)}
                </span>
              )}

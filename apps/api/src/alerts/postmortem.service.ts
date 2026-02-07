@@ -5,40 +5,53 @@ import { CorrelationService } from './correlation.service';
 
 @Injectable()
 export class PostmortemService {
-    private readonly logger = new Logger(PostmortemService.name);
+  private readonly logger = new Logger(PostmortemService.name);
 
-    constructor(
-        private readonly aiService: AiService,
-        private readonly correlationService: CorrelationService,
-    ) { }
+  constructor(
+    private readonly aiService: AiService,
+    private readonly correlationService: CorrelationService,
+  ) {}
 
-    /**
-     * Generates a draft postmortem for a resolved alert group.
-     */
-    async generatePostmortem(workspaceId: string, alertGroupId: string) {
-        const group = await prisma.alertGroup.findUnique({
-            where: { id: alertGroupId },
-            include: {
-                alertEvents: {
-                    orderBy: { occurredAt: 'asc' },
-                    take: 10, // First 10 events for context
-                },
-            },
-        });
+  /**
+   * Generates a draft postmortem for a resolved alert group.
+   */
+  async generatePostmortem(workspaceId: string, alertGroupId: string) {
+    const group = await prisma.alertGroup.findFirst({
+      where: { id: alertGroupId, workspaceId },
+      include: {
+        alertEvents: {
+          orderBy: { occurredAt: 'asc' },
+          take: 10, // First 10 events for context
+        },
+      },
+    });
 
-        if (!group) throw new Error('Alert group not found');
-        if (group.status !== 'RESOLVED') throw new Error('Postmortem can only be generated for resolved alerts');
+    if (!group) throw new Error('Alert group not found');
+    if (group.status !== 'RESOLVED')
+      throw new Error('Postmortem can only be generated for resolved alerts');
 
-        // 1. Gather Context
-        const correlatedAlerts = await this.correlationService.getCorrelatedAlerts(workspaceId, alertGroupId);
-        const correlatedTitles = correlatedAlerts.map(a => a.title).join(', ');
+    // 1. Gather Context
+    const correlatedAlerts = await this.correlationService.getCorrelatedAlerts(
+      workspaceId,
+      alertGroupId,
+    );
+    const correlatedTitles = correlatedAlerts.map((a) => a.title).join(', ');
 
-        const durationMins = group.resolvedAt
-            ? Math.round((group.resolvedAt.getTime() - group.createdAt.getTime()) / 60000)
-            : 0;
+    const durationMins = group.resolvedAt
+      ? Math.round((group.resolvedAt.getTime() - group.createdAt.getTime()) / 60000)
+      : 0;
 
-        // 2. Build Prompt for AI
-        const prompt = `
+    const timelineEntries = await prisma.incidentTimelineEntry.findMany({
+      where: { alertGroupId },
+      orderBy: { occurredAt: 'asc' },
+    });
+
+    if (!this.aiService.isEnabled()) {
+      return 'AI not configured.';
+    }
+
+    // 2. Build Prompt for AI
+    const prompt = `
 Generate a concise Incident Postmortem Report for the following resolved alert.
 
 INCIDENT DETAILS:
@@ -54,11 +67,17 @@ RESOLUTION:
 - Resolved By: ${group.lastResolvedBy || 'Unknown'}
 - Notes: ${group.resolutionNotes || 'No notes provided.'}
 
+ACTION ITEMS:
+- Jira: ${group.jiraIssueUrl || 'None'}
+
 CORRELATED ALERTS (Possible Cascading Effects):
 ${correlatedTitles || 'None found.'}
 
 TIMELINE SNAPSHOT (First few events):
-${group.alertEvents.map(e => `- [${e.occurredAt.toISOString()}] ${e.message}`).join('\n')}
+${group.alertEvents.map((e) => `- [${e.occurredAt.toISOString()}] ${e.message}`).join('\n')}
+
+INCIDENT TIMELINE:
+${timelineEntries.map((entry: { occurredAt: Date; title: string; message: string | null }) => `- [${entry.occurredAt.toISOString()}] ${entry.title}${entry.message ? ` — ${entry.message}` : ''}`).join('\n') || 'None'}
 
 OUTPUT FORMAT:
 Please structure the response as Markdown with the following sections:
@@ -69,12 +88,7 @@ Please structure the response as Markdown with the following sections:
 5. **Lessons Learned**: Suggestions to prevent recurrence.
         `;
 
-        // 3. Generate Draft
-        // We reuse callGemini from AiService, but we need to expose a generic method or add a specific one.
-        // For now, I'll assume I can add a method to AiService or reuse an existing one if flexible.
-        // Since AiService is strict about suggestions, I will add a generic 'generateContent' method to AiService in the next step.
-        // For this step, I will use a placeholder call and then modify AiService.
-
-        return this.aiService.generateContent(prompt);
-    }
+    // 3. Generate Draft
+    return this.aiService.generateContent(prompt);
+  }
 }

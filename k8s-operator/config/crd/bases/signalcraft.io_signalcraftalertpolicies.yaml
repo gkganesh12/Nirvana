@@ -1,0 +1,65 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: signalcraftalertpolicies.signalcraft.io
+spec:
+  group: signalcraft.io
+  names:
+    kind: SignalCraftAlertPolicy
+    listKind: SignalCraftAlertPolicyList
+    plural: signalcraftalertpolicies
+    singular: signalcraftalertpolicy
+    shortNames:
+      - scap
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - severity
+                - routing_key
+                - conditions
+              properties:
+                severity:
+                  type: string
+                  description: Alert severity (info, low, medium, high, critical)
+                routing_key:
+                  type: string
+                  description: Routing key for matching rules
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                    properties:
+                      type:
+                        type: string
+                      metric:
+                        type: string
+                      operator:
+                        type: string
+                      value:
+                        type: number
+            status:
+              type: object
+              properties:
+                state:
+                  type: string
+                message:
+                  type: string
+                observedGeneration:
+                  type: integer
+                  format: int64
+                lastSyncedAt:
+                  type: string
+                  format: date-time
+      subresources:
+        status: {}

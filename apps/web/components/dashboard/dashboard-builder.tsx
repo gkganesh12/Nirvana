@@ -147,7 +147,7 @@ export function DashboardBuilder({ dashboardId }: DashboardBuilderProps) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return <RecentAlertsWidget title={widget.title} data={data as any} loading={false} />;
       default:
-        return <div className="p-4 text-center text-gray-500">Unknown Widget Type</div>;
+        return <div className="p-4 text-center text-stone-500">Unknown Widget Type</div>;
     }
   };
 
@@ -175,8 +175,8 @@ export function DashboardBuilder({ dashboardId }: DashboardBuilderProps) {
             </div>
           ) : (
             <>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{name}</h1>
-              <p className="text-gray-500">{description}</p>
+              <h1 className="text-3xl font-bold text-stone-900">{name}</h1>
+              <p className="text-stone-500">{description}</p>
             </>
           )}
         </div>
@@ -206,8 +206,8 @@ export function DashboardBuilder({ dashboardId }: DashboardBuilderProps) {
       </div>
 
       {isEditing && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <p className="mb-3 text-sm font-medium text-gray-900 dark:text-gray-100">Add Component</p>
+        <div className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm border-stone-200 bg-white">
+          <p className="mb-3 text-sm font-medium text-stone-900">Add Component</p>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={() => addWidget('alert_count')}>
               <Activity className="mr-2 h-4 w-4" /> Metric
@@ -223,8 +223,8 @@ export function DashboardBuilder({ dashboardId }: DashboardBuilderProps) {
       )}
 
       {widgets.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-gray-300 p-12 text-center dark:border-gray-700">
-           <p className="text-gray-500">No widgets added. Click above to add some.</p>
+        <div className="rounded-xl border-2 border-dashed border-stone-300 p-12 text-center border-stone-300">
+           <p className="text-stone-500">No widgets added. Click above to add some.</p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

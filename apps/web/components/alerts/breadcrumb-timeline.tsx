@@ -40,10 +40,10 @@ const typeIcons: Record<string, React.ReactNode> = {
 };
 
 const levelColors: Record<string, string> = {
-    debug: 'text-zinc-500 border-zinc-700',
+    debug: 'text-stone-500 border-stone-200',
     info: 'text-blue-400 border-blue-800/30',
     warning: 'text-yellow-400 border-yellow-800/30',
-    error: 'text-red-400 border-red-800/30',
+    error: 'text-red-600 border-red-800/30',
 };
 
 const _levelIcons: Record<string, React.ReactNode> = {
@@ -77,14 +77,14 @@ export function BreadcrumbTimeline({ alertGroupId }: BreadcrumbTimelineProps) {
 
     if (loading) {
         return (
-            <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
-                <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+            <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
+                <h3 className="font-semibold text-stone-900 mb-4 flex items-center gap-2">
                     <Navigation className="w-5 h-5 text-red-500" />
                     Breadcrumb Timeline
                 </h3>
                 <div className="animate-pulse space-y-2">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="h-10 bg-zinc-800/50 rounded-lg"></div>
+                        <div key={i} className="h-10 bg-stone-100/80 rounded-lg"></div>
                     ))}
                 </div>
             </div>
@@ -93,13 +93,13 @@ export function BreadcrumbTimeline({ alertGroupId }: BreadcrumbTimelineProps) {
 
     if (breadcrumbs.length === 0) {
         return (
-            <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
-                <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+            <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
+                <h3 className="font-semibold text-stone-900 mb-4 flex items-center gap-2">
                     <Navigation className="w-5 h-5 text-red-500" />
                     Breadcrumb Timeline
                 </h3>
-                <p className="text-zinc-500 text-sm">No breadcrumbs available for this alert.</p>
-                <p className="text-zinc-600 text-xs mt-1">
+                <p className="text-stone-500 text-sm">No breadcrumbs available for this alert.</p>
+                <p className="text-stone-500 text-xs mt-1">
                     Breadcrumbs show events that occurred before the error.
                 </p>
             </div>
@@ -121,24 +121,24 @@ export function BreadcrumbTimeline({ alertGroupId }: BreadcrumbTimelineProps) {
     }
 
     return (
-        <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6">
+        <div className="bg-white/90 border border-stone-200 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-white flex items-center gap-2">
+                <h3 className="font-semibold text-stone-900 flex items-center gap-2">
                     <Navigation className="w-5 h-5 text-red-500" />
                     Breadcrumb Timeline
                 </h3>
-                <span className="text-xs text-zinc-500">{breadcrumbs.length} events</span>
+                <span className="text-xs text-stone-500">{breadcrumbs.length} events</span>
             </div>
 
             <div className="relative">
                 {/* Timeline line */}
-                <div className="absolute left-[19px] top-0 bottom-0 w-px bg-zinc-800"></div>
+                <div className="absolute left-[19px] top-0 bottom-0 w-px bg-stone-100"></div>
 
                 <div className="space-y-1">
                     {breadcrumbs.map((crumb, index) => (
                         <div key={crumb.id} className="relative flex items-start gap-3 group">
                             {/* Timeline dot */}
-                            <div className={`relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 bg-zinc-950 ${levelColors[crumb.level] || levelColors.info}`}>
+                            <div className={`relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 bg-white ${levelColors[crumb.level] || levelColors.info}`}>
                                 {typeIcons[crumb.type] || typeIcons.default}
                             </div>
 
@@ -146,14 +146,14 @@ export function BreadcrumbTimeline({ alertGroupId }: BreadcrumbTimelineProps) {
                             <div 
                                 className={`flex-1 p-3 rounded-lg border transition-all cursor-pointer ${
                                     index === breadcrumbs.length - 1 
-                                        ? 'bg-red-950/30 border-red-900/30' 
-                                        : 'bg-zinc-800/30 border-white/5 hover:bg-zinc-800/50'
+                                        ? 'bg-red-50 border-red-200' 
+                                        : 'bg-stone-100/70 border-stone-200 hover:bg-stone-100/80'
                                 }`}
                                 onClick={() => crumb.data && toggleExpand(crumb.id)}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs text-zinc-500 font-mono">
+                                        <span className="text-xs text-stone-500 font-mono">
                                             {formatTime(crumb.timestamp)}
                                         </span>
                                         <span className={`px-1.5 py-0.5 text-xs rounded ${levelColors[crumb.level] || ''} bg-opacity-20`}>
@@ -162,7 +162,7 @@ export function BreadcrumbTimeline({ alertGroupId }: BreadcrumbTimelineProps) {
                                         </span>
                                     </div>
                                     {crumb.data && (
-                                        <button className="text-zinc-500 hover:text-white">
+                                        <button className="text-stone-500 hover:text-stone-900">
                                             {expanded[crumb.id] ? (
                                                 <ChevronDown className="w-4 h-4" />
                                             ) : (
@@ -171,11 +171,11 @@ export function BreadcrumbTimeline({ alertGroupId }: BreadcrumbTimelineProps) {
                                         </button>
                                     )}
                                 </div>
-                                <p className="text-sm text-zinc-300 mt-1 line-clamp-2">{crumb.message}</p>
+                                <p className="text-sm text-stone-600 mt-1 line-clamp-2">{crumb.message}</p>
                                 
                                 {/* Expanded data */}
                                 {expanded[crumb.id] && crumb.data && (
-                                    <div className="mt-2 p-2 bg-zinc-950/50 rounded text-xs font-mono text-zinc-400 overflow-x-auto">
+                                    <div className="mt-2 p-2 bg-white/50 rounded text-xs font-mono text-stone-500 overflow-x-auto">
                                         <pre>{JSON.stringify(crumb.data, null, 2)}</pre>
                                     </div>
                                 )}

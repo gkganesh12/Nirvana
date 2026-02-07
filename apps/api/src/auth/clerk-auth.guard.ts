@@ -17,7 +17,9 @@ export class ClerkAuthGuard implements CanActivate {
 
     let jwtKey = process.env.CLERK_JWT_PUBLIC_KEY;
     if (jwtKey?.startsWith('pk_')) {
-      console.warn('CLERK_JWT_PUBLIC_KEY appears to be a Publishable Key (pk_...), ignoring it. Using Secret Key for verification.');
+      console.warn(
+        'CLERK_JWT_PUBLIC_KEY appears to be a Publishable Key (pk_...), ignoring it. Using Secret Key for verification.',
+      );
       jwtKey = undefined;
     }
 
@@ -33,8 +35,9 @@ export class ClerkAuthGuard implements CanActivate {
         jwtKey: jwtKey || undefined,
       });
     } catch (err) {
-      console.error('Token verification failed:', err);
-      throw new UnauthorizedException('Invalid token signature');
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error(`Token verification failed (Issuer: ${issuer}):`, errorMessage);
+      throw new UnauthorizedException(`Invalid token signature: ${errorMessage}`);
     }
 
     if (!verification?.sub) {
@@ -44,9 +47,11 @@ export class ClerkAuthGuard implements CanActivate {
     // Standardize user object on request
     request.user = {
       clerkUserId: verification.sub,
-      clerkId: verification.sub, // Keep both for safety
-      claims: verification
+      clerkId: verification.sub,
+      claims: verification,
+      authType: 'clerk',
     };
+    request.authenticationType = 'clerk';
     return true;
   }
 }

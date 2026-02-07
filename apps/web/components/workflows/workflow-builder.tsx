@@ -111,7 +111,7 @@ export function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
   return (
     <div className="space-y-8 p-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 pb-6 dark:border-gray-800">
+      <div className="flex items-center justify-between border-b border-stone-200 pb-6 border-stone-200">
         <div className="space-y-1">
           <Input 
             value={name} 
@@ -123,7 +123,7 @@ export function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
              value={description}
              onChange={(e) => setDescription(e.target.value)}
              placeholder="Description (optional)"
-             className="text-sm text-gray-500 border-none px-0 h-auto focus-visible:ring-0"
+             className="text-sm text-stone-500 border-none px-0 h-auto focus-visible:ring-0"
           />
         </div>
         <div className="flex gap-3">
@@ -136,14 +136,14 @@ export function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
       </div>
 
       {/* Trigger Section */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-6 dark:border-blue-900/30 dark:bg-blue-900/10">
+      <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-6 border-blue-900/30 bg-blue-900/10">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-            <Zap className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 bg-blue-900">
+            <Zap className="h-6 w-6 text-blue-600 text-blue-400" />
           </div>
           <div className="flex-1 space-y-2">
-             <h3 className="font-semibold text-gray-900 dark:text-gray-100">Trigger: When Alert Created</h3>
-             <p className="text-sm text-gray-500 dark:text-gray-400">
+             <h3 className="font-semibold text-stone-900 text-gray-100">Trigger: When Alert Created</h3>
+             <p className="text-sm text-stone-500 text-stone-500">
                This workflow starts automatically when a new alert matches the criteria.
              </p>
              {/* Configuration inputs for trigger could go here */}
@@ -159,22 +159,22 @@ export function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
         {steps.map((step, index) => (
            <div key={step.id} className="relative">
              {/* Connector Line */}
-             <div className="absolute left-6 -top-4 h-4 w-0.5 bg-gray-200 dark:bg-gray-800"></div>
+             <div className="absolute left-6 -top-4 h-4 w-0.5 bg-stone-200 bg-stone-100"></div>
              
-             <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                   <div className="text-sm font-bold text-gray-500">{index + 1}</div>
+             <div className="flex items-center gap-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm border-stone-200 bg-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-stone-100 bg-stone-100">
+                   <div className="text-sm font-bold text-stone-500">{index + 1}</div>
                 </div>
                 <div className="flex-1">
                    <select 
                       value={step.type}
                       onChange={(e) => updateStep(step.id, { type: e.target.value as WorkflowStep['type'] })}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 sm:text-sm"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-stone-100 border-stone-200 sm:text-sm"
                    >
                      <option value="action">Action</option>
                      <option value="condition">Condition</option>
                    </select>
-                   <div className="mt-2 text-xs text-gray-400">Step details configuration...</div>
+                   <div className="mt-2 text-xs text-stone-500">Step details configuration...</div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => removeStep(step.id)} className="text-red-500 hover:text-red-600">
                   <XCircle className="h-5 w-5" />
@@ -186,12 +186,12 @@ export function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
         {/* Add Step Button */}
         <div className="relative pt-4">
             {steps.length > 0 && (
-               <div className="absolute left-6 -top-4 h-8 w-0.5 bg-gray-200 dark:bg-gray-800"></div>
+               <div className="absolute left-6 -top-4 h-8 w-0.5 bg-stone-200 bg-stone-100"></div>
             )}
             <Button 
                onClick={addStep} 
                variant="outline" 
-               className="w-full border-dashed py-8 text-gray-500 hover:border-blue-500 hover:text-blue-500"
+               className="w-full border-dashed py-8 text-stone-500 hover:border-blue-500 hover:text-blue-500"
             >
               <Plus className="mr-2 h-5 w-5" /> Add Workflow Step
             </Button>

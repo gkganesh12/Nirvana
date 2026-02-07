@@ -3,40 +3,38 @@
 @tailwind utilities;
 
 :root {
-  /* DARK THEME BASE - RED & BLACK */
-  --background: 0 0% 0%;
-  /* #0a0a0a (Almost Black) */
-  --foreground: 0 0% 95%;
-  /* #f2f2f2 (Off White) */
+  /* LIGHT THEME BASE - WARM OFF-WHITE */
+  --background: 39 52% 96%;
+  /* #FBF8F2 */
+  --foreground: 24 9% 11%;
+  /* #1c1917 */
 
-  --card: 0 0% 7%;
-  /* #121212 (Dark Gray) */
-  --card-foreground: 0 0% 95%;
+  --card: 0 0% 100%;
+  --card-foreground: 24 9% 11%;
 
-  --popover: 0 0% 7%;
-  --popover-foreground: 0 0% 95%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 24 9% 11%;
 
   --primary: 0 72% 51%;
-  /* #dc2626 (Red-600) */
+  /* #dc2626 */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 0 0% 12%;
-  /* #1f1f1f */
-  --secondary-foreground: 0 0% 95%;
+  --secondary: 30 10% 94%;
+  /* #F5F1EA */
+  --secondary-foreground: 24 9% 11%;
 
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 60%;
+  --muted: 30 10% 92%;
+  --muted-foreground: 25 7% 35%;
 
-  --accent: 0 0% 15%;
-  --accent-foreground: 0 0% 95%;
+  --accent: 30 12% 90%;
+  --accent-foreground: 24 9% 11%;
 
-  --destructive: 0 62% 30%;
-  --destructive-foreground: 0 0% 95%;
+  --destructive: 0 62% 45%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 0 0% 15%;
-  --input: 0 0% 15%;
+  --border: 30 10% 85%;
+  --input: 30 10% 85%;
   --ring: 0 72% 51%;
-  /* Red Ring */
 
   --radius: 0.5rem;
 }
@@ -45,12 +43,15 @@
   border-color: hsl(var(--border));
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  /* Account for fixed navbar */
+}
+
 body {
   @apply bg-background text-foreground antialiased;
-  /* Subtle red glow in the background */
-  background-image:
-    radial-gradient(circle at top center, rgba(220, 38, 38, 0.15), transparent 40%),
-    radial-gradient(circle at bottom right, rgba(220, 38, 38, 0.05), transparent 40%);
+  background-image: none;
   min-height: 100vh;
 }
 
@@ -92,4 +93,12 @@ main {
   100% {
     transform: translateX(100%);
   }
+}
+
+html.auth-body,
+body.auth-body {
+  background-color: #fbf8f2;
+  color: #1c1917;
+  background-image: none;
+  overscroll-behavior-y: none;
 }

@@ -74,7 +74,7 @@ export function DeleteRuleDialog({ open, onOpenChange, rule, onSuccess }: Delete
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-red-600 hover:bg-red-700 text-stone-900"
           >
             {deleting ? 'Deleting...' : 'Delete Rule'}
           </Button>

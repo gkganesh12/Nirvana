@@ -19,24 +19,24 @@ interface RecentAlertsWidgetProps {
 }
 
 const severityStyles: Record<string, string> = {
-    CRITICAL: 'text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-900/30 border-red-200 dark:border-red-900',
-    HIGH: 'text-orange-700 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30 border-orange-200 dark:border-orange-900',
-    MEDIUM: 'text-yellow-700 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-900',
-    LOW: 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30 border-blue-200 dark:border-blue-900',
-    INFO: 'text-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800 border-gray-200 dark:border-gray-800',
+    CRITICAL: 'bg-red-50 text-red-700 border-red-200',
+    HIGH: 'bg-orange-50 text-orange-700 border-orange-200',
+    MEDIUM: 'bg-amber-50 text-amber-700 border-amber-200',
+    LOW: 'bg-sky-50 text-sky-700 border-sky-200',
+    INFO: 'bg-stone-100 text-stone-600 border-stone-200',
 };
 
 export function RecentAlertsWidget({ title, data, loading, error }: RecentAlertsWidgetProps) {
   return (
     <WidgetWrapper title={title} loading={loading} error={error} className="p-0">
-      <div className="divide-y divide-gray-100 dark:divide-gray-800">
+      <div className="divide-y divide-stone-200">
         {data?.map((alert) => (
           <div key={alert.id} className="flex items-center justify-between py-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="truncate text-sm font-medium text-stone-900">
                 {alert.title}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-stone-500">
                 {formatDistanceToNow(new Date(alert.lastSeenAt))}
               </p>
             </div>
@@ -46,7 +46,7 @@ export function RecentAlertsWidget({ title, data, loading, error }: RecentAlerts
           </div>
         ))}
         {(!data || data.length === 0) && !loading && !error && (
-             <div className="flex h-32 items-center justify-center text-sm text-gray-500">
+             <div className="flex h-32 items-center justify-center text-sm text-stone-500">
                 No recent alerts
             </div>
         )}

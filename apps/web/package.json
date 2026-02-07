@@ -19,6 +19,7 @@
     "@tanstack/react-query": "^5.17.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.24.7",
     "lucide-react": "^0.312.0",
     "next": "^14.1.0",
@@ -27,6 +28,7 @@
     "recharts": "^3.6.0",
     "rrweb": "^2.0.0-alpha.4",
     "rrweb-player": "^1.0.0-alpha.4",
+    "simple-icons": "^16.6.0",
     "socket.io-client": "^4.8.3",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7"

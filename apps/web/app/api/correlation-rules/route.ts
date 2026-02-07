@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const minConfidence = searchParams.get('minConfidence') || '0';
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5050';
         const res = await fetch(
             `${apiUrl}/api/correlation-rules?minConfidence=${minConfidence}`,
             {
@@ -53,7 +53,7 @@ export async function DELETE(request: NextRequest) {
 
     try {
         const { ruleId } = await request.json();
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5050';
         const res = await fetch(`${apiUrl}/api/correlation-rules/${ruleId}`, {
             method: 'DELETE',
             headers: {
@@ -88,7 +88,7 @@ export async function POST(_request: NextRequest) {
     }
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5050';
         const res = await fetch(`${apiUrl}/api/correlation-rules/analyze`, {
             method: 'POST',
             headers: {

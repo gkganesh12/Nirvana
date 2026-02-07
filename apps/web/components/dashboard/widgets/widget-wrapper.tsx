@@ -21,13 +21,13 @@ export function WidgetWrapper({
   onRefresh,
 }: WidgetWrapperProps) {
   return (
-    <div className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900", className)}>
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100">{title}</h3>
+    <div className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm", className)}>
+      <div className="flex items-center justify-between border-b border-stone-200 px-4 py-3">
+        <h3 className="font-medium text-stone-900">{title}</h3>
         {onRefresh && (
           <button
             onClick={onRefresh}
-            className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="rounded p-1 hover:bg-stone-100 hover:text-stone-500"
             title="Refresh"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -39,7 +39,7 @@ export function WidgetWrapper({
       <div className="flex-1 overflow-auto p-4">
         {loading ? (
           <div className="flex h-full items-center justify-center">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-stone-300 border-t-blue-600"></div>
           </div>
         ) : error ? (
           <div className="flex h-full items-center justify-center text-center">

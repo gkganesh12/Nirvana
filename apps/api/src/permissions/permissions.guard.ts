@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PermissionsService, ResourceName, RESOURCES } from './permissions.service';
-import { PermissionAction } from '@signalcraft/database';
+import { PermissionAction, prisma } from '@signalcraft/database';
 
 export const PERMISSION_KEY = 'required_permission';
 
@@ -42,10 +42,20 @@ export class PermissionsGuard implements CanActivate {
         }
 
         const request = context.switchToHttp().getRequest();
-        const userId = request.auth?.userId;
+        let user = request.dbUser;
+
+        if (!user) {
+            const clerkId = request.user?.clerkId;
+            if (clerkId) {
+                user = await prisma.user.findUnique({ where: { clerkId } });
+                request.dbUser = user;
+            }
+        }
+
+        const userId = user?.id;
 
         if (!userId) {
-            throw new ForbiddenException('Authentication required');
+            throw new ForbiddenException('User session required for permission check');
         }
 
         const result = await this.permissionsService.checkPermission(

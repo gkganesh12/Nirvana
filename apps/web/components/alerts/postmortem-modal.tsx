@@ -41,33 +41,33 @@ export function PostmortemModal({ alertGroupId, className }: PostmortemModalProp
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className={`border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white ${className}`} size="sm">
+        <Button variant="outline" className={`border-stone-200 text-stone-600 hover:bg-stone-100 hover:text-stone-900 ${className}`} size="sm">
           <FileText className="mr-2 h-4 w-4" />
           Generate Postmortem
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col bg-zinc-950 border-white/10 text-white">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col bg-white border-stone-200 text-stone-900">
         <DialogHeader>
-          <DialogTitle className="text-white">Incident Postmortem</DialogTitle>
-          <DialogDescription className="text-zinc-400">
+          <DialogTitle className="text-stone-900">Incident Postmortem</DialogTitle>
+          <DialogDescription className="text-stone-500">
             AI-generated analysis of the incident lifecycle, root cause, and learnings.
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto min-h-[300px] p-4 bg-zinc-900/50 rounded-md border border-white/5 text-sm">
+        <div className="flex-1 overflow-y-auto min-h-[300px] p-4 bg-white/90 rounded-md border border-stone-200 text-sm">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <Spinner />
-              <p className="text-zinc-500 animate-pulse">Analyzing incident data...</p>
+              <p className="text-stone-500 animate-pulse">Analyzing incident data...</p>
             </div>
           ) : report ? (
-            <div className="prose prose-sm prose-invert max-w-none whitespace-pre-wrap font-mono text-zinc-300">
+            <div className="prose prose-sm prose-invert max-w-none whitespace-pre-wrap font-mono text-stone-600">
               {report}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-              <Button onClick={generateReport} className="bg-red-600 hover:bg-red-700 text-white">Generate Draft Report</Button>
-              <p className="text-xs text-zinc-500">
+              <Button onClick={generateReport} className="bg-red-600 hover:bg-red-700 text-stone-900">Generate Draft Report</Button>
+              <p className="text-xs text-stone-500">
                 Uses AI to summarize events, correlations, and resolutions.
               </p>
             </div>
@@ -76,7 +76,7 @@ export function PostmortemModal({ alertGroupId, className }: PostmortemModalProp
 
         {report && (
           <div className="flex justify-end gap-2 mt-4">
-             <Button variant="outline" onClick={copyToClipboard} className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+             <Button variant="outline" onClick={copyToClipboard} className="border-stone-200 text-stone-600 hover:bg-stone-100">
                Copy Markdown
              </Button>
              <Button onClick={() => setIsOpen(false)} className="bg-red-600 hover:bg-red-700">Close</Button>

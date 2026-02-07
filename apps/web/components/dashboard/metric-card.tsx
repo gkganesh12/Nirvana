@@ -22,9 +22,9 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   const getTrendColor = () => {
-    if (!trend || trend === 'same') return 'text-gray-500';
+    if (!trend || trend === 'same') return 'text-stone-500';
     // For some metrics, up is bad (alerts), for others up is good (ack rate)
-    return trend === 'up' ? 'text-emerald-500' : 'text-red-500';
+    return trend === 'up' ? 'text-emerald-600' : 'text-red-600';
   };
 
   const getTrendIcon = () => {
@@ -35,22 +35,22 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl bg-zinc-950 border border-red-900/10 p-6 shadow-sm hover:shadow-[0_0_20px_rgba(220,38,38,0.1)] hover:border-red-500/30 transition-all duration-300',
+        'relative overflow-hidden rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-lg shadow-stone-900/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl',
         className
       )}
     >
       <div className="absolute inset-0 overflow-hidden rounded-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/10 to-transparent -translate-x-full animate-scan" />
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-amber-400/10 to-transparent animate-scan" />
       </div>
       <div className="relative flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-zinc-400">{title}</p>
+          <p className="text-sm font-medium text-stone-500">{title}</p>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-white">{value}</span>
-            {suffix && <span className="text-sm text-zinc-500">{suffix}</span>}
+            <span className="text-3xl font-bold text-stone-900">{value}</span>
+            {suffix && <span className="text-sm text-stone-500">{suffix}</span>}
           </div>
           {description && (
-            <p className="mt-1 text-xs text-zinc-500">{description}</p>
+            <p className="mt-1 text-xs text-stone-500">{description}</p>
           )}
         </div>
         
